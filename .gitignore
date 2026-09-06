@@ -1,0 +1,6 @@
+# Build packages
+*.apg
+
+# Build directories
+src/
+pkg/
