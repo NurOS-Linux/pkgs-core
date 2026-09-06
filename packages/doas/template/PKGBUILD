@@ -1,0 +1,45 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=doas
+pkgver=6.8.2
+pkgrel=1
+pkgdesc="Execute commands as another user (OpenDoas port)"
+arch=('x86_64')
+url="https://github.com/Duncaen/OpenDoas"
+license=('ISC' 'BSD-2-Clause')
+depends=('glibc' 'linux-pam')
+source=("https://github.com/Duncaen/OpenDoas/releases/download/v${pkgver}/opendoas-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/opendoas-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/opendoas-${pkgver}"
+
+  ./configure \
+      --prefix=/usr \
+      --sysconfdir=/etc \
+      --bindir=/usr/bin \
+      --with-pam \
+      --with-timestamp
+
+  make
+}
+
+package() {
+  cd "${srcdir}/opendoas-${pkgver}"
+
+  make DESTDIR="${pkgdir}" BINOWN="$(id -u)" BINGRP="$(id -g)" install
+
+  install -dm755 "${pkgdir}/etc"
+  cat > "${pkgdir}/etc/doas.conf" << 'EOF'
+# Permit users in group wheel to run commands as root
+permit :wheel
+EOF
+  chmod 600 "${pkgdir}/etc/doas.conf"
+}
