@@ -1,0 +1,56 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=util-linux
+pkgver=2.42.3
+pkgrel=1
+pkgdesc="Essential miscellaneous system utilities for Linux"
+arch=('x86_64')
+url="https://github.com/util-linux/util-linux"
+license=('GPL-2.0-or-later' 'LGPL-2.1-or-later' 'BSD-3-Clause')
+depends=('glibc' 'linux-pam' 'zlib')
+source=("https://www.kernel.org/pub/linux/utils/util-linux/v2.42/util-linux-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+      --prefix=/usr \
+      --sysconfdir=/etc \
+      --bindir=/usr/bin \
+      --sbindir=/usr/bin \
+      --localstatedir=/var \
+      --disable-chfn-chsh \
+      --disable-login \
+      --disable-nologin \
+      --disable-su \
+      --disable-setpriv \
+      --disable-runuser \
+      --disable-pylibmount \
+      --disable-use-tty-group \
+      --disable-makeinstall-chown \
+      --disable-makeinstall-setuid \
+      --without-python \
+      --without-systemd \
+      --without-systemdsystemunitdir
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+
+  if [ -d "${pkgdir}/usr/sbin" ]; then
+    mv "${pkgdir}/usr/sbin"/* "${pkgdir}/usr/bin/"
+    rmdir "${pkgdir}/usr/sbin"
+  fi
+}
