@@ -1,0 +1,48 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=sudo
+pkgver=1.9.17p2
+pkgrel=1
+pkgdesc="Give certain users the ability to run some commands as root"
+arch=('x86_64')
+url="https://www.sudo.ws/"
+license=('ISC' 'BSD-3-Clause')
+depends=('glibc' 'linux-pam' 'zlib')
+source=("https://www.sudo.ws/dist/sudo-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+      --prefix=/usr \
+      --sysconfdir=/etc \
+      --sbindir=/usr/bin \
+      --libexecdir=/usr/lib \
+      --with-pam \
+      --without-selinux \
+      --with-logpath=/var/log/sudo.log \
+      --with-rundir=/run/sudo \
+      --with-vardir=/var/db/sudo \
+      --with-env-editor
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" INSTALL_OWNER="" install
+
+  if [ -d "${pkgdir}/usr/sbin" ]; then
+    mv "${pkgdir}/usr/sbin"/* "${pkgdir}/usr/bin/"
+    rmdir "${pkgdir}/usr/sbin"
+  fi
+}
