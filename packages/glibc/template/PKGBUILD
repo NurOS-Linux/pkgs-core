@@ -1,0 +1,81 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=glibc
+pkgver=2.44
+pkgrel=1
+pkgdesc="GNU C Library for NurOS Juldyz"
+arch=('x86_64')
+url="https://www.gnu.org/software/libc"
+license=('GPL-2.0-or-later' 'LGPL-2.1-or-later')
+depends=('linux-api-headers>=4.10')
+makedepends=('bison' 'gawk' 'gcc' 'make' 'sed' 'python')
+backup=(
+  'etc/locale.gen'
+  'etc/gai.conf'
+)
+install=glibc.install
+source=(
+  "https://ftp.gnu.org/gnu/glibc/glibc-${pkgver}.tar.xz"
+  "locale.gen.txt"
+  "locale-gen"
+)
+
+prepare() {
+  local glibc_dir="${srcdir}/glibc-${pkgver}"
+  if [ ! -d "${glibc_dir}" ]; then
+    echo "Error: ${glibc_dir} not found in ${srcdir}" >&2
+    return 1
+  fi
+
+  mkdir -p "${srcdir}/build"
+}
+
+build() {
+  cd "${srcdir}/build"
+
+  echo "rootsbindir=/usr/sbin" > configparms
+
+  "${srcdir}/glibc-${pkgver}/configure" \
+      --prefix=/usr \
+      --disable-profile \
+      --enable-kernel=5.10 \
+      --enable-stack-protector=strong \
+      --enable-bind-now \
+      --disable-nscd \
+      libc_cv_slibdir=/usr/lib
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/build"
+
+  make DESTDIR="${pkgdir}" install
+
+  local files_dir="${startdir}/../files"
+  [ -d "${files_dir}" ] || files_dir="${startdir}"
+
+  rm -f "${pkgdir}"/etc/ld.so.cache
+  rm -f "${pkgdir}"/usr/bin/{tzselect,zdump,zic}
+  sed '/RTLDLIST=/s@/usr@@g' -i "${pkgdir}/usr/bin/ldd"
+
+  install -dm755 "${pkgdir}/etc"
+  if [ -f "${srcdir}/glibc-${pkgver}/posix/gai.conf" ]; then
+    install -m644 "${srcdir}/glibc-${pkgver}/posix/gai.conf" "${pkgdir}/etc/gai.conf"
+  fi
+
+  install -Dm755 "${files_dir}/locale-gen" "${pkgdir}/usr/bin/locale-gen"
+  install -m644 "${files_dir}/locale.gen.txt" "${pkgdir}/etc/locale.gen"
+  if [ -f "${srcdir}/glibc-${pkgver}/localedata/SUPPORTED" ]; then
+    sed -e '1,3d' -e 's|/| |g' -e 's|\\| |g' -e 's|^|#|g' \
+      "${srcdir}/glibc-${pkgver}/localedata/SUPPORTED" >> "${pkgdir}/etc/locale.gen"
+  fi
+
+  case "${CARCH}" in
+    x86_64)
+      install -dm755 "${pkgdir}/lib64"
+      ln -sf /usr/lib/ld-linux-x86-64.so.2 "${pkgdir}/lib64/ld-linux-x86-64.so.2"
+      ln -sf /usr/lib/ld-linux-x86-64.so.2 "${pkgdir}/lib64/ld-lsb-x86-64.so.3"
+      ;;
+  esac
+}

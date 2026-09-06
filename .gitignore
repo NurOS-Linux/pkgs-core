@@ -1,6 +1,13 @@
-# Build packages
+# APG packages
 *.apg
 
 # Build directories
-src/
-pkg/
+**/src/
+**/pkg/
+
+# Downloaded source archives
+*.tar.*
+*.tgz
+*.tbz2
+*.txz
+*.zip
