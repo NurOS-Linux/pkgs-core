@@ -1,0 +1,28 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=apgbuild
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Converter of Arch Linux PKGBUILD packages into APGv2 format"
+arch=('x86_64')
+url="https://git.nuros.org/utils/apgbuild"
+license=('GPL-3.0-or-later')
+depends=('bash' 'gcc-libs' 'glibc' 'xz' 'zstd')
+makedepends=('cargo')
+source=("https://git.nuros.org/utils/apgbuild/archive/v${pkgver}.tar.gz")
+
+prepare() {
+  cd "${srcdir}/${pkgname}"
+  cargo fetch --locked
+}
+
+build() {
+  cd "${srcdir}/${pkgname}"
+  cargo build --frozen --release
+}
+
+package() {
+  cd "${srcdir}/${pkgname}"
+  install -Dm755 "target/release/${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
+  install -Dm644 "README.md" "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+}
