@@ -1,0 +1,55 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=linux-pam
+pkgver=1.7.2
+pkgrel=1
+pkgdesc="Pluggable Authentication Modules for Linux"
+arch=('x86_64')
+url="https://github.com/linux-pam/linux-pam"
+license=('BSD-3-Clause' 'GPL-2.0-or-later')
+depends=('glibc')
+provides=('pam')
+source=("https://github.com/linux-pam/linux-pam/releases/download/v${pkgver}/Linux-PAM-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/Linux-PAM-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/Linux-PAM-${pkgver}"
+
+  meson setup build \
+      --prefix=/usr \
+      --sysconfdir=/etc \
+      --sbindir=/usr/bin \
+      -Ddocs=disabled \
+      -Dselinux=disabled \
+      -Daudit=disabled \
+      -Dnis=disabled \
+      -Deconf=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/Linux-PAM-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+
+  install -dm755 "${pkgdir}/etc/pam.d"
+  cat > "${pkgdir}/etc/pam.d/other" << 'EOF'
+auth     required pam_deny.so
+auth     required pam_warn.so
+account  required pam_deny.so
+account  required pam_warn.so
+password required pam_deny.so
+password required pam_warn.so
+session  required pam_deny.so
+session  required pam_warn.so
+EOF
+  chmod 644 "${pkgdir}/etc/pam.d/other"
+}
