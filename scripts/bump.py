@@ -12,21 +12,34 @@ from typing import Dict, List, Optional, Tuple
 USER_AGENT = "NurOS-PkgBumper/1.0"
 
 
-def parse_pkgbuild(pkgbuild_path: str) -> Dict[str, str]:
+def parse_pkgbuild(pkgbuild_path: str) -> Dict[str, any]:
     data = {}
     if not os.path.isfile(pkgbuild_path):
         return data
 
     with open(pkgbuild_path, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            m = re.match(r"^([a-zA-Z0-9_]+)=(.*)$", line)
-            if m:
-                key, val = m.group(1), m.group(2)
-                val = val.strip("'\"")
-                data[key] = val
+        content = f.read()
+
+    for line in content.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        m = re.match(r"^([a-zA-Z0-9_]+)=(.*)$", line)
+        if m:
+            key, val = m.group(1), m.group(2)
+            val = val.strip("'\"")
+            data[key] = val
+
+    provides_list = []
+    m_prov = re.search(r"provides=\(([^)]*)\)", content)
+    if m_prov:
+        raw_items = re.findall(r"['\"]([^'\"]+)['\"]|(\S+)", m_prov.group(1))
+        for q, u in raw_items:
+            item = (q or u).split("=")[0].strip()
+            if item and not item.endswith(".so"):
+                provides_list.append(item)
+    data["provides"] = provides_list
+
     return data
 
 
@@ -128,7 +141,7 @@ def bump_pkgbuild(pkgbuild_path: str, new_version: str) -> bool:
     return False
 
 
-def scan_packages(base_dir: str) -> List[Dict[str, str]]:
+def scan_packages(base_dir: str) -> List[Dict[str, any]]:
     pkgs = []
     packages_dir = os.path.join(base_dir, "packages")
     if not os.path.isdir(packages_dir):
@@ -148,7 +161,8 @@ def scan_packages(base_dir: str) -> List[Dict[str, str]]:
                     "pkgname": vars_dict.get("pkgname", entry),
                     "pkgver": vars_dict.get("pkgver", ""),
                     "pkgrel": vars_dict.get("pkgrel", "1"),
-                    "pkgbuild_path": pkgbuild_path,
+                    "provides": vars_dict.get("provides", []),
+                    "path": pkgbuild_path,
                 }
             )
     return pkgs
@@ -156,17 +170,15 @@ def scan_packages(base_dir: str) -> List[Dict[str, str]]:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Check and bump package versions in NurOS pkgs-core using Repology"
+        description="NurOS core packages version checker & bumper via Repology"
+    )
+    parser.add_argument(
+        "-p", "--package", help="Target specific package name (directory name)"
     )
     parser.add_argument(
         "--bump",
         choices=["latest", "next"],
-        help="Bump package version: 'latest' (highest release) or 'next' (immediate next release)",
-    )
-    parser.add_argument(
-        "--package",
-        "-p",
-        help="Check or bump a specific package only",
+        help="Bump mode: 'latest' (to newest upstream) or 'next' (to immediate next version)",
     )
     args = parser.parse_args()
 
@@ -176,7 +188,7 @@ def main():
     if args.package:
         packages = [p for p in packages if p["name"] == args.package]
         if not packages:
-            print(f"Error: package '{args.package}' not found in packages/", file=sys.stderr)
+            print(f"Error: package '{args.package}' not found", file=sys.stderr)
             sys.exit(1)
 
     print(f"Scanning {len(packages)} package(s)...\n")
@@ -184,38 +196,47 @@ def main():
     for pkg in packages:
         name = pkg["name"]
         curr_ver = pkg["pkgver"]
-        pkgbuild = pkg["pkgbuild_path"]
+        candidates = [pkg["pkgname"]] + [p for p in pkg["provides"] if p != pkg["pkgname"]]
 
-        print(f"[{name}] Current: {curr_ver}")
+        latest = None
+        all_versions = []
 
-        latest_ver, all_versions = get_repology_versions(name)
-        if not latest_ver:
-            print(f"  Repology: no data found for '{name}'\n")
-            continue
+        for cand in candidates:
+            cand_latest, cand_all = get_repology_versions(cand)
+            if not cand_latest:
+                continue
+            if split_version(cand_latest) >= split_version(curr_ver):
+                latest = cand_latest
+                all_versions = cand_all
+                break
+            if not latest or split_version(cand_latest) > split_version(latest):
+                latest = cand_latest
+                all_versions = cand_all
 
         next_ver = find_next_version(curr_ver, all_versions)
 
-        print(f"  Repology latest: {latest_ver}")
-        if next_ver and next_ver != latest_ver:
+        print(f"[{name}] Current: {curr_ver}")
+        if latest:
+            print(f"  Repology latest: {latest}")
+        if next_ver:
             print(f"  Repology next:   {next_ver}")
+        if not latest and not next_ver:
+            print(f"  Repology: no data found for '{name}'")
 
-        target_ver = None
-        if args.bump == "latest":
-            if split_version(latest_ver) > split_version(curr_ver):
-                target_ver = latest_ver
+        if args.bump:
+            target_version = latest if args.bump == "latest" else next_ver
+            if not target_version:
+                print(f"  -> No target version available to bump to.")
+            elif target_version == curr_ver:
+                print(f"  -> Package is already at version {curr_ver}.")
             else:
-                print(f"  Status: up to date ({curr_ver})")
-        elif args.bump == "next":
-            if next_ver:
-                target_ver = next_ver
-            else:
-                print(f"  Status: up to date (no next version)")
-
-        if target_ver:
-            if bump_pkgbuild(pkgbuild, target_ver):
-                print(f"  -> BUMPED: {curr_ver} -> {target_ver} (pkgrel reset to 1)")
-            else:
-                print(f"  -> Failed to update {pkgbuild}")
+                success = bump_pkgbuild(pkg["path"], target_version)
+                if success:
+                    print(
+                        f"  -> BUMPED {curr_ver}-{pkg['pkgrel']} -> {target_version}-1 in {pkg['path']}"
+                    )
+                else:
+                    print(f"  -> Failed to update {pkg['path']}", file=sys.stderr)
 
         print()
 
