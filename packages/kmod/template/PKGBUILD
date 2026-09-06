@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=kmod
+pkgver=34.2
+pkgrel=1
+pkgdesc="Linux kernel module management tools and libraries"
+arch=('x86_64')
+url="https://git.kernel.org/pub/scm/utils/kernel/kmod/kmod.git"
+license=('GPL-2.0-or-later' 'LGPL-2.1-or-later')
+depends=('glibc' 'zstd' 'xz' 'zlib')
+provides=('libkmod.so')
+source=("https://www.kernel.org/pub/linux/utils/kernel/kmod/kmod-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  meson setup build \
+      --prefix=/usr \
+      --sysconfdir=/etc \
+      --sbindir=/usr/bin \
+      -Dopenssl=disabled \
+      -Dzstd=enabled \
+      -Dxz=enabled \
+      -Dzlib=enabled \
+      -Dmanpages=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
