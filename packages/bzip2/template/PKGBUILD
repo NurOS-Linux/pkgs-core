@@ -1,0 +1,62 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=bzip2
+pkgver=1.0.8
+pkgrel=1
+pkgdesc="High-quality data compression program and library"
+arch=('x86_64')
+url="https://sourceware.org/bzip2/"
+license=('bzip2-1.0.6')
+depends=('glibc' 'bash')
+provides=('libbz2.so')
+source=(
+  "https://sourceware.org/pub/bzip2/bzip2-${pkgver}.tar.gz"
+  "bzip2.pc"
+)
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make -f Makefile-libbz2_so
+  make clean
+  make bzip2 bzip2recover
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  local files_dir="${startdir}/../files"
+  [ -d "${files_dir}" ] || files_dir="${startdir}"
+
+  install -dm755 "${pkgdir}/usr/bin"
+  install -dm755 "${pkgdir}/usr/lib"
+  install -dm755 "${pkgdir}/usr/include"
+  install -dm755 "${pkgdir}/usr/share/man/man1"
+
+  install -m755 bzip2-shared "${pkgdir}/usr/bin/bzip2"
+  install -m755 bzip2recover bzdiff bzgrep bzmore "${pkgdir}/usr/bin/"
+  ln -sf bzip2 "${pkgdir}/usr/bin/bunzip2"
+  ln -sf bzip2 "${pkgdir}/usr/bin/bzcat"
+
+  cp -a libbz2.so* "${pkgdir}/usr/lib/"
+  ln -sf libbz2.so.${pkgver} "${pkgdir}/usr/lib/libbz2.so"
+  ln -sf libbz2.so.${pkgver} "${pkgdir}/usr/lib/libbz2.so.1"
+
+  install -m644 bzlib.h "${pkgdir}/usr/include/bzlib.h"
+
+  install -m644 bzip2.1 "${pkgdir}/usr/share/man/man1/bzip2.1"
+  ln -sf bzip2.1 "${pkgdir}/usr/share/man/man1/bunzip2.1"
+  ln -sf bzip2.1 "${pkgdir}/usr/share/man/man1/bzcat.1"
+  ln -sf bzip2.1 "${pkgdir}/usr/share/man/man1/bzip2recover.1"
+
+  install -Dm644 "${files_dir}/bzip2.pc" "${pkgdir}/usr/lib/pkgconfig/bzip2.pc"
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
