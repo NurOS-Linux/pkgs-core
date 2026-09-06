@@ -1,0 +1,48 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=e2fsprogs
+pkgver=1.47.4
+pkgrel=1
+pkgdesc="Ext2/3/4 filesystem userspace utilities"
+arch=('x86_64')
+url="https://e2fsprogs.sourceforge.net/"
+license=('GPL-2.0-or-later' 'LGPL-2.0-or-later' 'MIT')
+depends=('glibc' 'util-linux')
+source=("https://www.kernel.org/pub/linux/kernel/people/tytso/e2fsprogs/v${pkgver}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+      --prefix=/usr \
+      --sysconfdir=/etc \
+      --bindir=/usr/bin \
+      --sbindir=/usr/bin \
+      --enable-elf-shlibs \
+      --disable-libblkid \
+      --disable-libuuid \
+      --disable-fsck \
+      --disable-uuidd
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  make DESTDIR="${pkgdir}" install-libs
+
+  if [ -d "${pkgdir}/usr/sbin" ]; then
+    mv "${pkgdir}/usr/sbin"/* "${pkgdir}/usr/bin/"
+    rmdir "${pkgdir}/usr/sbin"
+  fi
+}
