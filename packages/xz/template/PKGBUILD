@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=xz
+pkgver=5.8.3
+pkgrel=1
+pkgdesc="Library and command line tools for XZ and LZMA compressed files"
+arch=('x86_64')
+url="https://tukaani.org/xz/"
+license=('GPL-2.0-or-later' 'LGPL-2.1-or-later' '0BSD')
+depends=('glibc' 'bash')
+provides=('liblzma.so')
+source=("https://github.com/tukaani-project/xz/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+      --prefix=/usr \
+      --disable-static \
+      --docdir="/usr/share/doc/${pkgname}"
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
