@@ -1,0 +1,48 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=eudev
+pkgver=3.2.14
+pkgrel=1
+pkgdesc="Standalone device and uevent management daemon"
+arch=('x86_64')
+url="https://github.com/eudev-project/eudev"
+license=('GPL-2.0-or-later' 'LGPL-2.1-or-later')
+depends=('glibc' 'kmod')
+provides=('udev')
+source=("https://github.com/eudev-project/eudev/releases/download/v${pkgver}/eudev-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+      --prefix=/usr \
+      --sysconfdir=/etc \
+      --bindir=/usr/bin \
+      --sbindir=/usr/bin \
+      --enable-split-usr=no \
+      --enable-kmod \
+      --enable-hwdb \
+      --disable-selinux \
+      --disable-static
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+
+  if [ -d "${pkgdir}/usr/sbin" ]; then
+    mv "${pkgdir}/usr/sbin"/* "${pkgdir}/usr/bin/"
+    rmdir "${pkgdir}/usr/sbin"
+  fi
+}
