@@ -1,0 +1,36 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=zstd
+pkgver=1.5.7
+pkgrel=1
+pkgdesc="Zstandard - Fast real-time compression algorithm"
+arch=('x86_64')
+url="https://facebook.github.io/zstd/"
+license=('BSD-3-Clause' 'GPL-2.0-only')
+depends=('glibc' 'zlib' 'xz' 'liblzma.so')
+provides=('libzstd.so')
+source=("https://github.com/facebook/zstd/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make -j"$(nproc)" PREFIX=/usr
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr DESTDIR="${pkgdir}" install
+
+  rm -f "${pkgdir}/usr/lib/libzstd.a"
+
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
