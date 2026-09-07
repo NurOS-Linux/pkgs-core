@@ -25,9 +25,11 @@ build() {
     --prefix=/usr \
     --enable-shared \
     --with-system-expat=no \
+    --with-openssl=/usr \
     --without-ensurepip
 
   make
+  make sharedmods
 }
 
 package() {
