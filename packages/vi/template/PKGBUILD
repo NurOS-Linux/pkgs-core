@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=vi
+pkgver=20
+pkgrel=1
+pkgdesc="Small and capable vi clone"
+arch=('x86_64')
+url="https://github.com/aligrudi/neatvi"
+license=('ISC')
+depends=('glibc')
+provides=('neatvi')
+source=("https://github.com/aligrudi/neatvi/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/neatvi-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/neatvi-${pkgver}"
+
+  make
+}
+
+package() {
+  cd "${srcdir}/neatvi-${pkgver}"
+
+  install -dm755 "${pkgdir}/usr/bin"
+  install -m755 vi "${pkgdir}/usr/bin/vi"
+}
