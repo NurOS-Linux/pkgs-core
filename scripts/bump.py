@@ -7,9 +7,13 @@ import re
 import sys
 import urllib.error
 import urllib.request
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 USER_AGENT = "NurOS-PkgBumper/1.0"
+VALID_STATUSES = {"newest", "outdated", "legacy", "untrusted"}
+IGNORE_STATUSES = {"incorrect", "ignored", "noscheme", "unique", "devel", "rolling"}
+
+_REPOLOGY_CACHE: Dict[str, List[dict]] = {}
 
 
 def parse_pkgbuild(pkgbuild_path: str) -> Dict[str, any]:
@@ -27,11 +31,11 @@ def parse_pkgbuild(pkgbuild_path: str) -> Dict[str, any]:
         m = re.match(r"^([a-zA-Z0-9_]+)=(.*)$", line)
         if m:
             key, val = m.group(1), m.group(2)
-            val = val.strip("'\"")
+            val = val.split("#")[0].strip().strip("'\"")
             data[key] = val
 
     provides_list = []
-    m_prov = re.search(r"provides=\(([^)]*)\)", content)
+    m_prov = re.search(r"provides=\s*\((.*?)\)", content, re.DOTALL)
     if m_prov:
         raw_items = re.findall(r"['\"]([^'\"]+)['\"]|(\S+)", m_prov.group(1))
         for q, u in raw_items:
@@ -43,8 +47,15 @@ def parse_pkgbuild(pkgbuild_path: str) -> Dict[str, any]:
     return data
 
 
+def normalize_version(v: str) -> str:
+    v = v.strip().lstrip("v")
+    v = v.replace("_p", "p").replace(".p", "p")
+    return v
+
+
 def split_version(version: str) -> List[Tuple[int, str]]:
-    chunks = re.findall(r"(\d+|[a-zA-Z]+)", version)
+    v = normalize_version(version)
+    chunks = re.findall(r"(\d+|[a-zA-Z]+)", v)
     parsed = []
     for chunk in chunks:
         if chunk.isdigit():
@@ -70,51 +81,127 @@ def is_valid_release_version(v: str) -> bool:
     return True
 
 
-def get_repology_versions(project_name: str) -> Tuple[Optional[str], List[str]]:
+def fetch_repology_project(project_name: str) -> List[dict]:
+    if project_name in _REPOLOGY_CACHE:
+        return _REPOLOGY_CACHE[project_name]
+
     url = f"https://repology.org/api/v1/project/{project_name}"
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
 
     try:
         with urllib.request.urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode("utf-8"))
+            _REPOLOGY_CACHE[project_name] = data
+            return data
     except urllib.error.HTTPError as e:
         if e.code == 404:
-            return None, []
+            _REPOLOGY_CACHE[project_name] = []
+            return []
         raise
     except Exception:
-        return None, []
+        _REPOLOGY_CACHE[project_name] = []
+        return []
 
-    newest_candidates = set()
+
+def analyze_repology_project(project_name: str) -> Tuple[Set[str], Set[str]]:
+    data = fetch_repology_project(project_name)
+    newest_versions = set()
     all_clean_versions = set()
 
     for entry in data:
-        status = entry.get("status")
-        version = entry.get("version")
-        if not version or not is_valid_release_version(version):
+        status = entry.get("status", "")
+        version = entry.get("version", "")
+        if not version or status in IGNORE_STATUSES:
+            continue
+        if not is_valid_release_version(version):
             continue
 
-        all_clean_versions.add(version)
+        if status in VALID_STATUSES:
+            all_clean_versions.add(version)
         if status == "newest":
-            newest_candidates.add(version)
+            newest_versions.add(version)
 
-    sorted_all = sort_versions(list(all_clean_versions))
+    return newest_versions, all_clean_versions
+
+
+def score_candidate(
+    curr_ver: str,
+    pkgname: str,
+    cand_name: str,
+    newest: Set[str],
+    all_versions: Set[str],
+) -> int:
+    if not all_versions and not newest:
+        return -1
+
+    norm_curr = normalize_version(curr_ver)
+    norm_all = {normalize_version(v) for v in all_versions}
+    norm_newest = {normalize_version(v) for v in newest}
+
+    score = 0
+    if norm_curr in norm_newest:
+        score += 1500
+    elif norm_curr in norm_all:
+        score += 1000
+
+    if newest:
+        score += 100
+
+    if cand_name == pkgname:
+        score += 10
+
+    return score
+
+
+def resolve_project_versions(
+    pkgname: str,
+    curr_ver: str,
+    provides: List[str],
+) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+    candidates = [pkgname] + [p for p in provides if p != pkgname]
+
+    best_cand = None
+    best_score = -1
+    best_newest: Set[str] = set()
+    best_all: Set[str] = set()
+
+    for cand in candidates:
+        newest, all_vers = analyze_repology_project(cand)
+        score = score_candidate(curr_ver, pkgname, cand, newest, all_vers)
+        if score > best_score:
+            best_score = score
+            best_cand = cand
+            best_newest = newest
+            best_all = all_vers
+
+    if not best_cand or best_score < 0:
+        return None, None, None
+
+    sorted_newest = sort_versions(list(best_newest))
+    sorted_all = sort_versions(list(best_all))
+
     official_latest = None
-    if newest_candidates:
-        official_latest = sort_versions(list(newest_candidates))[-1]
+    if sorted_newest:
+        norm_curr = normalize_version(curr_ver)
+        matching = [v for v in sorted_newest if normalize_version(v) == norm_curr]
+        if matching:
+            official_latest = curr_ver
+        else:
+            official_latest = sorted_newest[-1]
     elif sorted_all:
         official_latest = sorted_all[-1]
 
-    return official_latest, sorted_all
+    next_ver = None
+    if official_latest and split_version(official_latest) > split_version(curr_ver):
+        newer_candidates = [
+            v for v in sorted_newest if split_version(v) > split_version(curr_ver)
+        ]
+        if newer_candidates:
+            next_ver = newer_candidates[0]
+        else:
+            next_ver = official_latest
 
-
-def find_next_version(current: str, all_versions: List[str]) -> Optional[str]:
-    sorted_vers = sort_versions(all_versions)
-    curr_key = split_version(current)
-
-    for v in sorted_vers:
-        if split_version(v) > curr_key:
-            return v
-    return None
+    return best_cand, official_latest, next_ver
 
 
 def bump_pkgbuild(pkgbuild_path: str, new_version: str) -> bool:
@@ -196,26 +283,13 @@ def main():
     for pkg in packages:
         name = pkg["name"]
         curr_ver = pkg["pkgver"]
-        candidates = [pkg["pkgname"]] + [p for p in pkg["provides"] if p != pkg["pkgname"]]
 
-        latest = None
-        all_versions = []
+        matched_cand, latest, next_ver = resolve_project_versions(
+            pkg["pkgname"], curr_ver, pkg["provides"]
+        )
 
-        for cand in candidates:
-            cand_latest, cand_all = get_repology_versions(cand)
-            if not cand_latest:
-                continue
-            if split_version(cand_latest) >= split_version(curr_ver):
-                latest = cand_latest
-                all_versions = cand_all
-                break
-            if not latest or split_version(cand_latest) > split_version(latest):
-                latest = cand_latest
-                all_versions = cand_all
-
-        next_ver = find_next_version(curr_ver, all_versions)
-
-        print(f"[{name}] Current: {curr_ver}")
+        cand_info = f" (via {matched_cand})" if matched_cand and matched_cand != name else ""
+        print(f"[{name}]{cand_info} Current: {curr_ver}")
         if latest:
             print(f"  Repology latest: {latest}")
         if next_ver:
@@ -226,8 +300,8 @@ def main():
         if args.bump:
             target_version = latest if args.bump == "latest" else next_ver
             if not target_version:
-                print(f"  -> No target version available to bump to.")
-            elif target_version == curr_ver:
+                print("  -> No target version available to bump to.")
+            elif normalize_version(target_version) == normalize_version(curr_ver):
                 print(f"  -> Package is already at version {curr_ver}.")
             else:
                 success = bump_pkgbuild(pkg["path"], target_version)
