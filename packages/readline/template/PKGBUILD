@@ -1,0 +1,36 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=readline
+pkgver=8.3
+pkgrel=1
+pkgdesc="GNU readline library"
+arch=('x86_64')
+url="https://tiswww.case.edu/php/chet/readline/rltop.html"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'ncurses')
+source=("https://ftp.gnu.org/gnu/readline/readline-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static \
+    --with-curses
+
+  make SHLIB_LIBS="-lncursesw"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" SHLIB_LIBS="-lncursesw" install
+}
