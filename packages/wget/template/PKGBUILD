@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=wget
+pkgver=1.25.0
+pkgrel=1
+pkgdesc="Network utility to retrieve files from the Web"
+arch=('x86_64')
+url="https://www.gnu.org/software/wget/"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'openssl' 'zlib')
+source=("https://ftp.gnu.org/gnu/wget/wget-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+      --prefix=/usr \
+      --sysconfdir=/etc \
+      --with-ssl=openssl \
+      --with-zlib \
+      --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt \
+      --disable-nls
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
