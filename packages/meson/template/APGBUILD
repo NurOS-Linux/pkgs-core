@@ -1,0 +1,30 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=meson
+pkgver=1.12.0
+pkgrel=1
+pkgdesc="High productivity build system"
+arch=('any')
+url="https://mesonbuild.com/"
+license=('Apache-2.0')
+depends=('python' 'ninja')
+source=("https://github.com/mesonbuild/meson/releases/download/${pkgver}/meson-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  # Pure python package, standard wheel build or direct setup
+  :
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  python3 setup.py install --root="${pkgdir}" --prefix=/usr --optimize=1
+}
