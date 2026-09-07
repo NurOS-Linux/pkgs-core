@@ -1,0 +1,46 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gcc
+pkgver=16.2.0
+pkgrel=1
+pkgdesc="The GNU Compiler Collection - C and C++ frontends"
+arch=('x86_64')
+url="https://gcc.gnu.org/"
+license=('GPL-3.0-or-later' 'LGPL-3.0-or-later')
+depends=('glibc' 'binutils' 'gmp' 'mpfr' 'mpc' 'isl' 'zlib' 'zstd')
+source=("https://ftp.gnu.org/gnu/gcc/gcc-${pkgver}/gcc-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  mkdir -p build
+  cd build
+
+  ../configure \
+    --prefix=/usr \
+    --disable-multilib \
+    --enable-languages=c,c++ \
+    --enable-default-pie \
+    --enable-default-ssp \
+    --disable-bootstrap \
+    --with-system-zlib
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}/build"
+
+  make DESTDIR="${pkgdir}" install
+  ln -sf gcc "${pkgdir}/usr/bin/cc"
+  ln -sf g++ "${pkgdir}/usr/bin/c++"
+  ln -sf ../bin/cpp "${pkgdir}/usr/lib/cpp"
+}
