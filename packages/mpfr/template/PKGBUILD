@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=mpfr
+pkgver=4.2.2
+pkgrel=1
+pkgdesc="Multiple-precision floating-point library"
+arch=('x86_64')
+url="https://www.mpfr.org/"
+license=('LGPL-3.0-or-later')
+depends=('glibc' 'gmp')
+source=("https://ftp.gnu.org/gnu/mpfr/mpfr-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static \
+    --enable-thread-safe \
+    --docdir=/usr/share/doc/mpfr-${pkgver}
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
