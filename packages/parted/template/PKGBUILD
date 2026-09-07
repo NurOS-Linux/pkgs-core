@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=parted
+pkgver=3.7
+pkgrel=1
+pkgdesc="A program for creating, destroying, resizing, checking and copying partitions"
+arch=('x86_64')
+url="https://www.gnu.org/software/parted/parted.html"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'util-linux' 'readline')
+source=("https://ftp.gnu.org/gnu/parted/parted-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sbindir=/usr/bin \
+    --disable-static \
+    --disable-device-mapper
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
