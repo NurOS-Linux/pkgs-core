@@ -25,15 +25,14 @@ build() {
     --prefix=/usr \
     --enable-shared \
     --with-system-expat=no \
-    --with-openssl=/usr \
+    --with-openssl \
     --without-ensurepip
 
-  # In chroot/cross environments, checksharedmods attempts to run tests that fail without full runtime env and renames modules to _failed.
-  make checksharedmods=:
+  make
 }
 
 package() {
   cd "${srcdir}/Python-${pkgver}"
 
-  make checksharedmods=: DESTDIR="${pkgdir}" install
+  make DESTDIR="${pkgdir}" install
 }
