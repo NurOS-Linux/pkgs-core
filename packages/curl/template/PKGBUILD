@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=curl
+pkgver=8.22.0
+pkgrel=1
+pkgdesc="Command line tool and library for transferring data with URLs"
+arch=('x86_64')
+url="https://curl.se/"
+license=('curl')
+depends=('glibc' 'openssl' 'zlib' 'zstd')
+source=("https://curl.se/download/curl-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+      --prefix=/usr \
+      --mandir=/usr/share/man \
+      --with-openssl \
+      --with-zlib \
+      --with-zstd \
+      --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt \
+      --disable-manual \
+      --disable-ldap \
+      --disable-ldaps
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
