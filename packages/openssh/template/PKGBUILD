@@ -8,7 +8,8 @@ arch=('x86_64')
 url="https://www.openssh.com/portable.html"
 license=('SSH-OpenSSH')
 depends=('glibc' 'openssl' 'zlib' 'linux-pam')
-source=("https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${pkgver}.tar.gz")
+install=openssh.install
+source=("https://cloudflare.cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${pkgver}.tar.gz")
 
 prepare() {
   local dir="${srcdir}/${pkgname}-${pkgver}"
@@ -22,14 +23,16 @@ build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
   ./configure \
-      --prefix=/usr \
-      --sysconfdir=/etc/ssh \
-      --sbindir=/usr/bin \
-      --with-ssl-dir=/usr \
-      --with-pam \
-      --with-privsep-path=/var/empty
+    --prefix=/usr \
+    --sysconfdir=/etc/ssh \
+    --sbindir=/usr/bin \
+    --libexecdir=/usr/lib/ssh \
+    --with-ssl-dir=/usr \
+    --with-pam \
+    --with-privsep-path=/var/empty \
+    --with-privsep-user=nobody
 
-  make -j"$(nproc)"
+  make
 }
 
 package() {
@@ -38,4 +41,8 @@ package() {
   make DESTDIR="${pkgdir}" install-nokeys
 
   install -dm755 "${pkgdir}/var/empty"
+
+  local files_dir="${startdir}/../files"
+  [ -d "${files_dir}" ] || files_dir="${startdir}"
+  install -Dm644 "${files_dir}/sshd.pam" "${pkgdir}/etc/pam.d/sshd"
 }
