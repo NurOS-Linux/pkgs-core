@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ninja
+pkgver=1.13.2
+pkgrel=1
+pkgdesc="Small build system with a focus on speed"
+arch=('x86_64')
+url="https://ninja-build.org/"
+license=('Apache-2.0')
+depends=('glibc')
+makedepends=('python')
+source=("https://github.com/ninja-build/ninja/archive/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  # Bootstrap ninja using Python
+  python3 configure.py --bootstrap
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 ninja "${pkgdir}/usr/bin/ninja"
+}
