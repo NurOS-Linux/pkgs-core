@@ -28,11 +28,12 @@ build() {
     --with-openssl=/usr \
     --without-ensurepip
 
-  LD_LIBRARY_PATH="${PWD}:/usr/lib" make
+  # In chroot/cross environments, checksharedmods attempts to run tests that fail without full runtime env and renames modules to _failed.
+  make checksharedmods=:
 }
 
 package() {
   cd "${srcdir}/Python-${pkgver}"
 
-  LD_LIBRARY_PATH="${PWD}:/usr/lib" make DESTDIR="${pkgdir}" install
+  make checksharedmods=: DESTDIR="${pkgdir}" install
 }
