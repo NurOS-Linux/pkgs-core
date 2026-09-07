@@ -1,0 +1,36 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=isl
+pkgver=0.28
+pkgrel=1
+pkgdesc="An Integer Set Library for the polyhedral model"
+arch=('x86_64')
+url="https://libisl.sourceforge.io/"
+license=('MIT')
+depends=('glibc' 'gmp')
+source=("https://libisl.sourceforge.io/isl-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static \
+    --docdir=/usr/share/doc/isl-${pkgver}
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
