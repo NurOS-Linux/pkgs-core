@@ -1,0 +1,67 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=base
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="NurOS minimal base system"
+pkgtype=misc
+arch=('all')
+url="https://nuros.org"
+license=('GPL-3.0-or-later')
+tags=('base' 'system' 'core')
+depends=(
+  # Filesystem hierarchy and core system data
+  'filesystem'
+  'iana-etc'
+  'tzdata'
+  'ca-certificates'
+
+  # Core runtime libraries
+  'glibc'
+  'libxcrypt'
+  'libcap'
+  'openssl'
+  'zlib'
+  'zstd'
+  'xz'
+  'bzip2'
+
+  # Service manager and init
+  'openrc'
+
+  # Process and user management, core utilities
+  'shadow'
+  'util-linux'
+  'coreutils'
+  'findutils'
+  'grep'
+  'sed'
+  'gawk'
+  'file'
+  'tar'
+  'procps-ng'
+  'less'
+  'ncurses'
+  'readline'
+
+  # Shell
+  'bash'
+
+  # Device management and kernel module support
+  'kmod'
+  'eudev'
+
+  # Storage and filesystems
+  'e2fsprogs'
+  'dosfstools'
+
+  # Networking
+  'iproute2'
+  'iputils'
+  'dhcpcd'
+)
+
+package() {
+  # Meta-package: does not install binaries directly
+  :
+}
