@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gmp
+pkgver=6.3.0
+pkgrel=1
+pkgdesc="A free library for arbitrary precision arithmetic"
+arch=('x86_64')
+url="https://gmplib.org/"
+license=('LGPL-3.0-or-later' 'GPL-2.0-or-later')
+depends=('glibc')
+source=("https://ftp.gnu.org/gnu/gmp/gmp-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --enable-cxx \
+    --disable-static \
+    --docdir=/usr/share/doc/gmp-${pkgver}
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
