@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ntpsec
+pkgver=1.2.5
+pkgrel=1
+pkgdesc="A secure, hardened, and improved implementation of Network Time Protocol"
+arch=('x86_64')
+url="https://www.ntpsec.org/"
+license=('BSD-2-Clause')
+depends=('glibc' 'openssl' 'libcap')
+source=("https://ftp.ntpsec.org/pub/releases/ntpsec-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./waf configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --sbindir=/usr/bin \
+    --disable-doc \
+    --disable-manpage
+
+  ./waf build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./waf install --destdir="${pkgdir}"
+}
