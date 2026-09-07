@@ -20,6 +20,12 @@ prepare() {
   if [ ! -d "${dir}" ]; then
     if [ -d "${srcdir}/${pkgname}-${pkgver}" ]; then
       mv "${srcdir}/${pkgname}-${pkgver}" "${dir}"
+    elif [ -d "${srcdir}/tulpar" ]; then
+      mv "${srcdir}/tulpar" "${dir}"
+    elif [ -d "${srcdir}/Tulpar" ]; then
+      mv "${srcdir}/Tulpar" "${dir}"
+    elif [ -d "${srcdir}/Tulpar-${pkgver}" ]; then
+      mv "${srcdir}/Tulpar-${pkgver}" "${dir}"
     else
       echo "Error: ${dir} not found" >&2
       return 1
