@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=rsyslog
+pkgver=8.2608.0
+pkgrel=1
+pkgdesc="An enhanced, multi-threaded syslog daemon"
+arch=('x86_64')
+url="https://www.rsyslog.com/"
+license=('GPL-3.0-or-later' 'LGPL-3.0-or-later' 'Apache-2.0')
+depends=('glibc' 'zlib')
+source=("https://github.com/rsyslog/rsyslog/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  autoreconf -fi || true
+  ./configure \
+    --prefix=/usr \
+    --sbindir=/usr/bin \
+    --sysconfdir=/etc \
+    --disable-libfastjson \
+    --disable-libestr \
+    --disable-uuid \
+    --disable-gnutls \
+    --disable-libgcrypt
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
