@@ -1,0 +1,50 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ncurses
+pkgver=6.6
+pkgrel=1
+pkgdesc="System V Release 4.0 curses emulation library"
+arch=('x86_64')
+url="https://invisible-island.net/ncurses/"
+license=('X11')
+depends=('glibc')
+source=("https://invisible-mirror.net/archives/ncurses/ncurses-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --mandir=/usr/share/man \
+    --with-shared \
+    --without-debug \
+    --without-ada \
+    --without-normal \
+    --enable-widec \
+    --enable-pc-files \
+    --with-pkg-config-libdir=/usr/lib/pkgconfig
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+
+  for lib in ncurses form panel menu; do
+    echo "INPUT(-l${lib}w)" > "${pkgdir}/usr/lib/lib${lib}.so"
+    ln -sf ${lib}w.pc "${pkgdir}/usr/lib/pkgconfig/${lib}.pc"
+  done
+
+  echo "INPUT(-lncursesw)" > "${pkgdir}/usr/lib/libcursesw.so"
+  echo "INPUT(-lncursesw)" > "${pkgdir}/usr/lib/libcurses.so"
+}
