@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=dash
+pkgver=0.5.13.5
+pkgrel=1
+pkgdesc="POSIX-compliant Unix shell, much smaller than GNU bash"
+arch=('x86_64')
+url="http://gondor.apana.org.au/~herbert/dash/"
+license=('BSD-3-Clause')
+depends=('glibc')
+provides=('dash-shell' 'sh')
+source=("http://gondor.apana.org.au/~herbert/dash/files/dash-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+      --prefix=/usr \
+      --bindir=/usr/bin \
+      --mandir=/usr/share/man
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
