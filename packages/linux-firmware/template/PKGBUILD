@@ -1,0 +1,25 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=linux-firmware
+pkgver=20260810
+pkgrel=1
+pkgdesc="Firmware files for Linux"
+arch=('any')
+url="https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git"
+license=('custom')
+depends=()
+source=("https://mirrors.edge.kernel.org/pub/linux/kernel/firmware/linux-firmware-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" FIRMWAREDIR=/usr/lib/firmware install
+}
