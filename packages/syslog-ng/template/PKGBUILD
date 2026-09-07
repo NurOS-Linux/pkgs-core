@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=syslog-ng
+pkgver=4.12.0
+pkgrel=1
+pkgdesc="Next generation syslog daemon for Linux"
+arch=('x86_64')
+url="https://www.syslog-ng.com/"
+license=('GPL-2.0-or-later' 'LGPL-2.1-or-later')
+depends=('glibc' 'openssl')
+source=("https://github.com/syslog-ng/syslog-ng/releases/download/syslog-ng-${pkgver}/syslog-ng-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc/syslog-ng \
+    --localstatedir=/var/lib/syslog-ng \
+    --sbindir=/usr/bin \
+    --disable-python \
+    --disable-java \
+    --disable-systemd
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
