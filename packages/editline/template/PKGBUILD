@@ -1,0 +1,36 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=editline
+pkgver=20260512.3.1
+pkgrel=1
+pkgdesc="Port of NetBSD Editline library (libedit)"
+arch=('x86_64')
+url="https://thrysoee.dk/editline/"
+license=('BSD-3-Clause')
+depends=('glibc' 'ncurses')
+provides=('libedit')
+source=("https://thrysoee.dk/editline/libedit-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/libedit-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/libedit-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static
+
+  make
+}
+
+package() {
+  cd "${srcdir}/libedit-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
