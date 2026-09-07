@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=dosfstools
+pkgver=4.2
+pkgrel=1
+pkgdesc="DOS filesystem utilities (mkfs.vfat, fsck.vfat)"
+arch=('x86_64')
+url="https://github.com/dosfstools/dosfstools"
+license=('GPL-3.0-or-later')
+depends=('glibc')
+source=("https://github.com/dosfstools/dosfstools/releases/download/v${pkgver}/dosfstools-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sbindir=/usr/bin \
+    --mandir=/usr/share/man \
+    --docdir=/usr/share/doc/dosfstools-${pkgver} \
+    --enable-compat-symlinks
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
