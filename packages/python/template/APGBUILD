@@ -28,12 +28,11 @@ build() {
     --with-openssl=/usr \
     --without-ensurepip
 
-  make
-  make sharedmods
+  LD_LIBRARY_PATH="${PWD}:/usr/lib" make
 }
 
 package() {
   cd "${srcdir}/Python-${pkgver}"
 
-  make DESTDIR="${pkgdir}" install
+  LD_LIBRARY_PATH="${PWD}:/usr/lib" make DESTDIR="${pkgdir}" install
 }
