@@ -8,6 +8,7 @@ arch=('x86_64')
 url="https://github.com/seccomp/libseccomp"
 license=('LGPL-2.1-only')
 depends=('glibc')
+makedepends=('gperf')
 source=("https://github.com/seccomp/libseccomp/releases/download/v${pkgver}/libseccomp-${pkgver}.tar.gz")
 
 prepare() {
