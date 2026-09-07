@@ -239,7 +239,9 @@ def scan_packages(base_dir: str) -> List[Dict[str, any]]:
         if not os.path.isdir(pkg_path):
             continue
 
-        pkgbuild_path = os.path.join(pkg_path, "template", "PKGBUILD")
+        pkgbuild_path = os.path.join(pkg_path, "template", "APGBUILD")
+        if not os.path.isfile(pkgbuild_path):
+            pkgbuild_path = os.path.join(pkg_path, "template", "PKGBUILD")
         if os.path.isfile(pkgbuild_path):
             vars_dict = parse_pkgbuild(pkgbuild_path)
             pkgs.append(
