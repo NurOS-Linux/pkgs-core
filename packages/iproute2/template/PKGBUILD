@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=iproute2
+pkgver=7.2.0
+pkgrel=1
+pkgdesc="IP routing and network configuration utilities"
+arch=('x86_64')
+url="https://wiki.linuxfoundation.org/networking/iproute2"
+license=('GPL-2.0-only')
+depends=('glibc')
+source=("https://mirrors.kernel.org/pub/linux/utils/net/iproute2/iproute2-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure --color auto
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" SBINDIR=/usr/bin install
+}
