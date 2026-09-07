@@ -1,0 +1,46 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=perl
+pkgver=5.44.0
+pkgrel=1
+pkgdesc="Practical Extraction and Report Language"
+arch=('x86_64')
+url="https://www.perl.org/"
+license=('GPL-1.0-or-later' 'Artistic-1.0-Perl')
+depends=('glibc' 'zlib' 'bzip2')
+source=("https://www.cpan.org/src/5.0/perl-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  sh Configure -des \
+    -Dprefix=/usr \
+    -Dvendorprefix=/usr \
+    -Dprivlib=/usr/share/perl5/core_perl \
+    -Darchlib=/usr/lib/perl5/5.44/core_perl \
+    -Dsitelib=/usr/share/perl5/site_perl \
+    -Dsitearch=/usr/lib/perl5/5.44/site_perl \
+    -Dvendorlib=/usr/share/perl5/vendor_perl \
+    -Dvendorarch=/usr/lib/perl5/5.44/vendor_perl \
+    -Dman1dir=/usr/share/man/man1 \
+    -Dman3dir=/usr/share/man/man3 \
+    -Dpager="/usr/bin/less -isR" \
+    -Duseshrplib \
+    -Dusethreads
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
