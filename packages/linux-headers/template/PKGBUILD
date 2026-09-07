@@ -1,0 +1,25 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=linux-headers
+pkgver=7.2.3
+pkgrel=1
+pkgdesc="Headers and API files from the Linux kernel"
+arch=('x86_64')
+url="https://www.kernel.org/"
+license=('GPL-2.0-only')
+depends=()
+source=("https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-${pkgver}.tar.xz")
+
+build() {
+  cd "${srcdir}/linux-${pkgver}"
+
+  make mrproper
+  make headers
+}
+
+package() {
+  cd "${srcdir}/linux-${pkgver}"
+
+  make INSTALL_HDR_PATH="${pkgdir}/usr" headers_install
+  find "${pkgdir}/usr/include" \( -name .install -o -name ..install.cmd \) -delete
+}
