@@ -1,0 +1,31 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=efibootmgr
+pkgver=18
+pkgrel=1
+pkgdesc="Linux user-space application to modify the EFI Boot Manager"
+arch=('x86_64')
+url="https://github.com/rhboot/efibootmgr"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'efivar')
+source=("https://github.com/rhboot/efibootmgr/releases/download/${pkgver}/efibootmgr-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make EFIDIR=nuros sbindir=/usr/bin
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make EFIDIR=nuros sbindir=/usr/bin DESTDIR="${pkgdir}" install
+}
