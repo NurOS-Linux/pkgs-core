@@ -1,0 +1,35 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gperf
+pkgver=3.3
+pkgrel=1
+pkgdesc="Perfect hash function generator"
+arch=('x86_64')
+url="https://www.gnu.org/software/gperf/"
+license=('GPL-3.0-or-later')
+depends=('glibc')
+source=("https://ftp.gnu.org/gnu/gperf/gperf-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --docdir=/usr/share/doc/gperf-${pkgver}
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
