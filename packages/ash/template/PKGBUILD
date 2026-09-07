@@ -22,17 +22,15 @@ prepare() {
     return 1
   fi
 
+  local files_dir="${startdir}/../files"
+  [ -d "${files_dir}" ] || files_dir="${startdir}"
+
   cd "${dir}"
   cp -r "${srcdir}/bltin" .
   cp "${srcdir}/histedit.h" .
   patch -Np1 -i "${srcdir}/ash-${pkgver}-current.patch"
   patch -Np1 -i "${srcdir}/ash-${pkgver}-linux.patch"
-
-  sed -i '/sysctl\.h/d' eval.c
-  sed -i 's/sys_siglist\[st\]/strsignal(st)/g' jobs.c
-  sed -i 's/sys_siglist\[\([^]]*\)\]/sigabbrev_np(\1)/g' bltin/kill.c
-  sed -i 's/sys_signame\[\([^]]*\)\]/(sigabbrev_np(\1) ? sigabbrev_np(\1) : "")/g' trap.c
-  sed -i '/define sys_signame sys_siglist/d' trap.c
+  patch -Np1 -i "${files_dir}/glibc-compat.patch"
 }
 
 build() {
