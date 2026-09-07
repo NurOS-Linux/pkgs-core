@@ -1,0 +1,46 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=helix
+pkgver=25.07.1
+pkgrel=1
+pkgdesc="Post-modern modal text editor"
+arch=('x86_64')
+url="https://helix-editor.com/"
+license=('MPL-2.0')
+depends=('glibc' 'gcc-libs')
+provides=('helix-editor')
+source=("https://github.com/helix-editor/helix/releases/download/${pkgver}/helix-${pkgver}-source.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/helix-term"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}"
+
+  export CARGO_HOME="${srcdir}/cargo"
+  cargo build --release --locked
+}
+
+package() {
+  cd "${srcdir}"
+
+  install -dm755 "${pkgdir}/usr/lib/helix"
+  install -m755 target/release/hx "${pkgdir}/usr/lib/helix/hx"
+
+  install -dm755 "${pkgdir}/usr/bin"
+  ln -sf ../lib/helix/hx "${pkgdir}/usr/bin/hx"
+  ln -sf ../lib/helix/hx "${pkgdir}/usr/bin/helix"
+
+  local runtime_dir="${pkgdir}/usr/lib/helix/runtime"
+  install -dm755 "${runtime_dir}/grammars"
+  cp -r runtime/queries "${runtime_dir}/"
+  cp -r runtime/themes "${runtime_dir}/"
+  find runtime/grammars -type f -name '*.so' -exec \
+    install -m755 {} "${runtime_dir}/grammars/" \;
+  install -m644 runtime/tutor "${runtime_dir}/tutor"
+}
