@@ -1,0 +1,51 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libapg
+pkgver=2.3.0
+pkgrel=1
+pkgdesc="Package management library for NurOS"
+arch=('x86_64')
+url="https://git.nuros.org/core/libAPG"
+license=('GPL-3.0-only')
+depends=('glibc' 'libarchive' 'lmdb' 'libsodium' 'libseccomp')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://git.nuros.org/core/libAPG/archive/v${pkgver}.zip")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}"
+  if [ ! -d "${dir}" ]; then
+    if [ -d "${srcdir}/libAPG" ]; then
+      mv "${srcdir}/libAPG" "${dir}"
+    else
+      echo "Error: ${dir} not found" >&2
+      return 1
+    fi
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}"
+
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --libdir=/usr/lib \
+    --buildtype=release \
+    -Dkeyring_dir=/etc/apg/trusted.d \
+    -Dkeys_dir=/etc/apg/keys \
+    -Dtmp_dir=/tmp/apg \
+    -Dcxx_bindings=enabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+
+  # Ensure default directories exist
+  install -dm755 "${pkgdir}/etc/apg/trusted.d"
+  install -dm700 "${pkgdir}/etc/apg/keys"
+  install -dm755 "${pkgdir}/var/lib/apg"
+}
