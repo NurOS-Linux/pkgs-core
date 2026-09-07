@@ -1,0 +1,51 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ash
+pkgver=5.1
+pkgrel=1
+pkgdesc="NetBSD Almquist Shell ported to Linux"
+arch=('x86_64')
+url="http://www.netbsd.org/"
+license=('BSD-3-Clause')
+depends=('glibc')
+source=(
+  "https://api.opensuse.org/public/source/shells/ash/ash-${pkgver}.tar.bz2"
+  "https://api.opensuse.org/public/source/shells/ash/ash-${pkgver}-bltin.tar.gz"
+  "https://api.opensuse.org/public/source/shells/ash/ash-${pkgver}-current.patch"
+  "https://api.opensuse.org/public/source/shells/ash/ash-${pkgver}-linux.patch"
+)
+
+prepare() {
+  local dir="${srcdir}/sh-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  cp -r "${srcdir}/bltin" .
+  cp "${srcdir}/histedit.h" .
+  patch -Np1 -i "${srcdir}/ash-${pkgver}-current.patch"
+  patch -Np1 -i "${srcdir}/ash-${pkgver}-linux.patch"
+
+  sed -i '/sysctl\.h/d' eval.c
+  sed -i 's/sys_siglist\[st\]/strsignal(st)/g' jobs.c
+  sed -i 's/sys_siglist\[\([^]]*\)\]/sigabbrev_np(\1)/g' bltin/kill.c
+  sed -i 's/sys_signame\[\([^]]*\)\]/(sigabbrev_np(\1) ? sigabbrev_np(\1) : "")/g' trap.c
+  sed -i '/define sys_signame sys_siglist/d' trap.c
+}
+
+build() {
+  cd "${srcdir}/sh-${pkgver}"
+
+  make -f Makefile.linux
+}
+
+package() {
+  cd "${srcdir}/sh-${pkgver}"
+
+  install -dm755 "${pkgdir}/usr/bin"
+  install -m755 ash "${pkgdir}/usr/bin/ash"
+  install -dm755 "${pkgdir}/usr/share/man/man1"
+  install -m644 sh.1 "${pkgdir}/usr/share/man/man1/ash.1"
+}
