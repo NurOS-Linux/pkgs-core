@@ -1,0 +1,35 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libsodium
+pkgver=1.0.22
+pkgrel=1
+pkgdesc="A modern, easy-to-use software library for encryption, decryption, signatures, password hashing and more"
+arch=('x86_64')
+url="https://libsodium.org/"
+license=('ISC')
+depends=('glibc')
+source=("https://download.libsodium.org/libsodium/releases/libsodium-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
