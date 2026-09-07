@@ -1,0 +1,47 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=binutils
+pkgver=2.47
+pkgrel=1
+pkgdesc="A set of programs to assemble and manipulate binary and object files"
+arch=('x86_64')
+url="https://www.gnu.org/software/binutils/"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'zlib' 'zstd')
+source=("https://ftp.gnu.org/gnu/binutils/binutils-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  mkdir -p build
+  cd build
+
+  ../configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --enable-gold \
+    --enable-ld=default \
+    --enable-plugins \
+    --enable-shared \
+    --disable-werror \
+    --enable-64-bit-bfd \
+    --with-system-zlib \
+    --with-zstd
+
+  make tooldir=/usr
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}/build"
+
+  make tooldir=/usr DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}"/usr/lib/lib{bfd,ctf,ctf-nobfd,gprofng,opcodes,sframe}.a
+}
