@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ca-certificates
+pkgver=20260816
+pkgrel=1
+pkgdesc="Common CA certificates and certificate management utility"
+arch=('any')
+url="https://salsa.debian.org/debian/ca-certificates"
+license=('MPL-2.0' 'GPL-2.0-or-later')
+depends=('glibc')
+source=("http://deb.debian.org/debian/pool/main/c/ca-certificates/ca-certificates_${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}"
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}"
+
+  make DESTDIR="${pkgdir}" install
+
+  install -dm755 "${pkgdir}/usr/bin"
+  mv "${pkgdir}/usr/sbin/update-ca-certificates" "${pkgdir}/usr/bin/"
+  rmdir "${pkgdir}/usr/sbin"
+
+  install -dm755 "${pkgdir}/etc/ssl/certs"
+  cat "${pkgdir}/usr/share/ca-certificates/mozilla"/*.crt > "${pkgdir}/etc/ssl/certs/ca-certificates.crt"
+  ln -sf certs/ca-certificates.crt "${pkgdir}/etc/ssl/cert.pem"
+}
