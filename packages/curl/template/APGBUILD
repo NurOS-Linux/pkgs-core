@@ -27,6 +27,7 @@ build() {
       --with-openssl \
       --with-zlib \
       --with-zstd \
+      --without-libpsl \
       --with-ca-bundle=/etc/ssl/certs/ca-certificates.crt \
       --disable-manual \
       --disable-ldap \
