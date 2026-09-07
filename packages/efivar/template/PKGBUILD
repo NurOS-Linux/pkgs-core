@@ -1,0 +1,31 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=efivar
+pkgver=39
+pkgrel=1
+pkgdesc="Tools and library to manipulate EFI variables"
+arch=('x86_64')
+url="https://github.com/rhboot/efivar"
+license=('LGPL-2.1-only')
+depends=('glibc')
+source=("https://github.com/rhboot/efivar/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make libdir=/usr/lib bindir=/usr/bin mandir=/usr/share/man includedir=/usr/include
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make libdir=/usr/lib bindir=/usr/bin mandir=/usr/share/man includedir=/usr/include DESTDIR="${pkgdir}" install
+}
