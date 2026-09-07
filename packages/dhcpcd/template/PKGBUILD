@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=dhcpcd
+pkgver=10.5.2
+pkgrel=1
+pkgdesc="RFC2131 compliant DHCP client"
+arch=('x86_64')
+url="https://roy.marples.name/projects/dhcpcd/"
+license=('BSD-2-Clause')
+depends=('glibc')
+source=("https://github.com/NetworkConfiguration/dhcpcd/releases/download/v${pkgver}/dhcpcd-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+      --prefix=/usr \
+      --sysconfdir=/etc \
+      --sbindir=/usr/bin \
+      --rundir=/run \
+      --dbdir=/var/lib/dhcpcd
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
