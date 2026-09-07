@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libcap
+pkgver=2.78
+pkgrel=1
+pkgdesc="POSIX 1003.1e capabilities library and tools"
+arch=('x86_64')
+url="https://sites.google.com/site/fullycapable/"
+license=('GPL-2.0-only' 'BSD-3-Clause')
+depends=('glibc')
+source=("https://git.kernel.org/pub/scm/libs/libcap/libcap.git/snapshot/libcap-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make prefix=/usr lib=lib SBINDIR=/usr/bin PKGCONFIGDIR=/usr/lib/pkgconfig
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make prefix=/usr lib=lib SBINDIR=/usr/bin PKGCONFIGDIR=/usr/lib/pkgconfig DESTDIR="${pkgdir}" install
+  chmod 755 "${pkgdir}"/usr/lib/libcap.so.*
+  chmod 755 "${pkgdir}"/usr/lib/libpsx.so.*
+}
