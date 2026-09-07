@@ -8,6 +8,7 @@ arch=('any')
 url="https://salsa.debian.org/debian/ca-certificates"
 license=('MPL-2.0' 'GPL-2.0-or-later')
 depends=('glibc')
+install=ca-certificates.install
 source=("http://deb.debian.org/debian/pool/main/c/ca-certificates/ca-certificates_${pkgver}.tar.xz")
 
 prepare() {
