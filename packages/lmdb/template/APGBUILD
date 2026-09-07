@@ -8,10 +8,10 @@ arch=('x86_64')
 url="https://symas.com/lmdb/"
 license=('OLDAP-2.8')
 depends=('glibc')
-source=("https://git.openldap.org/openldap/openldap/-/archive/LMDB_${pkgver}/openldap-LMDB_${pkgver}.tar.bz2")
+source=("https://github.com/LMDB/lmdb/archive/refs/tags/LMDB_${pkgver}.tar.gz")
 
 prepare() {
-  local dir="${srcdir}/openldap-LMDB_${pkgver}"
+  local dir="${srcdir}/lmdb-LMDB_${pkgver}"
   if [ ! -d "${dir}" ]; then
     echo "Error: ${dir} not found" >&2
     return 1
@@ -19,13 +19,13 @@ prepare() {
 }
 
 build() {
-  cd "${srcdir}/openldap-LMDB_${pkgver}/libraries/liblmdb"
+  cd "${srcdir}/lmdb-LMDB_${pkgver}/libraries/liblmdb"
 
   make prefix=/usr
 }
 
 package() {
-  cd "${srcdir}/openldap-LMDB_${pkgver}/libraries/liblmdb"
+  cd "${srcdir}/lmdb-LMDB_${pkgver}/libraries/liblmdb"
 
   make prefix=/usr DESTDIR="${pkgdir}" install
 }
