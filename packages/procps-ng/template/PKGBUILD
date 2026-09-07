@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=procps-ng
+pkgver=4.0.7
+pkgrel=1
+pkgdesc="Command line and full screen utilities for browsing procfs (ps, top, pkill, free, sysctl)"
+arch=('x86_64')
+url="https://gitlab.com/procps-ng/procps"
+license=('GPL-2.0-or-later' 'LGPL-2.1-or-later')
+depends=('glibc' 'ncurses')
+provides=('procps')
+conflicts=('procps')
+source=("https://downloads.sourceforge.net/project/procps-ng/Production/procps-ng-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sbindir=/usr/bin \
+    --docdir=/usr/share/doc/procps-ng-${pkgver} \
+    --disable-static \
+    --disable-kill \
+    --enable-watch8bit \
+    --without-systemd
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
