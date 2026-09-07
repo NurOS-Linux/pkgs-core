@@ -1,0 +1,60 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=tulpar
+pkgver=0.2.0
+pkgrel=1
+pkgdesc="Package manager CLI for NurOS"
+arch=('x86_64')
+url="https://git.nuros.org/core/tulpar"
+license=('GPL-3.0-only')
+depends=('glibc' 'libapg' 'curl')
+makedepends=('meson' 'ninja' 'pkgconf')
+provides=('apg')
+backup=(
+  'etc/apg/tulpar.conf'
+)
+source=("https://git.nuros.org/core/tulpar/archive/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}"
+  if [ ! -d "${dir}" ]; then
+    if [ -d "${srcdir}/${pkgname}-${pkgver}" ]; then
+      mv "${srcdir}/${pkgname}-${pkgver}" "${dir}"
+    else
+      echo "Error: ${dir} not found" >&2
+      return 1
+    fi
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}"
+
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --sbindir=/usr/bin \
+    --bindir=/usr/bin \
+    --buildtype=release \
+    -Dsysconf_apg_dir=/etc/apg \
+    -Dcache_dir=/var/cache/apg \
+    -Ddb_dir=/var/lib/apg/db \
+    -Dkeyring_dir=/etc/apg/trusted.d \
+    -Djournald=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+
+  # Compatibility symlink: apg -> tulpar
+  ln -sf tulpar "${pkgdir}/usr/bin/apg"
+
+  # Ensure default directories exist
+  install -dm755 "${pkgdir}/etc/apg/repos.d"
+  install -dm755 "${pkgdir}/var/cache/apg"
+  install -dm755 "${pkgdir}/var/lib/apg/db"
+}
