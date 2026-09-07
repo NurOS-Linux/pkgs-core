@@ -1,0 +1,35 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=less
+pkgver=704
+pkgrel=1
+pkgdesc="Pager program similar to more"
+arch=('x86_64')
+url="http://www.greenwoodsoftware.com/less/"
+license=('GPL-3.0-or-later' 'Less')
+depends=('glibc' 'ncurses')
+source=("https://ftp.gnu.org/gnu/less/less-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+      --prefix=/usr \
+      --sysconfdir=/etc
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
