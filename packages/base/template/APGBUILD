@@ -47,6 +47,10 @@ depends=(
   # Shell
   'bash'
 
+  # Package manager
+  'libapg'
+  'tulpar'
+
   # Device management and kernel module support
   'kmod'
   'eudev'
