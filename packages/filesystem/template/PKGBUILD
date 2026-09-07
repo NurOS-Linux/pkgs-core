@@ -1,0 +1,76 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=filesystem
+pkgver=2026.09.07
+pkgrel=1
+pkgdesc="NurOS base filesystem hierarchy and default configuration files"
+arch=('any')
+url="https://nuros.org"
+license=('GPL-3.0-or-later')
+depends=()
+backup=(
+  'etc/fstab'
+  'etc/host.conf'
+  'etc/hosts'
+  'etc/issue'
+  'etc/nsswitch.conf'
+  'etc/profile'
+  'etc/shells'
+)
+
+prepare() {
+  local dir="${startdir}/../files"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  local files_dir="${startdir}/../files"
+
+  # 1. Root and basic directories (FHS)
+  install -dm755 "${pkgdir}"/{dev,proc,sys,run,mnt,media,opt,home}
+  install -dm755 "${pkgdir}"/etc/{profile.d,opt,skel}
+  install -dm700 "${pkgdir}"/root
+  install -dm1777 "${pkgdir}"/tmp
+
+  # 2. /usr hierarchy (UsrMerge target)
+  install -dm755 "${pkgdir}"/usr/{bin,include,lib,share,src,local}
+  install -dm755 "${pkgdir}"/usr/share/{doc,info,man,misc,zoneinfo}
+  install -dm755 "${pkgdir}"/usr/share/man/man{1,2,3,4,5,6,7,8}
+  install -dm755 "${pkgdir}"/usr/local/{bin,etc,games,include,lib,man,sbin,share,src}
+
+  # 3. /var hierarchy
+  install -dm755 "${pkgdir}"/var/{cache,empty,lib,local,lock,log,opt,spool,tmp}
+  install -dm755 "${pkgdir}"/var/lib/{misc,apg}
+  install -dm1777 "${pkgdir}"/var/tmp
+
+  # 4. UsrMerge symlinks
+  ln -sf usr/bin "${pkgdir}/bin"
+  ln -sf usr/bin "${pkgdir}/sbin"
+  ln -sf usr/lib "${pkgdir}/lib"
+  ln -sf usr/lib "${pkgdir}/lib64"
+  ln -sf bin "${pkgdir}/usr/sbin"
+  ln -sf lib "${pkgdir}/usr/lib64"
+  ln -sf ../run "${pkgdir}/var/run"
+  ln -sf ../run/lock "${pkgdir}/var/lock"
+
+  # 5. Core configuration and identification files
+  install -m644 "${files_dir}/os-release" "${pkgdir}/usr/lib/os-release"
+  ln -sf ../usr/lib/os-release "${pkgdir}/etc/os-release"
+
+  install -m644 "${files_dir}/issue" "${pkgdir}/etc/issue"
+  install -m644 "${files_dir}/nsswitch.conf" "${pkgdir}/etc/nsswitch.conf"
+  install -m644 "${files_dir}/hosts" "${pkgdir}/etc/hosts"
+  install -m644 "${files_dir}/host.conf" "${pkgdir}/etc/host.conf"
+  install -m644 "${files_dir}/shells" "${pkgdir}/etc/shells"
+  install -m644 "${files_dir}/profile" "${pkgdir}/etc/profile"
+
+  # 6. Default skeleton files
+  touch "${pkgdir}/etc/fstab"
+  chmod 644 "${pkgdir}/etc/fstab"
+  touch "${pkgdir}/etc/mtab"
+  chmod 644 "${pkgdir}/etc/mtab"
+  ln -sf /proc/self/mounts "${pkgdir}/etc/mtab"
+}

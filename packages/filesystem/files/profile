@@ -1,0 +1,26 @@
+# /etc/profile: System-wide initialization for login shells
+
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+export PAGER="/usr/bin/less"
+export EDITOR="/usr/bin/vi"
+
+if [ -z "${LANG}" ]; then
+  export LANG="C.UTF-8"
+fi
+
+if [ -d /etc/profile.d ]; then
+  for script in /etc/profile.d/*.sh; do
+    if [ -r "${script}" ]; then
+      . "${script}"
+    fi
+  done
+  unset script
+fi
+
+# Set default prompt if not already configured
+if [ -n "${BASH_VERSION:-}" ]; then
+  PS1='[\u@\h \W]\$ '
+else
+  PS1='$ '
+fi
+export PS1
