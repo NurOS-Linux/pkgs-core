@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=patch
+pkgver=2.8
+pkgrel=1
+pkgdesc="A utility to apply its input list of differences to files"
+arch=('x86_64')
+url="https://savannah.gnu.org/projects/patch/"
+license=('GPL-3.0-or-later')
+depends=('glibc')
+source=("https://ftp.gnu.org/gnu/patch/patch-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure --prefix=/usr
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
