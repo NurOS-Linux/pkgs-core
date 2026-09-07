@@ -1,0 +1,65 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=openrc
+pkgver=0.63.3
+pkgrel=1
+pkgdesc="Service manager and init system for NurOS"
+arch=('x86_64')
+url="https://github.com/OpenRC/openrc"
+license=('BSD-2-Clause')
+depends=('glibc' 'ncurses' 'util-linux')
+provides=('init')
+backup=(
+  'etc/rc.conf'
+  'etc/conf.d/hostname'
+  'etc/conf.d/hwclock'
+  'etc/conf.d/keymaps'
+  'etc/conf.d/modules'
+)
+source=("https://github.com/OpenRC/openrc/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --sbindir=/usr/bin \
+    --bindir=/usr/bin \
+    --libdir=/usr/lib \
+    --buildtype=release \
+    -Dsysvinit=true \
+    -Dshell=/bin/sh \
+    -Dpam=false \
+    -Daudit=disabled \
+    -Dselinux=disabled \
+    -Dbash-completions=true \
+    -Dzsh-completions=true
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+
+  # Symlinks for standard reboot/poweroff commands
+  ln -sf openrc-shutdown "${pkgdir}/usr/bin/reboot"
+  ln -sf openrc-shutdown "${pkgdir}/usr/bin/poweroff"
+  ln -sf openrc-shutdown "${pkgdir}/usr/bin/halt"
+  ln -sf openrc-shutdown "${pkgdir}/usr/bin/shutdown"
+  ln -sf openrc-init "${pkgdir}/usr/bin/telinit"
+
+  # Compatibility symlink for kernel boot parameter init=/sbin/init
+  mkdir -p "${pkgdir}/sbin"
+  ln -sf ../usr/bin/openrc-init "${pkgdir}/sbin/init"
+}
