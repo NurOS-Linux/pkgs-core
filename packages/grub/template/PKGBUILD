@@ -1,0 +1,54 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=grub
+pkgver=2.14
+pkgrel=1
+pkgdesc="GNU GRand Unified Bootloader (2)"
+arch=('x86_64')
+url="https://www.gnu.org/software/grub/"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'xz' 'efibootmgr' 'dosfstools')
+source=("https://ftp.gnu.org/gnu/grub/grub-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  mkdir -p build-efi
+  cd build-efi
+  ../configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --sbindir=/usr/bin \
+    --with-platform=efi \
+    --target=x86_64 \
+    --disable-werror
+  make
+
+  cd ..
+  mkdir -p build-bios
+  cd build-bios
+  ../configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --sbindir=/usr/bin \
+    --with-platform=pc \
+    --target=i386 \
+    --disable-werror
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}/build-bios"
+  make DESTDIR="${pkgdir}" install
+
+  cd "${srcdir}/${pkgname}-${pkgver}/build-efi"
+  make DESTDIR="${pkgdir}" install
+}
