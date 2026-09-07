@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libarchive
+pkgver=3.8.9
+pkgrel=1
+pkgdesc="Multi-format archive and compression library"
+arch=('x86_64')
+url="https://www.libarchive.org/"
+license=('BSD-2-Clause')
+depends=('glibc' 'zlib' 'bzip2' 'xz' 'zstd' 'openssl')
+source=("https://github.com/libarchive/libarchive/releases/download/v${pkgver}/libarchive-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static \
+    --without-xml2 \
+    --without-expat \
+    --with-zlib \
+    --with-bz2lib \
+    --with-lzma \
+    --with-zstd \
+    --with-openssl
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
