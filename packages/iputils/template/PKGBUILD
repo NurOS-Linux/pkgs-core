@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=iputils
+pkgver=20250605
+pkgrel=1
+pkgdesc="Network monitoring tools, including ping"
+arch=('x86_64')
+url="https://github.com/iputils/iputils"
+license=('GPL-2.0-or-later' 'BSD-3-Clause')
+depends=('glibc' 'libcap')
+source=("https://github.com/iputils/iputils/releases/download/${pkgver}/iputils-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  meson setup build \
+    --prefix=/usr \
+    --buildtype=release \
+    -DBUILD_MANS=false \
+    -DBUILD_HTML_MANS=false \
+    -DUSE_GETTEXT=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
