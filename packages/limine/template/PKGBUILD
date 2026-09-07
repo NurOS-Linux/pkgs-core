@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=limine
+pkgver=12.8.0
+pkgrel=1
+pkgdesc="Modern, advanced, portable, multiprotocol bootloader"
+arch=('x86_64')
+url="https://limine-bootloader.org/"
+license=('BSD-2-Clause')
+depends=('glibc')
+source=("https://github.com/limine-bootloader/limine/releases/download/v${pkgver}/limine-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --enable-bios \
+    --enable-uefi-x86-64 \
+    --enable-uefi-ia32
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
