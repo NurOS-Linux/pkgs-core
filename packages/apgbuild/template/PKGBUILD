@@ -1,9 +1,9 @@
 # Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
 
 pkgname=apgbuild
-pkgver=0.1.0
+pkgver=0.2.0
 pkgrel=1
-pkgdesc="Converter of Arch Linux PKGBUILD packages into APGv2 format"
+pkgdesc="Package builder and converter for NurOS APG packages"
 arch=('x86_64')
 url="https://git.nuros.org/utils/apgbuild"
 license=('GPL-3.0-or-later')
@@ -12,7 +12,17 @@ makedepends=('cargo')
 source=("https://git.nuros.org/utils/apgbuild/archive/v${pkgver}.tar.gz")
 
 prepare() {
-  cd "${srcdir}/${pkgname}"
+  local dir="${srcdir}/${pkgname}"
+  if [ ! -d "${dir}" ]; then
+    if [ -d "${srcdir}/${pkgname}-${pkgver}" ]; then
+      mv "${srcdir}/${pkgname}-${pkgver}" "${dir}"
+    else
+      echo "Error: ${dir} not found" >&2
+      return 1
+    fi
+  fi
+
+  cd "${dir}"
   cargo fetch --locked
 }
 
