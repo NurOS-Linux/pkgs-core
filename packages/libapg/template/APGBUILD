@@ -9,13 +9,17 @@ url="https://git.nuros.org/core/libAPG"
 license=('GPL-3.0-only')
 depends=('glibc' 'libarchive' 'lmdb' 'libsodium' 'libseccomp')
 makedepends=('meson' 'ninja' 'pkgconf')
-source=("https://git.nuros.org/core/libAPG/archive/v${pkgver}.zip")
+source=("https://git.nuros.org/core/libAPG/archive/v${pkgver}.tar.gz")
 
 prepare() {
   local dir="${srcdir}/${pkgname}"
   if [ ! -d "${dir}" ]; then
     if [ -d "${srcdir}/libAPG" ]; then
       mv "${srcdir}/libAPG" "${dir}"
+    elif [ -d "${srcdir}/${pkgname}-${pkgver}" ]; then
+      mv "${srcdir}/${pkgname}-${pkgver}" "${dir}"
+    elif [ -d "${srcdir}/libAPG-${pkgver}" ]; then
+      mv "${srcdir}/libAPG-${pkgver}" "${dir}"
     else
       echo "Error: ${dir} not found" >&2
       return 1
