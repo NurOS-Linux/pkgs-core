@@ -1,0 +1,31 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=lmdb
+pkgver=0.9.33
+pkgrel=1
+pkgdesc="Symas Lightning Memory-Mapped Database"
+arch=('x86_64')
+url="https://symas.com/lmdb/"
+license=('OLDAP-2.8')
+depends=('glibc')
+source=("https://git.openldap.org/openldap/openldap/-/archive/LMDB_${pkgver}/openldap-LMDB_${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/openldap-LMDB_${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/openldap-LMDB_${pkgver}/libraries/liblmdb"
+
+  make prefix=/usr
+}
+
+package() {
+  cd "${srcdir}/openldap-LMDB_${pkgver}/libraries/liblmdb"
+
+  make prefix=/usr DESTDIR="${pkgdir}" install
+}
