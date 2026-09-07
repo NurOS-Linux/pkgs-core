@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=vim
+pkgver=9.2.1037
+pkgrel=1
+pkgdesc="Vim the editor"
+arch=('x86_64')
+url="https://www.vim.org/"
+license=('Vim')
+depends=('glibc' 'ncurses')
+source=("https://github.com/vim/vim/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+      --prefix=/usr \
+      --sysconfdir=/etc \
+      --enable-multibyte \
+      --with-features=huge \
+      --without-x \
+      --enable-gui=no
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
