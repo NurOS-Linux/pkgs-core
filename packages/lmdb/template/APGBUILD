@@ -27,5 +27,19 @@ build() {
 package() {
   cd "${srcdir}/lmdb-LMDB_${pkgver}/libraries/liblmdb"
 
+  install -dm755 "${pkgdir}"/usr/{bin,lib,include,share/man/man1,lib/pkgconfig}
   make prefix=/usr DESTDIR="${pkgdir}" install
+
+  cat << 'EOF' > "${pkgdir}/usr/lib/pkgconfig/lmdb.pc"
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: lmdb
+Description: Lightning Memory-Mapped Database
+Version: 0.9.33
+Libs: -L${libdir} -llmdb
+Cflags: -I${includedir}
+EOF
 }
