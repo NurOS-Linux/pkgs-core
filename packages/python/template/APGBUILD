@@ -22,7 +22,7 @@ build() {
   cd "${srcdir}/Python-${pkgver}"
 
   # OpenSSL 4.0 removed deprecated legacy protocol methods (TLSv1_method, TLSv1_1_method)
-  CFLAGS="${CFLAGS} -DOPENSSL_NO_TLS1_METHOD -DOPENSSL_NO_TLS1_1_METHOD" \
+  CFLAGS="${CFLAGS:-} -DOPENSSL_NO_TLS1_METHOD -DOPENSSL_NO_TLS1_1_METHOD" \
   ./configure \
     --prefix=/usr \
     --enable-shared \
