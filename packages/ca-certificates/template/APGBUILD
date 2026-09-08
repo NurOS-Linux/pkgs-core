@@ -23,18 +23,21 @@ prepare() {
 }
 
 build() {
-  :
+  cd "${srcdir}/${pkgname}"
+  make
 }
 
 package() {
   cd "${srcdir}/${pkgname}"
+  make install DESTDIR="${pkgdir}"
 
-  # Install update-ca-certificates utility
   install -dm755 "${pkgdir}/usr/bin"
-  install -m755 sbin/update-ca-certificates "${pkgdir}/usr/bin/"
+  ln -sf ../sbin/update-ca-certificates "${pkgdir}/usr/bin/update-ca-certificates"
 
-  # Install Mozilla CA certificates bundle into standard SSL locations
   install -dm755 "${pkgdir}/etc/ssl/certs"
+  install -dm755 "${pkgdir}/etc/ca-certificates/update.d"
+  touch "${pkgdir}/etc/ca-certificates.conf"
+
   install -m644 "${srcdir}/cacert.pem" "${pkgdir}/etc/ssl/certs/ca-certificates.crt"
   ln -sf certs/ca-certificates.crt "${pkgdir}/etc/ssl/cert.pem"
 }
