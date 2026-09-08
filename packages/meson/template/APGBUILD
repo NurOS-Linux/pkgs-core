@@ -19,12 +19,21 @@ prepare() {
 }
 
 build() {
-  # Pure python package, standard wheel build or direct setup
   :
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  python3 setup.py install --root="${pkgdir}" --prefix=/usr --optimize=1
+  local pydir="${pkgdir}/usr/lib/python3.14/site-packages"
+  mkdir -p "${pydir}" "${pkgdir}/usr/bin"
+
+  cp -a mesonbuild "${pydir}/"
+  install -m755 meson.py "${pkgdir}/usr/bin/meson"
+
+  install -d "${pkgdir}/usr/share/bash-completion/completions"
+  install -m644 data/shell-completions/bash/meson "${pkgdir}/usr/share/bash-completion/completions/meson"
+
+  install -d "${pkgdir}/usr/share/zsh/site-functions"
+  install -m644 data/shell-completions/zsh/_meson "${pkgdir}/usr/share/zsh/site-functions/_meson"
 }
