@@ -1,7 +1,7 @@
 # Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
 
 pkgname=libapg
-pkgver=2.3.0
+pkgver=2.3.1
 pkgrel=1
 pkgdesc="Package management library for NurOS"
 arch=('x86_64')
