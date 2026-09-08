@@ -21,13 +21,11 @@ prepare() {
 build() {
   cd "${srcdir}/Python-${pkgver}"
 
-  # OpenSSL 4.0 removed deprecated legacy protocol methods (TLSv1_method, TLSv1_1_method, TLSv1_2_method)
   ./configure \
     --prefix=/usr \
     --enable-shared \
     --with-system-expat=no \
-    --without-ensurepip \
-    CFLAGS="${CFLAGS:-} -DOPENSSL_NO_TLS1_METHOD -DOPENSSL_NO_TLS1_1_METHOD -DOPENSSL_NO_TLS1_2_METHOD"
+    --without-ensurepip
 
   make
 }
