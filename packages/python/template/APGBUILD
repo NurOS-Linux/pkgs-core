@@ -25,7 +25,6 @@ build() {
     --prefix=/usr \
     --enable-shared \
     --with-system-expat=no \
-    --with-openssl \
     --without-ensurepip
 
   make
