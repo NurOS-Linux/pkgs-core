@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=rsync
+pkgver=3.4.1
+pkgrel=1
+pkgdesc="A fast and versatile file copying tool"
+arch=('x86_64')
+url="https://rsync.samba.org/"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'zlib' 'zstd' 'openssl')
+source=("https://download.samba.org/pub/rsync/src/rsync-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --disable-debug \
+    --disable-xxhash \
+    --disable-lz4 \
+    --disable-md2man
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
