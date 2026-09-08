@@ -13,7 +13,7 @@ provides=('apg')
 backup=(
   'etc/apg/tulpar.conf'
 )
-source=("https://git.nuros.org/core/tulpar/archive/v${pkgver}.tar.gz")
+source=("https://git.nuros.org/core/tulpar/archive/main.tar.gz")
 
 prepare() {
   local dir="${srcdir}/${pkgname}"
@@ -26,6 +26,8 @@ prepare() {
       mv "${srcdir}/Tulpar" "${dir}"
     elif [ -d "${srcdir}/Tulpar-${pkgver}" ]; then
       mv "${srcdir}/Tulpar-${pkgver}" "${dir}"
+    elif [ -d "${srcdir}/tulpar-main" ]; then
+      mv "${srcdir}/tulpar-main" "${dir}"
     else
       echo "Error: ${dir} not found" >&2
       return 1
