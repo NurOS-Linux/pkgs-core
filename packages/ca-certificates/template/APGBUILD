@@ -8,7 +8,6 @@ arch=('any')
 url="https://salsa.debian.org/debian/ca-certificates"
 license=('MPL-2.0' 'GPL-2.0-or-later')
 depends=('glibc')
-install=ca-certificates.install
 source=(
   "http://deb.debian.org/debian/pool/main/c/ca-certificates/ca-certificates_${pkgver}.tar.xz"
   "https://curl.se/ca/cacert.pem"
@@ -23,21 +22,19 @@ prepare() {
 }
 
 build() {
-  cd "${srcdir}/${pkgname}"
-  make
+  :
 }
 
 package() {
   cd "${srcdir}/${pkgname}"
-  make install DESTDIR="${pkgdir}"
 
   install -dm755 "${pkgdir}/usr/bin"
-  ln -sf ../sbin/update-ca-certificates "${pkgdir}/usr/bin/update-ca-certificates"
+  install -m755 sbin/update-ca-certificates "${pkgdir}/usr/bin/"
 
-  install -dm755 "${pkgdir}/etc/ssl/certs"
   install -dm755 "${pkgdir}/etc/ca-certificates/update.d"
   touch "${pkgdir}/etc/ca-certificates.conf"
 
+  install -dm755 "${pkgdir}/etc/ssl/certs"
   install -m644 "${srcdir}/cacert.pem" "${pkgdir}/etc/ssl/certs/ca-certificates.crt"
   ln -sf certs/ca-certificates.crt "${pkgdir}/etc/ssl/cert.pem"
 }
