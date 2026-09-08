@@ -9,7 +9,10 @@ url="https://salsa.debian.org/debian/ca-certificates"
 license=('MPL-2.0' 'GPL-2.0-or-later')
 depends=('glibc')
 install=ca-certificates.install
-source=("http://deb.debian.org/debian/pool/main/c/ca-certificates/ca-certificates_${pkgver}.tar.xz")
+source=(
+  "http://deb.debian.org/debian/pool/main/c/ca-certificates/ca-certificates_${pkgver}.tar.xz"
+  "https://curl.se/ca/cacert.pem"
+)
 
 prepare() {
   local dir="${srcdir}/${pkgname}"
@@ -20,21 +23,18 @@ prepare() {
 }
 
 build() {
-  cd "${srcdir}/${pkgname}"
-
-  make
+  :
 }
 
 package() {
   cd "${srcdir}/${pkgname}"
 
-  make DESTDIR="${pkgdir}" install
-
+  # Install update-ca-certificates utility
   install -dm755 "${pkgdir}/usr/bin"
-  mv "${pkgdir}/usr/sbin/update-ca-certificates" "${pkgdir}/usr/bin/"
-  rmdir "${pkgdir}/usr/sbin"
+  install -m755 sbin/update-ca-certificates "${pkgdir}/usr/bin/"
 
+  # Install Mozilla CA certificates bundle into standard SSL locations
   install -dm755 "${pkgdir}/etc/ssl/certs"
-  cat "${pkgdir}/usr/share/ca-certificates/mozilla"/*.crt > "${pkgdir}/etc/ssl/certs/ca-certificates.crt"
+  install -m644 "${srcdir}/cacert.pem" "${pkgdir}/etc/ssl/certs/ca-certificates.crt"
   ln -sf certs/ca-certificates.crt "${pkgdir}/etc/ssl/cert.pem"
 }
