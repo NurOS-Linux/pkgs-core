@@ -43,4 +43,33 @@ package() {
   ln -sf gcc "${pkgdir}/usr/bin/cc"
   ln -sf g++ "${pkgdir}/usr/bin/c++"
   ln -sf ../bin/cpp "${pkgdir}/usr/lib/cpp"
+
+  # POSIX compiler wrappers
+  cat > "${pkgdir}/usr/bin/c89" << 'EOF'
+#!/bin/sh
+fl="-std=c89"
+for opt; do
+  case "$opt" in
+    -std=c89|-std=iso9899:1990) fl="";;
+    -std=*) echo "$(basename "$0") called with non ISO C89 option $opt" >&2
+            exit 1;;
+  esac
+done
+exec gcc $fl ${1+"$@"}
+EOF
+  chmod 755 "${pkgdir}/usr/bin/c89"
+
+  cat > "${pkgdir}/usr/bin/c99" << 'EOF'
+#!/bin/sh
+fl="-std=c99"
+for opt; do
+  case "$opt" in
+    -std=c99|-std=iso9899:1999) fl="";;
+    -std=*) echo "$(basename "$0") called with non ISO C99 option $opt" >&2
+            exit 1;;
+  esac
+done
+exec gcc $fl ${1+"$@"}
+EOF
+  chmod 755 "${pkgdir}/usr/bin/c99"
 }
