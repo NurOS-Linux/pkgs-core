@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=cmake
+pkgver=3.31.5
+pkgrel=1
+pkgdesc="A cross-platform open-source make system"
+arch=('x86_64')
+url="https://cmake.org/"
+license=('BSD-3-Clause')
+depends=('glibc' 'openssl' 'zlib')
+source=("https://github.com/Kitware/CMake/releases/download/v${pkgver}/cmake-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./bootstrap \
+    --prefix=/usr \
+    --parallel="$(nproc)" \
+    --system-libs \
+    --no-system-libarchive \
+    --no-system-jsoncpp \
+    --no-system-libuv \
+    --no-system-librhash \
+    --no-system-nghttp2 \
+    --no-system-curl
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
