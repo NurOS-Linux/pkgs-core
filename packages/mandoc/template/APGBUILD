@@ -1,0 +1,50 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=mandoc
+pkgver=1.14.6
+pkgrel=1
+pkgdesc="UNIX manpage compiler - mandoc toolkit"
+arch=('x86_64')
+url="https://mandoc.bsd.lv/"
+license=('ISC')
+depends=('glibc' 'zlib')
+source=("https://mandoc.bsd.lv/snapshots/mandoc-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  cat << 'EOF' > configure.local
+PREFIX="/usr"
+BINDIR="/usr/bin"
+SBINDIR="/usr/bin"
+MANDIR="/usr/share/man"
+LIBDIR="/usr/lib"
+INCLUDEDIR="/usr/include"
+MANM_MAN="man"
+MANM_MDOC="mdoc"
+MANM_ROFF="roff"
+MANM_EQN="eqn"
+MANM_TBL="tbl"
+BUILD_CGI="0"
+BUILD_CATMAN="0"
+UTF8_LOCALE="C.UTF-8"
+EOF
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" base-install
+}
