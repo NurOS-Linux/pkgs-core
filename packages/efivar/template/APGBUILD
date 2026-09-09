@@ -21,11 +21,11 @@ prepare() {
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  make libdir=/usr/lib bindir=/usr/bin mandir=/usr/share/man includedir=/usr/include
+  make ERRORS="" libdir=/usr/lib bindir=/usr/bin mandir=/usr/share/man includedir=/usr/include
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  make libdir=/usr/lib bindir=/usr/bin mandir=/usr/share/man includedir=/usr/include DESTDIR="${pkgdir}" install
+  make ERRORS="" libdir=/usr/lib bindir=/usr/bin mandir=/usr/share/man includedir=/usr/include DESTDIR="${pkgdir}" install
 }
