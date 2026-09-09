@@ -7,7 +7,7 @@ pkgdesc="Next generation syslog daemon for Linux"
 arch=('x86_64')
 url="https://www.syslog-ng.com/"
 license=('GPL-2.0-or-later' 'LGPL-2.1-or-later')
-depends=('glibc' 'openssl')
+depends=('glibc' 'openssl' 'glib' 'json-c')
 source=("https://github.com/syslog-ng/syslog-ng/releases/download/syslog-ng-${pkgver}/syslog-ng-${pkgver}.tar.gz")
 
 prepare() {
