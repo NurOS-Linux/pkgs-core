@@ -1,0 +1,35 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libyaml
+pkgver=0.2.5
+pkgrel=1
+pkgdesc="Fast YAML 1.1 parser and emitter library"
+arch=('x86_64')
+url="https://pyyaml.org/wiki/LibYAML"
+license=('MIT')
+depends=('glibc')
+source=("https://pyyaml.org/download/libyaml/yaml-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/yaml-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/yaml-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/yaml-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
