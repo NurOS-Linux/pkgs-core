@@ -35,5 +35,5 @@ package() {
 
   make DESTDIR="${pkgdir}" install
   install -dm755 "${pkgdir}/etc/chrony"
-  install -m644 examples/chrony.conf.example "${pkgdir}/etc/chrony/chrony.conf"
+  install -m644 examples/chrony.conf.example2 "${pkgdir}/etc/chrony/chrony.conf"
 }
