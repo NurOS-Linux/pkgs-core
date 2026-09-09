@@ -1,15 +1,14 @@
 # Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
 
-pkgname=bc
-pkgver=1.08.1
+pkgname=texinfo
+pkgver=7.2
 pkgrel=1
-pkgdesc="An arbitrary precision numeric processing language"
+pkgdesc="GNU documentation system for on-line information and printed output"
 arch=('x86_64')
-url="https://www.gnu.org/software/bc/"
+url="https://www.gnu.org/software/texinfo/"
 license=('GPL-3.0-or-later')
-depends=('glibc' 'readline')
-makedepends=('texinfo')
-source=("https://ftp.gnu.org/gnu/bc/bc-${pkgver}.tar.gz")
+depends=('glibc' 'perl' 'ncurses')
+source=("https://ftp.gnu.org/gnu/texinfo/texinfo-${pkgver}.tar.xz")
 
 prepare() {
   local dir="${srcdir}/${pkgname}-${pkgver}"
@@ -23,10 +22,7 @@ build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
   ./configure \
-    --prefix=/usr \
-    --with-readline \
-    --mandir=/usr/share/man \
-    --infodir=/usr/share/info
+    --prefix=/usr
 
   make
 }
