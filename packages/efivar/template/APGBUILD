@@ -8,6 +8,7 @@ arch=('x86_64')
 url="https://github.com/rhboot/efivar"
 license=('LGPL-2.1-only')
 depends=('glibc')
+makedepends=('mandoc')
 source=("https://github.com/rhboot/efivar/archive/refs/tags/${pkgver}.tar.gz")
 
 prepare() {
