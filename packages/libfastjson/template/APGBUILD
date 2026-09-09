@@ -1,0 +1,35 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libfastjson
+pkgver=1.2304.0
+pkgrel=1
+pkgdesc="A fast JSON library for C, optimized for rsyslog"
+arch=('x86_64')
+url="https://github.com/rsyslog/libfastjson"
+license=('MIT')
+depends=('glibc')
+source=("https://download.rsyslog.com/libfastjson/libfastjson-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
