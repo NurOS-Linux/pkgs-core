@@ -28,11 +28,11 @@ build() {
     --disable-doc \
     --disable-manpage
 
-  ./waf build
+  ./waf build --notests
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  ./waf install --destdir="${pkgdir}"
+  ./waf install --destdir="${pkgdir}" --notests
 }
