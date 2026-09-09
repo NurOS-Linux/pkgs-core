@@ -30,7 +30,9 @@ build() {
     --no-system-libuv \
     --no-system-librhash \
     --no-system-nghttp2 \
-    --no-system-curl
+    --no-system-curl \
+    --no-system-expat \
+    --no-system-cppdap
 
   make -j"$(nproc)"
 }
