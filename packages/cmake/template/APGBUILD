@@ -7,7 +7,7 @@ pkgdesc="A cross-platform open-source make system"
 arch=('x86_64')
 url="https://cmake.org/"
 license=('BSD-3-Clause')
-depends=('glibc' 'openssl' 'zlib')
+depends=('glibc' 'openssl' 'zlib' 'ncurses')
 source=("https://github.com/Kitware/CMake/releases/download/v${pkgver}/cmake-${pkgver}.tar.gz")
 
 prepare() {
