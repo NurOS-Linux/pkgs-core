@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=json-c
+pkgver=0.18
+pkgrel=1
+pkgdesc="JSON implementation in C"
+arch=('x86_64')
+url="https://github.com/json-c/json-c/wiki"
+license=('MIT')
+depends=('glibc')
+makedepends=('cmake')
+source=("https://s3.amazonaws.com/json-c_releases/releases/json-c-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  mkdir -p build
+  cd build
+  cmake .. \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_STATIC_LIBS=OFF \
+    -DENABLE_TESTING=OFF
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}/build"
+
+  make DESTDIR="${pkgdir}" install
+}
