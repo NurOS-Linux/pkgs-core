@@ -29,6 +29,8 @@ build() {
       --with-libpam \
       --without-selinux \
       --without-acl \
+      --without-libbsd \
+      --disable-logind \
       --disable-static
 
   make
