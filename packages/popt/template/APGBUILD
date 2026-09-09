@@ -1,0 +1,35 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=popt
+pkgver=1.19
+pkgrel=1
+pkgdesc="Command line option parsing library"
+arch=('x86_64')
+url="http://freshmeat.sourceforge.net/projects/popt"
+license=('MIT')
+depends=('glibc')
+source=("https://ftp2.osuosl.org/pub/blfs/conglomeration/popt/popt-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
