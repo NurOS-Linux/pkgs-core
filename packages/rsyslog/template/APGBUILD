@@ -27,7 +27,9 @@ build() {
     --sysconfdir=/etc \
     --disable-uuid \
     --disable-gnutls \
-    --disable-libgcrypt
+    --disable-libgcrypt \
+    --disable-impstats-push \
+    --disable-omotel
 
   make
 }
