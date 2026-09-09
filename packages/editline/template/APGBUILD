@@ -1,7 +1,7 @@
 # Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
 
 pkgname=editline
-pkgver=20260512.3.1
+pkgver=20260512-3.1
 pkgrel=1
 pkgdesc="Port of NetBSD Editline library (libedit)"
 arch=('x86_64')
