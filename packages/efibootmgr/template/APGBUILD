@@ -7,7 +7,7 @@ pkgdesc="Linux user-space application to modify the EFI Boot Manager"
 arch=('x86_64')
 url="https://github.com/rhboot/efibootmgr"
 license=('GPL-2.0-or-later')
-depends=('glibc' 'efivar')
+depends=('glibc' 'efivar' 'popt')
 source=("https://github.com/rhboot/efibootmgr/releases/download/${pkgver}/efibootmgr-${pkgver}.tar.bz2")
 
 prepare() {
