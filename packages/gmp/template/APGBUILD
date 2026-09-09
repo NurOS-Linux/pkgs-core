@@ -21,8 +21,7 @@ prepare() {
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  export CFLAGS="${CFLAGS} -std=gnu89"
-  ./configure \
+  CC="gcc -std=gnu89" CXX="g++" ./configure \
     --prefix=/usr \
     --enable-cxx \
     --disable-static \
