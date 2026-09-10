@@ -2,12 +2,12 @@
 
 pkgname=gawk
 pkgver=5.4.1
-pkgrel=1
+pkgrel=2
 pkgdesc="GNU awk pattern scanning and processing language"
 arch=('x86_64')
 url="https://www.gnu.org/software/gawk/"
 license=('GPL-3.0-or-later')
-depends=('glibc')
+depends=('glibc' 'mpfr' 'gmp')
 source=("https://ftp.gnu.org/gnu/gawk/gawk-${pkgver}.tar.xz")
 
 prepare() {
@@ -23,7 +23,9 @@ build() {
 
   ./configure \
       --prefix=/usr \
-      --sysconfdir=/etc
+      --sysconfdir=/etc \
+      --with-mpfr \
+      --with-gmp
 
   make
 }
