@@ -2,7 +2,7 @@
 
 pkgname=findutils
 pkgver=4.11.0
-pkgrel=1
+pkgrel=2
 pkgdesc="GNU utilities for finding files"
 arch=('x86_64')
 url="https://www.gnu.org/software/findutils/"
@@ -31,5 +31,5 @@ build() {
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  make DESTDIR="${pkgdir}" install
+  make DESTDIR="${pkgdir}" AM_UPDATE_INFO_DIR=no install
 }
