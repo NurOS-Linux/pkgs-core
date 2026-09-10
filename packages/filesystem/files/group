@@ -1,0 +1,14 @@
+root:x:0:
+bin:x:1:daemon
+daemon:x:2:
+sys:x:3:bin
+adm:x:4:daemon
+tty:x:5:
+disk:x:6:
+wheel:x:10:root
+video:x:27:
+audio:x:29:
+input:x:97:
+kvm:x:98:
+users:x:999:
+nobody:x:65534:

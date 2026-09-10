@@ -2,7 +2,7 @@
 
 pkgname=filesystem
 pkgver=2026.09.07
-pkgrel=1
+pkgrel=2
 pkgdesc="NurOS base filesystem hierarchy and default configuration files"
 arch=('any')
 url="https://nuros.org"
@@ -10,11 +10,14 @@ license=('GPL-3.0-or-later')
 depends=()
 backup=(
   'etc/fstab'
+  'etc/group'
   'etc/host.conf'
   'etc/hosts'
   'etc/issue'
   'etc/nsswitch.conf'
+  'etc/passwd'
   'etc/profile'
+  'etc/shadow'
   'etc/shells'
 )
 
@@ -67,7 +70,12 @@ package() {
   install -m644 "${files_dir}/shells" "${pkgdir}/etc/shells"
   install -m644 "${files_dir}/profile" "${pkgdir}/etc/profile"
 
-  # 6. Default skeleton files
+  # 6. Core user and group database
+  install -m644 "${files_dir}/passwd" "${pkgdir}/etc/passwd"
+  install -m644 "${files_dir}/group" "${pkgdir}/etc/group"
+  install -m600 "${files_dir}/shadow" "${pkgdir}/etc/shadow"
+
+  # 7. Default skeleton files
   touch "${pkgdir}/etc/fstab"
   chmod 644 "${pkgdir}/etc/fstab"
   touch "${pkgdir}/etc/mtab"
