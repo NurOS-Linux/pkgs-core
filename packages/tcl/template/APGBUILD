@@ -25,7 +25,8 @@ build() {
     --prefix=/usr \
     --mandir=/usr/share/man \
     --enable-threads \
-    --enable-64bit
+    --enable-64bit \
+    --enable-man-suffix
 
   make
 }
