@@ -44,8 +44,8 @@ package() {
   install -dm755 "${pkgdir}"/usr/share/man/man{1,2,3,4,5,6,7,8}
   install -dm755 "${pkgdir}"/usr/local/{bin,etc,games,include,lib,man,sbin,share,src}
 
-  # 3. /var hierarchy
-  install -dm755 "${pkgdir}"/var/{cache,empty,lib,local,lock,log,opt,spool,tmp}
+  # 3. /var hierarchy (run and lock are symlinks to /run)
+  install -dm755 "${pkgdir}"/var/{cache,empty,lib,local,log,opt,spool,tmp}
   install -dm755 "${pkgdir}"/var/lib/{misc,apg}
   install -dm1777 "${pkgdir}"/var/tmp
 
