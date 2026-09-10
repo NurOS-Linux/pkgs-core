@@ -8,6 +8,7 @@ arch=('any')
 url="https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git"
 license=('custom')
 depends=()
+makedepends=('parallel')
 source=("https://mirrors.edge.kernel.org/pub/linux/kernel/firmware/linux-firmware-${pkgver}.tar.xz")
 
 prepare() {
