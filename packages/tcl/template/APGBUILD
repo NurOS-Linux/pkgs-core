@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=tcl
+pkgver=8.6.16
+pkgrel=1
+pkgdesc="Powerful, easy-to-learn dynamic programming language"
+arch=('x86_64')
+url="https://www.tcl-lang.org/"
+license=('TCL')
+depends=('glibc' 'zlib')
+source=("https://downloads.sourceforge.net/project/tcl/Tcl/${pkgver}/tcl${pkgver}-src.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}${pkgver}/unix"
+
+  ./configure \
+    --prefix=/usr \
+    --mandir=/usr/share/man \
+    --enable-threads \
+    --enable-64bit
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}${pkgver}/unix"
+
+  make DESTDIR="${pkgdir}" install install-private-headers
+  ln -sf tclsh8.6 "${pkgdir}/usr/bin/tclsh"
+}
