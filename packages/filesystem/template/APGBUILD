@@ -34,6 +34,7 @@ package() {
 
   # 1. Root and basic directories (FHS)
   install -dm755 "${pkgdir}"/{dev,proc,sys,run,mnt,media,opt,home}
+  install -dm755 "${pkgdir}"/run/lock
   install -dm755 "${pkgdir}"/etc/{profile.d,opt,skel}
   install -dm700 "${pkgdir}"/root
   install -dm1777 "${pkgdir}"/tmp
