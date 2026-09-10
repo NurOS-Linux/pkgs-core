@@ -7,7 +7,7 @@ pkgdesc="GNU C Library for NurOS Juldyz"
 arch=('x86_64')
 url="https://www.gnu.org/software/libc"
 license=('GPL-2.0-or-later' 'LGPL-2.1-or-later')
-depends=('linux-api-headers>=4.10')
+depends=('linux-headers>=4.10')
 makedepends=('bison' 'gawk' 'gcc' 'make' 'sed' 'python')
 backup=(
   'etc/locale.gen'
