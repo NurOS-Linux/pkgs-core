@@ -1,0 +1,46 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pciutils
+pkgver=3.13.0
+pkgrel=1
+pkgdesc="PCI bus configuration space access library and tools"
+arch=('x86_64')
+url="https://mj.ucw.cz/sw/pciutils/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'kmod' 'zlib')
+makedepends=('pkgconf')
+source=("https://mirrors.edge.kernel.org/pub/software/utils/pciutils/pciutils-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make \
+    PREFIX=/usr \
+    SBINDIR=/usr/bin \
+    SHAREDIR=/usr/share/hwdata \
+    MANDIR=/usr/share/man \
+    SHARED=yes \
+    all
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make \
+    PREFIX=/usr \
+    SBINDIR=/usr/bin \
+    SHAREDIR=/usr/share/hwdata \
+    MANDIR=/usr/share/man \
+    SHARED=yes \
+    DESTDIR="${pkgdir}" \
+    install \
+    install-lib
+}
