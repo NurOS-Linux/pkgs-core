@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=git
+pkgver=2.48.1
+pkgrel=1
+pkgdesc="Fast, scalable, distributed revision control system"
+arch=('x86_64')
+url="https://git-scm.com/"
+license=('GPL-2.0-only')
+depends=('glibc' 'curl' 'expat' 'openssl' 'zlib' 'perl')
+source=("https://mirrors.edge.kernel.org/pub/software/scm/git/git-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --with-curl \
+    --with-expat \
+    --with-openssl \
+    --with-zlib
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
