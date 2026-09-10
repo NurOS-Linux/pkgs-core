@@ -2,7 +2,7 @@
 
 pkgname=bash
 pkgver=5.3
-pkgrel=1
+pkgrel=2
 pkgdesc="The GNU Bourne Again shell"
 arch=('x86_64')
 url="https://www.gnu.org/software/bash/"
@@ -33,7 +33,7 @@ build() {
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  make DESTDIR="${pkgdir}" install
+  make DESTDIR="${pkgdir}" AM_UPDATE_INFO_DIR=no install
 
   ln -sf bash "${pkgdir}/usr/bin/sh"
 }
