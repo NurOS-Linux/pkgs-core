@@ -27,7 +27,7 @@ build() {
     --with-curl \
     --with-expat \
     --with-openssl \
-    --with-zlib
+    --with-zlib=/usr
 
   make
 }
