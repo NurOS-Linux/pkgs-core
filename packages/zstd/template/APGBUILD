@@ -7,7 +7,7 @@ pkgdesc="Zstandard - Fast real-time compression algorithm"
 arch=('x86_64')
 url="https://facebook.github.io/zstd/"
 license=('BSD-3-Clause' 'GPL-2.0-only')
-depends=('glibc' 'zlib' 'xz' 'liblzma.so')
+depends=('glibc' 'zlib' 'xz')
 provides=('libzstd.so')
 source=("https://github.com/facebook/zstd/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.gz")
 
