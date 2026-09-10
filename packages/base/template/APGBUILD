@@ -20,6 +20,7 @@ depends=(
   'glibc'
   'libxcrypt'
   'libcap'
+  'linux-pam'
   'openssl'
   'zlib'
   'zstd'
