@@ -1,0 +1,31 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=tree
+pkgver=2.2.1
+pkgrel=1
+pkgdesc="A recursive directory listing program"
+arch=('x86_64')
+url="https://oldmanprogrammer.net/source.php?dir=projects/tree"
+license=('GPL-2.0-or-later')
+depends=('glibc')
+source=("https://gitlab.com/OldManProgrammer/unix-tree/-/archive/${pkgver}/unix-tree-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/unix-tree-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/unix-tree-${pkgver}"
+
+  make PREFIX=/usr
+}
+
+package() {
+  cd "${srcdir}/unix-tree-${pkgver}"
+
+  make PREFIX=/usr DESTDIR="${pkgdir}" install
+}
