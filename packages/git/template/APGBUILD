@@ -7,7 +7,7 @@ pkgdesc="Fast, scalable, distributed revision control system"
 arch=('x86_64')
 url="https://git-scm.com/"
 license=('GPL-2.0-only')
-depends=('glibc' 'curl' 'expat' 'openssl' 'zlib' 'perl')
+depends=('glibc' 'curl' 'expat' 'openssl' 'zlib' 'perl' 'gettext' 'tcl')
 source=("https://mirrors.edge.kernel.org/pub/software/scm/git/git-${pkgver}.tar.xz")
 
 prepare() {
