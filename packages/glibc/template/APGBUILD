@@ -2,7 +2,7 @@
 
 pkgname=glibc
 pkgver=2.44
-pkgrel=1
+pkgrel=2
 pkgdesc="GNU C Library for NurOS Juldyz"
 arch=('x86_64')
 url="https://www.gnu.org/software/libc"
@@ -73,9 +73,7 @@ package() {
 
   case "${CARCH}" in
     x86_64)
-      install -dm755 "${pkgdir}/lib64"
-      ln -sf /usr/lib/ld-linux-x86-64.so.2 "${pkgdir}/lib64/ld-linux-x86-64.so.2"
-      ln -sf /usr/lib/ld-linux-x86-64.so.2 "${pkgdir}/lib64/ld-lsb-x86-64.so.3"
+      ln -sf ld-linux-x86-64.so.2 "${pkgdir}/usr/lib/ld-lsb-x86-64.so.3"
       ;;
   esac
 }
