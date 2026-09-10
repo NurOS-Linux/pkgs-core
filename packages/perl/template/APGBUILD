@@ -2,7 +2,7 @@
 
 pkgname=perl
 pkgver=5.44.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Practical Extraction and Report Language"
 arch=('x86_64')
 url="https://www.perl.org/"
@@ -32,6 +32,7 @@ build() {
     -Dvendorarch=/usr/lib/perl5/5.44/vendor_perl \
     -Dman1dir=/usr/share/man/man1 \
     -Dman3dir=/usr/share/man/man3 \
+    -Dman3ext=3pm \
     -Dpager="/usr/bin/less -isR" \
     -Duseshrplib \
     -Dusethreads
