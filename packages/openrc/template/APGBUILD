@@ -2,7 +2,7 @@
 
 pkgname=openrc
 pkgver=0.63.3
-pkgrel=1
+pkgrel=2
 pkgdesc="Service manager and init system for NurOS"
 arch=('x86_64')
 url="https://github.com/OpenRC/openrc"
@@ -59,7 +59,6 @@ package() {
   ln -sf openrc-shutdown "${pkgdir}/usr/bin/shutdown"
   ln -sf openrc-init "${pkgdir}/usr/bin/telinit"
 
-  # Compatibility symlink for kernel boot parameter init=/sbin/init
-  mkdir -p "${pkgdir}/sbin"
-  ln -sf ../usr/bin/openrc-init "${pkgdir}/sbin/init"
+  # Standard init binary in /usr/bin (/sbin is symlink to usr/bin)
+  ln -sf openrc-init "${pkgdir}/usr/bin/init"
 }
