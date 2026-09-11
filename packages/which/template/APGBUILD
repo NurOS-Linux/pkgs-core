@@ -2,7 +2,7 @@
 
 pkgname=which
 pkgver=2.21
-pkgrel=1
+pkgrel=2
 pkgdesc="Utility to show the full path of commands"
 arch=('x86_64')
 url="https://carlowood.github.io/which/"
@@ -32,4 +32,5 @@ package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
   make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
 }
