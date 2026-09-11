@@ -2,7 +2,7 @@
 
 pkgname=wget
 pkgver=1.25.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Network utility to retrieve files from the Web"
 arch=('x86_64')
 url="https://www.gnu.org/software/wget/"
@@ -36,4 +36,5 @@ package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
   make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
 }
