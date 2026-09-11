@@ -2,7 +2,7 @@
 
 pkgname=nano
 pkgver=9.2
-pkgrel=1
+pkgrel=2
 pkgdesc="Small and friendly text editor"
 arch=('x86_64')
 url="https://www.nano-editor.org/"
@@ -33,4 +33,5 @@ package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
   make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
 }
