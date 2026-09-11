@@ -2,7 +2,7 @@
 
 pkgname=readline
 pkgver=8.3
-pkgrel=2
+pkgrel=3
 pkgdesc="GNU readline library"
 arch=('x86_64')
 url="https://tiswww.case.edu/php/chet/readline/rltop.html"
@@ -32,5 +32,10 @@ build() {
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  make DESTDIR="${pkgdir}" SHLIB_LIBS="-lncursesw" AM_UPDATE_INFO_DIR=no install
+  # Mask install-info during packaging so doc/Makefile.in skips updating /usr/share/info/dir
+  local fakebin="${srcdir}/fakebin"
+  mkdir -p "${fakebin}"
+  ln -sf /bin/false "${fakebin}/install-info"
+
+  PATH="${fakebin}:${PATH}" make DESTDIR="${pkgdir}" SHLIB_LIBS="-lncursesw" install
 }
