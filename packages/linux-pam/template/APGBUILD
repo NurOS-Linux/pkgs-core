@@ -2,7 +2,7 @@
 
 pkgname=linux-pam
 pkgver=1.7.2
-pkgrel=2
+pkgrel=3
 pkgdesc="Pluggable Authentication Modules for Linux"
 arch=('x86_64')
 url="https://github.com/linux-pam/linux-pam"
@@ -12,9 +12,6 @@ provides=('pam')
 backup=(
   'etc/pam.d/other'
   'etc/pam.d/system-auth'
-  'etc/pam.d/login'
-  'etc/pam.d/passwd'
-  'etc/pam.d/su'
 )
 source=("https://github.com/linux-pam/linux-pam/releases/download/v${pkgver}/Linux-PAM-${pkgver}.tar.xz")
 
@@ -73,28 +70,6 @@ password  required  pam_unix.so try_first_pass nullok sha512 shadow
 session   required  pam_limits.so
 session   required  pam_unix.so
 session   optional  pam_permit.so
-EOF
-
-  cat > "${pkgdir}/etc/pam.d/login" << 'EOF'
-#%PAM-1.0
-auth      requisite pam_nologin.so
-auth      include   system-auth
-account   include   system-auth
-password  include   system-auth
-session   include   system-auth
-EOF
-
-  cat > "${pkgdir}/etc/pam.d/passwd" << 'EOF'
-#%PAM-1.0
-password  include   system-auth
-EOF
-
-  cat > "${pkgdir}/etc/pam.d/su" << 'EOF'
-#%PAM-1.0
-auth      sufficient pam_rootok.so
-auth      include   system-auth
-account   include   system-auth
-session   include   system-auth
 EOF
 
   chmod 644 "${pkgdir}/etc/pam.d"/*
