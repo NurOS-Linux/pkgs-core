@@ -2,7 +2,7 @@
 
 pkgname=bash
 pkgver=5.3
-pkgrel=2
+pkgrel=3
 pkgdesc="The GNU Bourne Again shell"
 arch=('x86_64')
 url="https://www.gnu.org/software/bash/"
@@ -33,7 +33,12 @@ build() {
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  make DESTDIR="${pkgdir}" AM_UPDATE_INFO_DIR=no install
+  # Mask install-info during packaging so doc/Makefile.in skips updating /usr/share/info/dir
+  local fakebin="${srcdir}/fakebin"
+  mkdir -p "${fakebin}"
+  ln -sf /bin/false "${fakebin}/install-info"
+
+  PATH="${fakebin}:${PATH}" make DESTDIR="${pkgdir}" install
 
   ln -sf bash "${pkgdir}/usr/bin/sh"
 }
