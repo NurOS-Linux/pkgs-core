@@ -2,7 +2,7 @@
 
 pkgname=glibc
 pkgver=2.44
-pkgrel=2
+pkgrel=3
 pkgdesc="GNU C Library for NurOS Juldyz"
 arch=('x86_64')
 url="https://www.gnu.org/software/libc"
@@ -50,7 +50,7 @@ build() {
 package() {
   cd "${srcdir}/build"
 
-  make DESTDIR="${pkgdir}" install
+  make DESTDIR="${pkgdir}" INSTALL_INFO=no install
 
   local files_dir="${startdir}/../files"
   [ -d "${files_dir}" ] || files_dir="${startdir}"
