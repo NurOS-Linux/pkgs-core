@@ -7,8 +7,8 @@ pkgdesc="Generate Rust FFI bindings to C and C++ libraries"
 arch=('x86_64')
 url="https://github.com/rust-lang/rust-bindgen"
 license=('BSD-3-Clause')
-depends=('rust' 'llvm')
-makedepends=('rust')
+depends=('rust' 'clang')
+makedepends=('rust' 'clang')
 provides=('bindgen')
 source=("https://github.com/rust-lang/rust-bindgen/archive/refs/tags/v${pkgver}.tar.gz")
 
