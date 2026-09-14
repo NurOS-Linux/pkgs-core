@@ -1,0 +1,44 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=clang
+pkgver=22.1.8
+pkgrel=1
+pkgdesc="C language family frontend for LLVM"
+arch=('x86_64')
+url="https://clang.llvm.org/"
+license=('Apache-2.0 WITH LLVM-exception')
+depends=('llvm' 'glibc' 'gcc')
+makedepends=('llvm' 'cmake' 'ninja' 'python')
+source=("https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}/llvm-project-${pkgver}.src.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/llvm-project-${pkgver}.src"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/llvm-project-${pkgver}.src"
+
+  cmake -B build -S clang -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCLANG_DEFAULT_PIE_ON_LINUX=ON \
+    -DCLANG_LINK_CLANG_DYLIB=ON \
+    -DLLVM_LINK_LLVM_DYLIB=ON \
+    -DLLVM_ENABLE_RTTI=ON \
+    -DLLVM_INCLUDE_TESTS=OFF \
+    -DCLANG_INCLUDE_TESTS=OFF \
+    -DCLANG_INCLUDE_DOCS=OFF \
+    -DLLVM_EXTERNAL_CLANG_TOOLS_EXTRA_SOURCE_DIR="${srcdir}/llvm-project-${pkgver}.src/clang-tools-extra"
+
+  ninja -C build -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/llvm-project-${pkgver}.src"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
