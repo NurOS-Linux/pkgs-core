@@ -1,0 +1,43 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=lldb
+pkgver=22.1.8
+pkgrel=1
+pkgdesc="Next generation, high-performance debugger from the LLVM project"
+arch=('x86_64')
+url="https://lldb.llvm.org/"
+license=('Apache-2.0 WITH LLVM-exception')
+depends=('llvm' 'clang' 'ncurses' 'zlib' 'xz' 'python')
+makedepends=('llvm' 'clang' 'cmake' 'ninja' 'python')
+source=("https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}/llvm-project-${pkgver}.src.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/llvm-project-${pkgver}.src"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/llvm-project-${pkgver}.src"
+
+  cmake -B build -S lldb -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCLANG_LINK_CLANG_DYLIB=ON \
+    -DLLVM_LINK_LLVM_DYLIB=ON \
+    -DLLDB_ENABLE_CURSES=ON \
+    -DLLDB_ENABLE_LIBEDIT=OFF \
+    -DLLDB_ENABLE_PYTHON=ON \
+    -DLLVM_INCLUDE_TESTS=OFF \
+    -DLLDB_INCLUDE_TESTS=OFF
+
+  ninja -C build -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/llvm-project-${pkgver}.src"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
