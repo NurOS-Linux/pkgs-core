@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=rust-bindgen
+pkgver=0.73.2
+pkgrel=1
+pkgdesc="Generate Rust FFI bindings to C and C++ libraries"
+arch=('x86_64')
+url="https://github.com/rust-lang/rust-bindgen"
+license=('BSD-3-Clause')
+depends=('rust' 'llvm')
+makedepends=('rust')
+provides=('bindgen')
+source=("https://github.com/rust-lang/rust-bindgen/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cargo build --release --bin bindgen
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 "target/release/bindgen" "${pkgdir}/usr/bin/bindgen"
+}
