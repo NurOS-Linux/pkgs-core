@@ -1,0 +1,63 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+#
+# Special thanks and credits to the Arch Linux maintainers
+# for mkinitcpio modular initramfs creation utility.
+
+pkgname=mkinitcpio
+pkgver=42
+pkgrel=1
+pkgdesc="Modular initramfs image creation utility"
+arch=('x86_64')
+url="https://gitlab.archlinux.org/archlinux/mkinitcpio/mkinitcpio"
+license=('GPL-2.0-only')
+depends=('bash' 'mkinitcpio-busybox' 'kmod' 'util-linux' 'libarchive' 'coreutils' 'findutils' 'grep' 'zstd')
+makedepends=('meson' 'ninja' 'pkgconf')
+optdepends=(
+  'gzip: Use gzip compression for the initramfs image'
+  'xz: Use xz compression for the initramfs image'
+  'zstd: Use zstd compression for the initramfs image'
+)
+provides=('initramfs')
+backup=('etc/mkinitcpio.conf')
+source=("https://gitlab.archlinux.org/archlinux/mkinitcpio/mkinitcpio/-/archive/v${pkgver}/mkinitcpio-v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-v${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+
+  # Fix standalone version detection without git checkout
+  sed -i "s/run_command('tools\/dist.sh', 'get-version', check: true).stdout().strip()/'${pkgver}'/" meson.build
+
+  # Allow udevd detection across standard locations (/usr/bin/udevd or /usr/lib/systemd/systemd-udevd)
+  sed -i "s/udevd = find_program('systemd-udevd', 'udevd', dirs: udevd_dirs, required: true)/udevd = find_program('systemd-udevd', 'udevd', dirs: udevd_dirs + ['\/usr\/bin', '\/usr\/lib\/systemd', '\/usr\/lib\/udev'], required: false)/" meson.build
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-v${pkgver}"
+
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    -Dsystemd=disabled \
+    -Dalpm=false \
+    -Ddocs=false \
+    -Dkernel_install=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-v${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+
+  # Ensure hooks and presets directories exist
+  install -dm755 "${pkgdir}/etc/mkinitcpio.d"
+  install -dm755 "${pkgdir}/usr/lib/initcpio/hooks"
+  install -dm755 "${pkgdir}/usr/lib/initcpio/install"
+}
