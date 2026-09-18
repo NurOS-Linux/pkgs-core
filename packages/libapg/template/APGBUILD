@@ -1,13 +1,13 @@
 # Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
 
 pkgname=libapg
-pkgver=2.3.3
+pkgver=2.5.0
 pkgrel=1
 pkgdesc="Package management library for NurOS"
 arch=('x86_64')
 url="https://git.nuros.org/core/libAPG"
 license=('GPL-3.0-only')
-depends=('glibc' 'libarchive' 'lmdb' 'libsodium' 'libseccomp')
+depends=('glibc' 'libarchive' 'lmdb' 'libsodium' 'libseccomp' 'yyjson')
 makedepends=('meson' 'ninja' 'pkgconf')
 source=("https://git.nuros.org/core/libAPG/archive/v${pkgver}.tar.gz")
 
