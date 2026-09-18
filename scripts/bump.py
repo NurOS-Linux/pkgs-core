@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-
 import argparse
+import glob
 import json
 import os
 import re
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 from typing import Dict, List, Optional, Set, Tuple
 
@@ -14,6 +15,8 @@ VALID_STATUSES = {"newest", "outdated", "legacy", "untrusted"}
 IGNORE_STATUSES = {"incorrect", "ignored", "noscheme", "unique", "devel", "rolling"}
 
 _REPOLOGY_CACHE: Dict[str, List[dict]] = {}
+_ANITYA_CACHE: Dict[str, Tuple[Set[str], Set[str]]] = {}
+_ARCH_CACHE: Dict[str, Tuple[Set[str], Set[str]]] = {}
 
 
 def parse_pkgbuild(pkgbuild_path: str) -> Dict[str, any]:
@@ -38,35 +41,39 @@ def parse_pkgbuild(pkgbuild_path: str) -> Dict[str, any]:
     m_prov = re.search(r"provides=\s*\((.*?)\)", content, re.DOTALL)
     if m_prov:
         raw_items = re.findall(r"['\"]([^'\"]+)['\"]|(\S+)", m_prov.group(1))
-        for q, u in raw_items:
-            item = (q or u).split("=")[0].strip()
-            if item and not item.endswith(".so"):
+        for g1, g2 in raw_items:
+            item = g1 or g2
+            item = item.split("=")[0].split("<")[0].split(">")[0].strip()
+            if item and item not in provides_list:
                 provides_list.append(item)
-    data["provides"] = provides_list
 
+    data["provides_list"] = provides_list
     return data
 
 
 def normalize_version(v: str) -> str:
-    v = v.strip().lstrip("v")
-    v = v.replace("_p", "p").replace(".p", "p")
-    return v
+    return re.sub(r"^[vV_rR]+", "", v).replace("_", ".")
 
 
-def split_version(version: str) -> List[Tuple[int, str]]:
-    v = normalize_version(version)
-    chunks = re.findall(r"(\d+|[a-zA-Z]+)", v)
-    parsed = []
-    for chunk in chunks:
-        if chunk.isdigit():
-            parsed.append((int(chunk), ""))
+def split_version(v: str) -> List:
+    v_clean = normalize_version(v)
+    parts = re.split(r"([0-9]+)", v_clean)
+    res = []
+    for p in parts:
+        if not p:
+            continue
+        if p.isdigit():
+            res.append(int(p))
         else:
-            parsed.append((0, chunk))
-    return parsed
+            res.append(p)
+    return res
 
 
 def sort_versions(versions: List[str]) -> List[str]:
-    return sorted(versions, key=split_version)
+    def key_func(v):
+        return split_version(v)
+
+    return sorted(versions, key=key_func)
 
 
 def is_valid_release_version(v: str) -> bool:
@@ -89,7 +96,7 @@ def fetch_repology_project(project_name: str) -> List[dict]:
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
 
     try:
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with urllib.request.urlopen(req, timeout=3) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             _REPOLOGY_CACHE[project_name] = data
             return data
@@ -97,10 +104,64 @@ def fetch_repology_project(project_name: str) -> List[dict]:
         if e.code == 404:
             _REPOLOGY_CACHE[project_name] = []
             return []
-        raise
+        _REPOLOGY_CACHE[project_name] = []
+        return []
     except Exception:
         _REPOLOGY_CACHE[project_name] = []
         return []
+
+
+def fetch_anitya_project(project_name: str) -> Tuple[Set[str], Set[str]]:
+    if project_name in _ANITYA_CACHE:
+        return _ANITYA_CACHE[project_name]
+
+    url = f"https://release-monitoring.org/api/v2/projects/?name={urllib.parse.quote(project_name)}"
+    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    newest = set()
+    all_clean = set()
+
+    try:
+        with urllib.request.urlopen(req, timeout=4) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            for item in data.get("items", []):
+                if item.get("name", "").lower() == project_name.lower():
+                    v = item.get("version")
+                    if v and is_valid_release_version(v):
+                        newest.add(v)
+                        all_clean.add(v)
+                    for sv in item.get("stable_versions", []) or item.get("versions", []):
+                        if sv and is_valid_release_version(sv):
+                            all_clean.add(sv)
+    except Exception:
+        pass
+
+    _ANITYA_CACHE[project_name] = (newest, all_clean)
+    return newest, all_clean
+
+
+def fetch_arch_project(project_name: str) -> Tuple[Set[str], Set[str]]:
+    if project_name in _ARCH_CACHE:
+        return _ARCH_CACHE[project_name]
+
+    url = f"https://archlinux.org/packages/search/json/?name={urllib.parse.quote(project_name)}"
+    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    newest = set()
+    all_clean = set()
+
+    try:
+        with urllib.request.urlopen(req, timeout=4) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            for item in data.get("results", []):
+                if item.get("pkgname", "").lower() == project_name.lower():
+                    v = item.get("pkgver")
+                    if v and is_valid_release_version(v):
+                        newest.add(v)
+                        all_clean.add(v)
+    except Exception:
+        pass
+
+    _ARCH_CACHE[project_name] = (newest, all_clean)
+    return newest, all_clean
 
 
 def analyze_repology_project(project_name: str) -> Tuple[Set[str], Set[str]]:
@@ -120,6 +181,15 @@ def analyze_repology_project(project_name: str) -> Tuple[Set[str], Set[str]]:
             all_clean_versions.add(version)
         if status == "newest":
             newest_versions.add(version)
+
+    if not newest_versions and not all_clean_versions:
+        an_newest, an_all = fetch_anitya_project(project_name)
+        newest_versions.update(an_newest)
+        all_clean_versions.update(an_all)
+
+        arch_newest, arch_all = fetch_arch_project(project_name)
+        newest_versions.update(arch_newest)
+        all_clean_versions.update(arch_all)
 
     return newest_versions, all_clean_versions
 
@@ -221,100 +291,105 @@ def bump_pkgbuild(pkgbuild_path: str, new_version: str) -> bool:
         flags=re.MULTILINE,
     )
 
-    if count_v > 0:
-        with open(pkgbuild_path, "w", encoding="utf-8") as f:
-            f.write(new_content)
-        return True
-    return False
+    if count_v == 0:
+        return False
+
+    with open(pkgbuild_path, "w", encoding="utf-8") as f:
+        f.write(new_content)
+    return True
 
 
-def scan_packages(base_dir: str) -> List[Dict[str, any]]:
-    pkgs = []
-    packages_dir = os.path.join(base_dir, "packages")
-    if not os.path.isdir(packages_dir):
-        return pkgs
-
-    for entry in sorted(os.listdir(packages_dir)):
-        pkg_path = os.path.join(packages_dir, entry)
-        if not os.path.isdir(pkg_path):
-            continue
-
-        pkgbuild_path = os.path.join(pkg_path, "template", "APGBUILD")
-        if not os.path.isfile(pkgbuild_path):
-            pkgbuild_path = os.path.join(pkg_path, "template", "PKGBUILD")
-        if os.path.isfile(pkgbuild_path):
-            vars_dict = parse_pkgbuild(pkgbuild_path)
-            pkgs.append(
-                {
-                    "name": entry,
-                    "pkgname": vars_dict.get("pkgname", entry),
-                    "pkgver": vars_dict.get("pkgver", ""),
-                    "pkgrel": vars_dict.get("pkgrel", "1"),
-                    "provides": vars_dict.get("provides", []),
-                    "path": pkgbuild_path,
-                }
-            )
-    return pkgs
+def scan_packages(base_dir: str) -> List[Tuple[str, str, Dict[str, any]]]:
+    packages = []
+    pattern = os.path.join(base_dir, "packages", "*", "template", "APGBUILD")
+    for pkgbuild in sorted(glob.glob(pattern)):
+        rel = os.path.relpath(pkgbuild, base_dir)
+        pkg_dir = os.path.dirname(os.path.dirname(pkgbuild))
+        pkg_name = os.path.basename(pkg_dir)
+        data = parse_pkgbuild(pkgbuild)
+        if data.get("pkgver"):
+            packages.append((pkg_name, pkgbuild, data))
+    return packages
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="NurOS core packages version checker & bumper via Repology"
+        description="NurOS core packages version checker & bumper via Repology/Anitya/Arch"
     )
     parser.add_argument(
-        "-p", "--package", help="Target specific package name (directory name)"
+        "--check",
+        nargs="?",
+        const="__ALL__",
+        help="Check single package or all packages without bumping",
     )
     parser.add_argument(
         "--bump",
-        choices=["latest", "next"],
-        help="Bump mode: 'latest' (to newest upstream) or 'next' (to immediate next version)",
+        nargs="?",
+        const="__ALL__",
+        help="Bump single package or all packages to next available version",
+    )
+    parser.add_argument(
+        "--latest",
+        action="store_true",
+        help="When bumping, bump directly to latest instead of next stepwise version",
     )
     args = parser.parse_args()
 
-    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    packages = scan_packages(root_dir)
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    packages = scan_packages(repo_root)
 
-    if args.package:
-        packages = [p for p in packages if p["name"] == args.package]
+    target_name = args.check or args.bump
+    is_bump_mode = bool(args.bump)
+
+    if target_name and target_name != "__ALL__":
+        packages = [p for p in packages if p[0] == target_name]
         if not packages:
-            print(f"Error: package '{args.package}' not found", file=sys.stderr)
+            print(f"Error: package '{target_name}' not found.")
             sys.exit(1)
 
-    print(f"Scanning {len(packages)} package(s)...\n")
+    print(f"Loaded {len(packages)} packages.")
+    print("-" * 60)
 
-    for pkg in packages:
-        name = pkg["name"]
-        curr_ver = pkg["pkgver"]
+    bumped_count = 0
+    up_to_date_count = 0
+    outdated_count = 0
+    not_found_count = 0
 
-        matched_cand, latest, next_ver = resolve_project_versions(
-            pkg["pkgname"], curr_ver, pkg["provides"]
-        )
+    for name, path, data in packages:
+        curr_ver = data["pkgver"]
+        provides = data.get("provides_list", [])
 
-        cand_info = f" (via {matched_cand})" if matched_cand and matched_cand != name else ""
-        print(f"[{name}]{cand_info} Current: {curr_ver}")
-        if latest:
-            print(f"  Repology latest: {latest}")
-        if next_ver:
-            print(f"  Repology next:   {next_ver}")
-        if not latest and not next_ver:
-            print(f"  Repology: no data found for '{name}'")
+        cand, latest, next_ver = resolve_project_versions(name, curr_ver, provides)
 
-        if args.bump:
-            target_version = latest if args.bump == "latest" else next_ver
-            if not target_version:
-                print("  -> No target version available to bump to.")
-            elif normalize_version(target_version) == normalize_version(curr_ver):
-                print(f"  -> Package is already at version {curr_ver}.")
-            else:
-                success = bump_pkgbuild(pkg["path"], target_version)
-                if success:
-                    print(
-                        f"  -> BUMPED {curr_ver}-{pkg['pkgrel']} -> {target_version}-1 in {pkg['path']}"
-                    )
+        if not cand or not latest:
+            print(f"[-] {name:<18} {curr_ver:<12} (upstream data not found)")
+            not_found_count += 1
+            continue
+
+        is_outdated = split_version(latest) > split_version(curr_ver)
+
+        if not is_outdated:
+            print(f"[=] {name:<18} {curr_ver:<12} (up-to-date)")
+            up_to_date_count += 1
+        else:
+            target_ver = latest if args.latest else (next_ver or latest)
+            status_str = f"outdated -> next: {next_ver} | latest: {latest}"
+            print(f"[!] {name:<18} {curr_ver:<12} ({status_str})")
+            outdated_count += 1
+
+            if is_bump_mode:
+                if bump_pkgbuild(path, target_ver):
+                    print(f"    -> BUMPED to {target_ver}")
+                    bumped_count += 1
                 else:
-                    print(f"  -> Failed to update {pkg['path']}", file=sys.stderr)
+                    print(f"    -> FAILED to update {path}")
 
-        print()
+    print("-" * 60)
+    print(
+        f"Summary: Up-to-date: {up_to_date_count} | Outdated: {outdated_count} | Not found: {not_found_count}"
+    )
+    if is_bump_mode:
+        print(f"Total packages bumped: {bumped_count}")
 
 
 if __name__ == "__main__":
