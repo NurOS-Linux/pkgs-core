@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=mkinitcpio-busybox
+pkgver=1.36.1
+pkgrel=1
+pkgdesc="Base initramfs tools for mkinitcpio"
+arch=('x86_64')
+url="https://www.busybox.net/"
+license=('GPL-2.0-only')
+depends=('glibc' 'libxcrypt')
+source=(
+  "https://busybox.net/downloads/busybox-${pkgver}.tar.bz2"
+  "config"
+)
+
+prepare() {
+  local dir="${srcdir}/busybox-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  cp "${srcdir}/config" .config
+  make oldconfig
+}
+
+build() {
+  cd "${srcdir}/busybox-${pkgver}"
+
+  export KCONFIG_NOTIMESTAMP=1
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/busybox-${pkgver}"
+
+  install -Dm755 busybox "${pkgdir}/usr/lib/initcpio/busybox"
+}
