@@ -1,0 +1,13 @@
+# mkinitcpio preset file for the 'linux' package in NurOS
+
+ALL_config="/etc/mkinitcpio.conf"
+ALL_kver="/boot/vmlinuz-nuros"
+
+PRESETS=('default' 'fallback')
+
+# default config
+default_image="/boot/initramfs-linux.img"
+
+# fallback config
+fallback_image="/boot/initramfs-linux-fallback.img"
+fallback_options="-S autodetect"

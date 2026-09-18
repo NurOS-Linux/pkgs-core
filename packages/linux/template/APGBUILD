@@ -11,11 +11,15 @@ arch=('x86_64')
 url="https://www.kernel.org/"
 license=('GPL-2.0-only')
 depends=('kmod')
-optdepends=('linux-firmware: Firmware files for built-in and modular hardware drivers')
+optdepends=(
+  'mkinitcpio: Modular initramfs image creation utility'
+  'linux-firmware: Firmware files for built-in and modular hardware drivers'
+)
 makedepends=('bc' 'bison' 'flex' 'openssl' 'kmod' 'rsync' 'rust' 'rust-bindgen' 'llvm')
 source=(
   "https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-${pkgver}.tar.xz"
   "config.x86_64"
+  "linux.preset"
 )
 
 prepare() {
@@ -57,4 +61,7 @@ package() {
 
   # 3. Clean up build and source symlinks pointing to build environment
   find "${pkgdir}/usr/lib/modules" -maxdepth 2 -type l \( -name build -o -name source \) -delete
+
+  # 4. Install mkinitcpio preset
+  install -Dm644 "${srcdir}/linux.preset" "${pkgdir}/etc/mkinitcpio.d/linux.preset"
 }
