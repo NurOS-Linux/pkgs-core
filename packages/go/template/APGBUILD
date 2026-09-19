@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=go
+pkgver=1.27.1
+pkgrel=1
+pkgdesc="Core compiler tools for the Go programming language"
+arch=('x86_64')
+url="https://go.dev/"
+license=('BSD-3-Clause')
+depends=('glibc' 'binutils' 'gcc')
+source=("https://go.dev/dl/go${pkgver}.linux-amd64.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/go"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}"
+
+  install -dm755 "${pkgdir}/usr/lib/go"
+  cp -a go/* "${pkgdir}/usr/lib/go/"
+
+  install -dm755 "${pkgdir}/usr/bin"
+  ln -sf /usr/lib/go/bin/go "${pkgdir}/usr/bin/go"
+  ln -sf /usr/lib/go/bin/gofmt "${pkgdir}/usr/bin/gofmt"
+
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
