@@ -15,7 +15,7 @@ optdepends=(
   'mkinitcpio: Modular initramfs image creation utility'
   'linux-firmware: Firmware files for built-in and modular hardware drivers'
 )
-makedepends=('bc' 'bison' 'flex' 'openssl' 'kmod' 'rsync' 'rust' 'rust-bindgen' 'llvm')
+makedepends=('bc' 'bison' 'flex' 'openssl' 'kmod' 'rsync' 'rust' 'rust-bindgen' 'llvm' 'elfutils')
 source=(
   "https://cdn.kernel.org/pub/linux/kernel/v7.x/linux-${pkgver}.tar.xz"
   "config.x86_64"
