@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=kbd
+pkgver=2.10.0
+pkgrel=1
+pkgdesc="Keytable files and keyboard utilities"
+arch=('x86_64')
+url="http://www.kbd-project.org"
+license=('GPL-2.0-or-later')
+depends=('glibc')
+makedepends=('bison' 'flex')
+source=("https://kernel.org/pub/linux/utils/kbd/kbd-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --mandir=/usr/share/man \
+    --disable-vlock \
+    --disable-tests \
+    --disable-nls
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
