@@ -11,12 +11,13 @@ arch=('x86_64')
 url="https://gitlab.archlinux.org/archlinux/mkinitcpio/mkinitcpio"
 license=('GPL-2.0-only')
 depends=('bash' 'mkinitcpio-busybox' 'kmod' 'util-linux' 'libarchive' 'coreutils' 'findutils' 'grep' 'zstd')
-makedepends=('meson' 'ninja' 'pkgconf')
 optdepends=(
+  'kbd: Keymap and console font support in initramfs'
   'gzip: Use gzip compression for the initramfs image'
   'xz: Use xz compression for the initramfs image'
   'zstd: Use zstd compression for the initramfs image'
 )
+makedepends=('meson' 'ninja' 'pkgconf')
 provides=('initramfs')
 backup=('etc/mkinitcpio.conf')
 source=("https://gitlab.archlinux.org/archlinux/mkinitcpio/mkinitcpio/-/archive/v${pkgver}/mkinitcpio-v${pkgver}.tar.gz")
@@ -31,7 +32,7 @@ prepare() {
   cd "${dir}"
 
   # Fix standalone version detection without git checkout
-  sed -i "s/run_command('tools\/dist.sh', 'get-version', check: true).stdout().strip()/'${pkgver}'/" meson.build
+  sed -i "s/run_command('tools\/dist.sh', 'get-version', check: true).stdout().strip()/'${pkgver}'/\" meson.build
 
   # Allow udevd detection across standard locations (/usr/bin/udevd or /usr/lib/systemd/systemd-udevd)
   sed -i "s/udevd = find_program('systemd-udevd', 'udevd', dirs: udevd_dirs, required: true)/udevd = find_program('systemd-udevd', 'udevd', dirs: udevd_dirs + ['\/usr\/bin', '\/usr\/lib\/systemd', '\/usr\/lib\/udev'], required: false)/" meson.build
@@ -58,6 +59,8 @@ package() {
 
   # Ensure hooks and presets directories exist
   install -dm755 "${pkgdir}/etc/mkinitcpio.d"
-  install -dm755 "${pkgdir}/usr/lib/initcpio/hooks"
-  install -dm755 "${pkgdir}/usr/lib/initcpio/install"
+
+  # Adjust default mkinitcpio.conf hooks for NurOS:
+  # Omit optional keymap and consolefont from default HOOKS to avoid errors when kbd is not installed
+  sed -i 's/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base udev autodetect microcode modconf kms keyboard block filesystems fsck)/' "${pkgdir}/etc/mkinitcpio.conf"
 }
