@@ -33,7 +33,6 @@ build() {
     --buildtype=release \
     -Dxorg=true \
     -Dxephyr=true \
-    -Dxwayland=false \
     -Dglamor=false \
     -Ddri1=false \
     -Ddri2=false \
