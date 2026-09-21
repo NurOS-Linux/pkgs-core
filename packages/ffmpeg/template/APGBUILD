@@ -1,0 +1,48 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ffmpeg
+pkgver=7.1
+pkgrel=1
+pkgdesc="Complete, cross-platform solution to record, convert and stream audio and video"
+arch=('x86_64')
+url="https://ffmpeg.org/"
+license=('GPL-3.0-or-later')
+depends=(
+  'glibc' 'alsa-lib' 'libogg' 'libvorbis' 'flac' 'opus'
+  'libdrm' 'zlib' 'bzip2' 'xz' 'openssl'
+)
+makedepends=('nasm' 'pkgconf')
+source=("https://ffmpeg.org/releases/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-debug \
+    --disable-static \
+    --enable-shared \
+    --enable-gpl \
+    --enable-version3 \
+    --enable-alsa \
+    --enable-libopus \
+    --enable-libvorbis \
+    --enable-openssl
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
