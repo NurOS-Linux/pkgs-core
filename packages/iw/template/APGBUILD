@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=iw
+pkgver=6.17
+pkgrel=1
+pkgdesc="nl80211 based CLI configuration utility for wireless devices"
+arch=('x86_64')
+url="https://wireless.docs.kernel.org/en/latest/en/users/documentation/iw.html"
+license=('ISC')
+depends=('glibc' 'libnl')
+makedepends=('pkgconf')
+source=("https://kernel.org/pub/software/network/iw/iw-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" PREFIX=/usr SBINDIR=/usr/bin install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
