@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=fontconfig
+pkgver=2.15.0
+pkgrel=1
+pkgdesc="Library for configuring and customizing font access"
+arch=('x86_64')
+url="https://www.freedesktop.org/wiki/Software/fontconfig/"
+license=('MIT')
+depends=('glibc' 'freetype' 'expat')
+makedepends=('meson' 'ninja' 'pkgconf' 'gperf' 'python')
+source=("https://www.freedesktop.org/software/fontconfig/release/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Ddoc=disabled \
+    -Dtests=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
