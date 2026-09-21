@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libxrandr
+pkgver=1.5.4
+pkgrel=1
+pkgdesc="X11 RandR (Resize and Rotate) extension library"
+arch=('x86_64')
+url="https://xorg.freedesktop.org/"
+license=('MIT')
+depends=('glibc' 'libx11' 'libxext' 'libxrender')
+makedepends=('pkgconf' 'xorgproto' 'util-macros')
+source=("https://xorg.freedesktop.org/releases/individual/lib/libXrandr-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/libXrandr-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/libXrandr-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --disable-static
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/libXrandr-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
