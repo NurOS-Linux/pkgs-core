@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=wlr-randr
+pkgver=0.4.1
+pkgrel=1
+pkgdesc="An xrandr clone for wlroots compositors"
+arch=('x86_64')
+url="https://gitlab.freedesktop.org/emersion/wlr-randr"
+license=('MIT')
+depends=('glibc' 'wayland')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://gitlab.freedesktop.org/emersion/wlr-randr/-/archive/v${pkgver}/wlr-randr-v${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-v${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-v${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --buildtype=release \
+    -Dman-pages=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-v${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
