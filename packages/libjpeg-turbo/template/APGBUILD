@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libjpeg-turbo
+pkgver=3.1.0
+pkgrel=1
+pkgdesc="MMX/SSE2 accelerated library for manipulating JPEG image files"
+arch=('x86_64')
+url="https://libjpeg-turbo.org/"
+license=('IJG' 'BSD-3-Clause' 'Zlib')
+depends=('glibc')
+makedepends=('cmake' 'nasm')
+source=("https://github.com/libjpeg-turbo/libjpeg-turbo/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  cmake -B build -S . \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DENABLE_STATIC=OFF
+
+  cmake --build build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" cmake --install build
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
