@@ -72,4 +72,5 @@ done
 exec gcc $fl ${1+"$@"}
 EOF
   chmod 755 "${pkgdir}/usr/bin/c99"
+  rm -f "${pkgdir}/usr/share/info/dir"
 }
