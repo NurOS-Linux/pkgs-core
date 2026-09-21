@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=alsa-utils
+pkgver=1.2.13
+pkgrel=1
+pkgdesc="Advanced Linux Sound Architecture - Utilities (alsamixer, amixer, aplay, arecord)"
+arch=('x86_64')
+url="https://www.alsa-project.org/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'alsa-lib' 'ncurses')
+makedepends=('pkgconf')
+source=("https://www.alsa-project.org/files/pub/utils/${pkgname}-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --sbindir=/usr/bin \
+    --disable-alsaconf \
+    --disable-bat \
+    --disable-xmlto
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
