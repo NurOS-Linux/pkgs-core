@@ -38,6 +38,7 @@ build() {
     -Ddri1=false \
     -Ddri2=false \
     -Ddri3=false \
+    -Dsecure-rpc=false \
     -Dudev=true \
     -Dlog_dir=/var/log \
     -Dxkb_output_dir=/var/lib/xkb
