@@ -34,4 +34,5 @@ package() {
 
   make DESTDIR="${pkgdir}" install
   ln -sf flex "${pkgdir}/usr/bin/lex"
+  rm -f "${pkgdir}/usr/share/info/dir"
 }
