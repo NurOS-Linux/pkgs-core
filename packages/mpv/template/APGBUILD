@@ -20,6 +20,10 @@ prepare() {
     echo "Error: ${dir} not found" >&2
     return 1
   fi
+
+  cd "${dir}"
+  # FFmpeg 7.x const uint8_t write_packet compatibility
+  sed -i 's/static int write_packet(void \*p, uint8_t \*buf, int buf_size)/static int write_packet(void *p, const uint8_t *buf, int buf_size)/' audio/decode/ad_spdif.c
 }
 
 build() {
@@ -38,7 +42,7 @@ build() {
     -Ddrm=disabled \
     -Dmanpage-build=disabled
 
-  ninja -C build -v
+  ninja -C build
 }
 
 package() {
