@@ -1,0 +1,26 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=uthash
+pkgver=2.3.0
+pkgrel=1
+pkgdesc="A hash table and linked list implementation for C structures"
+arch=('any')
+url="https://troydhanson.github.io/uthash/"
+license=('BSD-1-Clause')
+depends=()
+source=("https://github.com/troydhanson/uthash/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -dm755 "${pkgdir}/usr/include"
+  install -m644 src/*.h "${pkgdir}/usr/include/"
+}
