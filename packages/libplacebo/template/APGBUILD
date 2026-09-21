@@ -27,15 +27,24 @@ prepare() {
   rm -rf "${dir}/3rdparty/jinja" "${dir}/3rdparty/markupsafe" "${dir}/3rdparty/glad"
   mkdir -p "${dir}/3rdparty"
 
-  if [ -d "${srcdir}/jinja-3.1.5" ]; then
-    cp -r "${srcdir}/jinja-3.1.5" "${dir}/3rdparty/jinja"
-  fi
-  if [ -d "${srcdir}/markupsafe-3.0.2" ]; then
-    cp -r "${srcdir}/markupsafe-3.0.2" "${dir}/3rdparty/markupsafe"
-  fi
-  if [ -d "${srcdir}/glad-2.0.8" ]; then
-    cp -r "${srcdir}/glad-2.0.8" "${dir}/3rdparty/glad"
-  fi
+  for src_dir in "${srcdir}/jinja-"* "${srcdir}/Jinja-"*; do
+    if [ -d "${src_dir}" ]; then
+      cp -r "${src_dir}" "${dir}/3rdparty/jinja"
+      break
+    fi
+  done
+  for src_dir in "${srcdir}/markupsafe-"* "${srcdir}/MarkupSafe-"*; do
+    if [ -d "${src_dir}" ]; then
+      cp -r "${src_dir}" "${dir}/3rdparty/markupsafe"
+      break
+    fi
+  done
+  for src_dir in "${srcdir}/glad-"* "${srcdir}/Glad-"*; do
+    if [ -d "${src_dir}" ]; then
+      cp -r "${src_dir}" "${dir}/3rdparty/glad"
+      break
+    fi
+  done
 }
 
 build() {
@@ -50,9 +59,10 @@ build() {
     -Dvulkan=disabled \
     -Dopengl=disabled \
     -Dshaderc=disabled \
-    -Dlcms=disabled
+    -Dlcms=disabled \
+    -Dunwind=disabled
 
-  ninja -C build
+  ninja -C build -v
 }
 
 package() {
