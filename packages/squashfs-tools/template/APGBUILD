@@ -1,0 +1,45 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=squashfs-tools
+pkgver=4.7.5
+pkgrel=1
+pkgdesc="Tools for creating and unpacking squashfs filesystems"
+arch=('x86_64')
+url="https://github.com/plougher/squashfs-tools"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'zlib' 'xz' 'zstd' 'lz4' 'lzo')
+source=("https://github.com/plougher/squashfs-tools/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}/squashfs-tools"
+
+  make \
+    GZIP_SUPPORT=1 \
+    XZ_SUPPORT=1 \
+    LZO_SUPPORT=1 \
+    LZ4_SUPPORT=1 \
+    ZSTD_SUPPORT=1 \
+    XATTR_SUPPORT=1 \
+    -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}/squashfs-tools"
+
+  install -Dm755 mksquashfs "${pkgdir}/usr/bin/mksquashfs"
+  install -Dm755 unsquashfs "${pkgdir}/usr/bin/unsquashfs"
+  install -Dm755 sqfstar "${pkgdir}/usr/bin/sqfstar"
+  install -Dm755 sqfscat "${pkgdir}/usr/bin/sqfscat"
+
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  install -dm755 "${pkgdir}/usr/share/man/man1"
+  install -m644 manpages/*.1 "${pkgdir}/usr/share/man/man1/"
+}
