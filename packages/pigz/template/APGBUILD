@@ -1,0 +1,35 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pigz
+pkgver=2.8
+pkgrel=1
+pkgdesc="A parallel implementation of gzip for modern multi-processor, multi-core machines"
+arch=('x86_64')
+url="https://zlib.net/pigz/"
+license=('Zlib')
+depends=('glibc' 'zlib')
+source=("https://zlib.net/pigz/pigz-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make CFLAGS="${CFLAGS} -Wall -Wextra" -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 pigz "${pkgdir}/usr/bin/pigz"
+  ln -sf pigz "${pkgdir}/usr/bin/unpigz"
+
+  install -Dm644 pigz.1 "${pkgdir}/usr/share/man/man1/pigz.1"
+  ln -sf pigz.1 "${pkgdir}/usr/share/man/man1/unpigz.1"
+}
