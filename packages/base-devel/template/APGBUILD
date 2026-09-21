@@ -1,0 +1,49 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=base-devel
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="NurOS core development and build toolchain meta-package"
+pkgtype=misc
+arch=('any')
+url="https://nuros.org"
+license=('GPL-3.0-or-later')
+tags=('base' 'devel' 'toolchain')
+depends=(
+  # Base system foundation
+  'base'
+
+  # Compiler & Assembler Toolchain
+  'gcc'
+  'binutils'
+  'glibc'
+  'linux-headers'
+
+  # Core Build Automation & Parsers
+  'make'
+  'ninja'
+  'meson'
+  'cmake'
+  'pkgconf'
+  'patch'
+  'diffutils'
+  'm4'
+  'bison'
+  'flex'
+  'gperf'
+  'texinfo'
+  'gettext'
+
+  # Core Toolchain Dependencies & Math
+  'gmp'
+  'mpfr'
+  'mpc'
+  'isl'
+  'libffi'
+  'elfutils'
+
+  # Packaging Tools
+  'apgbuild'
+  'libapg'
+  'tulpar'
+)
