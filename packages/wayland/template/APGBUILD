@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=wayland
+pkgver=1.23.1
+pkgrel=1
+pkgdesc="Core Wayland display server and client library"
+arch=('x86_64')
+url="https://wayland.freedesktop.org/"
+license=('MIT')
+depends=('glibc' 'libffi' 'expat')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://gitlab.freedesktop.org/wayland/wayland/-/archive/${pkgver}/wayland-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --buildtype=release \
+    -Ddocumentation=false \
+    -Dtests=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
