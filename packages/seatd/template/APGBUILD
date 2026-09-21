@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=seatd
+pkgver=0.9.1
+pkgrel=1
+pkgdesc="A minimal seat management daemon, and universal seat management library"
+arch=('x86_64')
+url="https://sr.ht/~kennylevinsen/seatd/"
+license=('MIT')
+depends=('glibc')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://git.sr.ht/~kennylevinsen/seatd/archive/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --buildtype=release \
+    -Dlibseat-builtin=enabled \
+    -Dserver=enabled \
+    -Dman-pages=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
