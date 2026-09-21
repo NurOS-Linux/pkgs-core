@@ -41,4 +41,5 @@ package() {
   PATH="${fakebin}:${PATH}" make DESTDIR="${pkgdir}" install
 
   ln -sf bash "${pkgdir}/usr/bin/sh"
+  rm -f "${pkgdir}/usr/share/info/dir"
 }
