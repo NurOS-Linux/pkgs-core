@@ -28,6 +28,11 @@ build() {
   ./configure \
     --prefix=/usr \
     --disable-debug \
+    --disable-doc \
+    --disable-htmlpages \
+    --disable-manpages \
+    --disable-podpages \
+    --disable-txtpages \
     --disable-static \
     --enable-shared \
     --enable-gpl \
