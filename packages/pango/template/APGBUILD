@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pango
+pkgver=1.56.1
+pkgrel=1
+pkgdesc="A library for layout and rendering of text"
+arch=('x86_64')
+url="https://pango.gnome.org/"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'glib-2.0' 'cairo' 'harfbuzz' 'fontconfig' 'fribidi' 'libxft')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://gitlab.gnome.org/GNOME/pango/-/archive/${pkgver}/pango-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --buildtype=release \
+    -Dintrospection=disabled \
+    -Dfontconfig=enabled \
+    -Dfreetype=enabled \
+    -Dcairo=enabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
