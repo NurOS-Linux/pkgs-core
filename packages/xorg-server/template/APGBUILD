@@ -32,7 +32,9 @@ build() {
     --localstatedir=/var \
     --buildtype=release \
     -Dxorg=true \
-    -Dxephyr=true \
+    -Dxephyr=false \
+    -Dxnest=false \
+    -Dxvfb=false \
     -Dglx=false \
     -Dglamor=false \
     -Ddri1=false \
@@ -40,6 +42,10 @@ build() {
     -Ddri3=false \
     -Dsecure-rpc=false \
     -Dudev=true \
+    -Dsystemd_logind=false \
+    -Dlibunwind=false \
+    -Ddocs=false \
+    -Ddevel-docs=false \
     -Dlog_dir=/var/log \
     -Dxkb_output_dir=/var/lib/xkb
 
