@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ttf-jetbrains-mono
+pkgver=2.304
+pkgrel=1
+pkgdesc="A typeface made for developers by JetBrains"
+arch=('any')
+url="https://www.jetbrains.com/lp/mono/"
+license=('OFL-1.1')
+depends=('fontconfig')
+makedepends=('unzip')
+source=("https://github.com/JetBrains/JetBrainsMono/releases/download/v${pkgver}/JetBrainsMono-${pkgver}.zip")
+
+prepare() {
+  local dir="${srcdir}/fonts"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  :
+}
+
+package() {
+  cd "${srcdir}"
+
+  install -dm755 "${pkgdir}/usr/share/fonts/TTF"
+  install -m644 fonts/ttf/*.ttf "${pkgdir}/usr/share/fonts/TTF/"
+
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
