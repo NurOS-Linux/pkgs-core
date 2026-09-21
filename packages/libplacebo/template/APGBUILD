@@ -1,0 +1,43 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libplacebo
+pkgver=6.338.2
+pkgrel=1
+pkgdesc="Reusable library for GPU-accelerated video/image rendering primitives"
+arch=('x86_64')
+url="https://code.videolan.org/videolan/libplacebo"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'vulkan-headers')
+makedepends=('meson' 'ninja' 'pkgconf' 'python')
+source=("https://code.videolan.org/videolan/libplacebo/-/archive/v${pkgver}/${pkgname}-v${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-v${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-v${pkgver}"
+
+  meson setup build \
+    --prefix=/usr \
+    --buildtype=release \
+    -Ddemos=false \
+    -Dtests=false \
+    -Dvulkan=disabled \
+    -Dopengl=disabled \
+    -Dshaderc=disabled \
+    -Dlcms=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-v${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
