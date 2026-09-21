@@ -1,0 +1,60 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=xorg-server
+pkgver=21.1.16
+pkgrel=1
+pkgdesc="X.Org X server"
+arch=('x86_64')
+url="https://xorg.freedesktop.org/"
+license=('MIT')
+depends=(
+  'glibc' 'pixman' 'libdrm' 'libpciaccess' 'libxau' 'libxdmcp'
+  'libxfont2' 'libxkbfile' 'libxcvt' 'xkeyboard-config' 'xkbcomp'
+  'eudev' 'openssl'
+)
+makedepends=('meson' 'ninja' 'pkgconf' 'xorgproto' 'xtrans')
+source=("https://xorg.freedesktop.org/releases/individual/xserver/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dxorg=true \
+    -Dxephyr=true \
+    -Dxwayland=false \
+    -Dglamor=false \
+    -Ddri1=false \
+    -Ddri2=false \
+    -Ddri3=false \
+    -Dudev=true \
+    -Dlog_dir=/var/log \
+    -Dxkb_output_dir=/var/lib/xkb
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+
+  # Ensure setuid on Xorg binary for running from unprivileged TTY if needed
+  chmod u+s "${pkgdir}/usr/bin/Xorg" 2>/dev/null || true
+
+  install -dm755 "${pkgdir}/etc/X11/xorg.conf.d"
+  install -dm755 "${pkgdir}/var/lib/xkb"
+
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
