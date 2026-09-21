@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libxdmcp
+pkgver=1.1.5
+pkgrel=1
+pkgdesc="X Display Manager Control Protocol library"
+arch=('x86_64')
+url="https://xorg.freedesktop.org/"
+license=('MIT')
+depends=('glibc')
+makedepends=('xorgproto' 'pkgconf')
+source=("https://xorg.freedesktop.org/releases/individual/lib/libXdmcp-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/libXdmcp-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/libXdmcp-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --disable-docs \
+    --disable-static
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/libXdmcp-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
