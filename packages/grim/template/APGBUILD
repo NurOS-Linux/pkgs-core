@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=grim
+pkgver=1.4.1
+pkgrel=1
+pkgdesc="Grab images from a Wayland compositor"
+arch=('x86_64')
+url="https://wayland.emersion.fr/grim/"
+license=('MIT')
+depends=('glibc' 'wayland' 'wayland-protocols' 'cairo' 'libpng' 'libjpeg-turbo')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://gitlab.freedesktop.org/emersion/grim/-/archive/v${pkgver}/grim-v${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-v${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-v${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --buildtype=release \
+    -Dman-pages=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-v${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
