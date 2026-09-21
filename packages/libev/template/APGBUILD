@@ -1,0 +1,36 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libev
+pkgver=4.33
+pkgrel=1
+pkgdesc="A full-featured and high-performance event loop"
+arch=('x86_64')
+url="http://software.schmorp.de/pkg/libev.html"
+license=('BSD-2-Clause' 'GPL-2.0-or-later')
+depends=('glibc')
+source=("https://dist.schmorp.de/libev/libev-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --mandir=/usr/share/man
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
