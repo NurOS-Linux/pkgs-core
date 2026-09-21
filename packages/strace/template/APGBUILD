@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=strace
+pkgver=6.13
+pkgrel=1
+pkgdesc="A diagnostic, debugging and instructional userspace tracer"
+arch=('x86_64')
+url="https://strace.io/"
+license=('LGPL-2.1-or-later')
+depends=('glibc')
+source=("https://github.com/strace/strace/releases/download/v${pkgver}/strace-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --mandir=/usr/share/man \
+    --enable-mpers=check
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
