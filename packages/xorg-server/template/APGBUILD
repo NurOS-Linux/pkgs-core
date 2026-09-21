@@ -12,7 +12,7 @@ depends=(
   'libxfont2' 'libxkbfile' 'libxcvt' 'xkeyboard-config' 'xkbcomp'
   'eudev' 'openssl'
 )
-makedepends=('meson' 'ninja' 'pkgconf' 'xorgproto' 'xtrans')
+makedepends=('meson' 'ninja' 'pkgconf' 'xorgproto' 'xtrans' 'font-util')
 source=("https://xorg.freedesktop.org/releases/individual/xserver/${pkgname}-${pkgver}.tar.xz")
 
 prepare() {
@@ -33,6 +33,7 @@ build() {
     --buildtype=release \
     -Dxorg=true \
     -Dxephyr=true \
+    -Dglx=false \
     -Dglamor=false \
     -Ddri1=false \
     -Ddri2=false \
