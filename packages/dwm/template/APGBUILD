@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=dwm
+pkgver=6.5
+pkgrel=1
+pkgdesc="A dynamic window manager for X"
+arch=('x86_64')
+url="https://dwm.suckless.org/"
+license=('MIT')
+depends=('glibc' 'libx11' 'libxinerama' 'libxft' 'freetype')
+makedepends=('pkgconf')
+source=("https://dl.suckless.org/dwm/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make X11INC=/usr/include X11LIB=/usr/lib FREETYPEINC=/usr/include/freetype2
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
