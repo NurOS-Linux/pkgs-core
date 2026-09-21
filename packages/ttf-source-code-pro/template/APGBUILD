@@ -1,0 +1,17 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ttf-source-code-pro
+pkgver=2.042
+pkgrel=1
+pkgdesc="Monospaced font family for coding environments by Adobe"
+arch=('any')
+url="https://github.com/adobe-fonts/source-code-pro"
+license=('OFL')
+depends=()
+makedepends=('unzip')
+source=("https://github.com/adobe-fonts/source-code-pro/releases/download/2.042R-u/1.062R-i/1.026R-vf/TTF-source-code-pro-${pkgver}R-u_1.062R-i.zip")
+
+package() {
+  install -dm755 "${pkgdir}/usr/share/fonts/TTF"
+  find "${srcdir}" -type f -name "*.ttf" -exec install -m644 {} "${pkgdir}/usr/share/fonts/TTF/" \;
+}
