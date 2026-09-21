@@ -1,0 +1,16 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ttf-liberation
+pkgver=2.1.5
+pkgrel=1
+pkgdesc="Font family metric-compatible with Arial, Times New Roman, and Courier New"
+arch=('any')
+url="https://github.com/liberationfonts/liberation-fonts"
+license=('SIL')
+depends=()
+source=("https://mirrors.kernel.org/debian/pool/main/f/fonts-liberation/fonts-liberation_${pkgver}.orig.tar.gz")
+
+package() {
+  install -dm755 "${pkgdir}/usr/share/fonts/TTF"
+  find "${srcdir}" -type f -name "*.ttf" -exec install -m644 {} "${pkgdir}/usr/share/fonts/TTF/" \;
+}
