@@ -1,0 +1,16 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ttf-hack
+pkgver=3.003
+pkgrel=1
+pkgdesc="A typeface designed for source code"
+arch=('any')
+url="https://sourcefoundry.org/hack/"
+license=('MIT' 'OFL')
+depends=()
+source=("https://github.com/source-foundry/Hack/releases/download/v${pkgver}/Hack-v${pkgver}-ttf.tar.xz")
+
+package() {
+  install -dm755 "${pkgdir}/usr/share/fonts/TTF"
+  find "${srcdir}" -type f -name "*.ttf" -exec install -m644 {} "${pkgdir}/usr/share/fonts/TTF/" \;
+}
