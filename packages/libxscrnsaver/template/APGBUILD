@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libxscrnsaver
+pkgver=1.2.4
+pkgrel=1
+pkgdesc="X11 Screen Saver extension client library"
+arch=('x86_64')
+url="https://xorg.freedesktop.org/"
+license=('MIT')
+depends=('glibc' 'libx11' 'libxext')
+makedepends=('pkgconf' 'xorgproto')
+source=("https://xorg.freedesktop.org/archive/individual/lib/libXScrnSaver-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/libXScrnSaver-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/libXScrnSaver-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --disable-static
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/libXScrnSaver-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
