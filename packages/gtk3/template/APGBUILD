@@ -1,0 +1,50 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gtk3
+pkgver=3.24.43
+pkgrel=1
+pkgdesc="GTK+ Graphical User Interface Library (v3)"
+arch=('x86_64')
+url="https://www.gtk.org/"
+license=('LGPL-2.0-or-later')
+depends=(
+  'glibc' 'glib' 'cairo' 'pango' 'gdk-pixbuf' 'at-spi2-core'
+  'libepoxy' 'libx11' 'libxext' 'libxinerama' 'libxi' 'libxrandr'
+  'libxcursor' 'libxcomposite' 'libxdamage' 'libxfixes' 'shared-mime-info'
+)
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://download.gnome.org/sources/gtk+/3.24/gtk+-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/gtk+-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/gtk+-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --buildtype=release \
+    -Dintrospection=false \
+    -Ddemos=false \
+    -Dexamples=false \
+    -Dtests=false \
+    -Dman=false \
+    -Dx11_backend=true \
+    -Dwayland_backend=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/gtk+-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
