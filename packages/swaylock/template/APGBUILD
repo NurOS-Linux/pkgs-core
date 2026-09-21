@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=swaylock
+pkgver=1.8.0
+pkgrel=1
+pkgdesc="Screen locker for Wayland"
+arch=('x86_64')
+url="https://github.com/swaywm/swaylock"
+license=('MIT')
+depends=('glibc' 'wayland' 'wayland-protocols' 'cairo' 'libxkbcommon' 'linux-pam')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://github.com/swaywm/swaylock/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --buildtype=release \
+    -Dpam=enabled \
+    -Dman-pages=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
