@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libxau
+pkgver=1.0.12
+pkgrel=1
+pkgdesc="X11 authorisation library"
+arch=('x86_64')
+url="https://xorg.freedesktop.org/"
+license=('MIT')
+depends=('glibc')
+makedepends=('xorgproto' 'pkgconf')
+source=("https://xorg.freedesktop.org/releases/individual/lib/libXau-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/libXau-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/libXau-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --disable-static
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/libXau-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
