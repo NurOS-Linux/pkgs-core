@@ -44,4 +44,5 @@ package() {
 
   make tooldir=/usr DESTDIR="${pkgdir}" install
   rm -f "${pkgdir}"/usr/lib/lib{bfd,ctf,ctf-nobfd,gprofng,opcodes,sframe}.a
+  rm -f "${pkgdir}/usr/share/info/dir"
 }
