@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=flac
+pkgver=1.4.3
+pkgrel=1
+pkgdesc="Free Lossless Audio Codec"
+arch=('x86_64')
+url="https://xiph.org/flac/"
+license=('BSD-3-Clause' 'GPL-2.0-or-later')
+depends=('glibc' 'libogg')
+makedepends=('pkgconf')
+source=("https://downloads.xiph.org/releases/flac/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static \
+    --disable-doxygen-docs
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
