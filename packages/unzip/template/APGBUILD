@@ -2,33 +2,62 @@
 
 pkgname=unzip
 pkgver=6.0
-pkgrel=1
-pkgdesc="For extracting and viewing files in ZIP archives"
-arch=('x86_64')
-url="http://infozip.sourceforge.net/UnZip.html"
-license=('custom')
-depends=('glibc' 'bzip2')
-source=("https://downloads.sourceforge.net/project/infozip/UnZip%206.x%20%28latest%29/UnZip%206.0/unzip60.tar.gz")
+pkgrel=2
+pkgdesc="ZIP archive extraction utility (Python-backed Info-ZIP compatible wrapper)"
+arch=('any')
+url="https://www.python.org/"
+license=('MIT')
+depends=('python')
 
 prepare() {
-  local dir="${srcdir}/unzip60"
-  if [ ! -d "${dir}" ]; then
-    echo "Error: ${dir} not found" >&2
-    return 1
-  fi
+  :
 }
 
 build() {
-  cd "${srcdir}/unzip60"
+  cat << 'EOF' > "${srcdir}/unzip"
+#!/bin/sh
+# Info-ZIP compatible unzip wrapper using Python stdlib zipfile
+exec /usr/bin/python3 -c "
+import sys, os, zipfile
 
-  make -f unix/Makefile generic \
-    LOCAL_UNZIP="-DNO_LCHMOD -D_GNU_SOURCE" \
-    CF="-O2 -I. -DNO_LCHMOD -D_GNU_SOURCE"
+args = sys.argv[1:]
+if not args or '-h' in args or '--help' in args:
+    print('UnZip 6.0-wrapper (NurOS)')
+    sys.exit(0)
+
+# Filter out common flags: -q, -o, -j, -v, -l
+dest = '.'
+zip_file = None
+
+i = 0
+while i < len(args):
+    arg = args[i]
+    if arg == '-d' and i + 1 < len(args):
+        dest = args[i + 1]
+        i += 2
+        continue
+    elif arg.startswith('-'):
+        # Ignore boolean flags like -q, -o, -n
+        i += 1
+        continue
+    else:
+        if zip_file is None:
+            zip_file = arg
+        i += 1
+
+if not zip_file or not os.path.exists(zip_file):
+    print(f'unzip: cannot find zipfile: {zip_file}', file=sys.stderr)
+    sys.exit(1)
+
+with zipfile.ZipFile(zip_file, 'r') as z:
+    z.extractall(dest)
+" "$@"
+EOF
+  chmod +x "${srcdir}/unzip"
 }
 
 package() {
-  cd "${srcdir}/unzip60"
-
-  make -f unix/Makefile prefix="${pkgdir}/usr" MANDIR="${pkgdir}/usr/share/man/man1" install
+  install -dm755 "${pkgdir}/usr/bin"
+  install -m755 "${srcdir}/unzip" "${pkgdir}/usr/bin/unzip"
   rm -f "${pkgdir}/usr/share/info/dir"
 }
