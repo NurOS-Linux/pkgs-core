@@ -1,0 +1,16 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ttf-fantasque-sans
+pkgver=1.8.0
+pkgrel=1
+pkgdesc="A font family designed for programming with a pinch of fun"
+arch=('any')
+url="https://github.com/belluzj/fantasque-sans"
+license=('OFL')
+depends=()
+source=("https://github.com/belluzj/fantasque-sans/releases/download/v${pkgver}/FantasqueSansMono-Normal.tar.gz")
+
+package() {
+  install -dm755 "${pkgdir}/usr/share/fonts/TTF"
+  find "${srcdir}" -type f \( -name "*.ttf" -o -name "*.otf" \) -exec install -m644 {} "${pkgdir}/usr/share/fonts/TTF/" \;
+}
