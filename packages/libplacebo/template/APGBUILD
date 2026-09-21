@@ -9,7 +9,12 @@ url="https://github.com/haasn/libplacebo"
 license=('LGPL-2.1-or-later')
 depends=('glibc')
 makedepends=('meson' 'ninja' 'pkgconf' 'python')
-source=("https://github.com/haasn/libplacebo/archive/refs/tags/v${pkgver}.tar.gz")
+source=(
+  "https://github.com/haasn/libplacebo/archive/refs/tags/v${pkgver}.tar.gz"
+  "https://github.com/pallets/jinja/archive/refs/tags/3.1.5.tar.gz"
+  "https://github.com/pallets/markupsafe/archive/refs/tags/3.0.2.tar.gz"
+  "https://github.com/Dav1dde/glad/archive/refs/tags/v2.0.8.tar.gz"
+)
 
 prepare() {
   local dir="${srcdir}/${pkgname}-${pkgver}"
@@ -17,6 +22,14 @@ prepare() {
     echo "Error: ${dir} not found" >&2
     return 1
   fi
+
+  # Deploy bundled python preprocessor submodules required by glsl_preproc
+  rm -rf "${dir}/3rdparty/jinja" "${dir}/3rdparty/markupsafe" "${dir}/3rdparty/glad"
+  mkdir -p "${dir}/3rdparty"
+
+  mv "${srcdir}/jinja-3.1.5" "${dir}/3rdparty/jinja"
+  mv "${srcdir}/markupsafe-3.0.2" "${dir}/3rdparty/markupsafe"
+  mv "${srcdir}/glad-2.0.8" "${dir}/3rdparty/glad"
 }
 
 build() {
@@ -33,7 +46,7 @@ build() {
     -Dshaderc=disabled \
     -Dlcms=disabled
 
-  ninja -C build -v
+  ninja -C build
 }
 
 package() {
