@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libass
+pkgver=0.17.3
+pkgrel=1
+pkgdesc="A portable subtitle renderer for the ASS/SSA subtitle format"
+arch=('x86_64')
+url="https://github.com/libass/libass"
+license=('ISC')
+depends=('glibc' 'freetype' 'fontconfig')
+makedepends=('nasm' 'pkgconf')
+source=("https://github.com/libass/libass/releases/download/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
