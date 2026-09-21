@@ -1,0 +1,43 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=mpv
+pkgver=0.39.0
+pkgrel=1
+pkgdesc="Command line video player"
+arch=('x86_64')
+url="https://mpv.io/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'ffmpeg' 'alsa-lib' 'libx11' 'libxext' 'libxrandr' 'libxinerama' 'libxkbcommon')
+makedepends=('meson' 'ninja' 'pkgconf' 'python')
+source=("https://github.com/mpv-player/mpv/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --buildtype=release \
+    -Dalsa=enabled \
+    -Dx11=enabled \
+    -Dwayland=disabled \
+    -Ddrm=disabled \
+    -Dmanpage-build=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
