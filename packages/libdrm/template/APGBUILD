@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libdrm
+pkgver=2.4.124
+pkgrel=1
+pkgdesc="Userspace interface to kernel DRM services"
+arch=('x86_64')
+url="https://dri.freedesktop.org/"
+license=('MIT')
+depends=('glibc' 'libpciaccess')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://dri.freedesktop.org/libdrm/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --buildtype=release \
+    -Dudev=true \
+    -Dvalgrind=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
