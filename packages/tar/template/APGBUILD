@@ -32,4 +32,5 @@ package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
   make DESTDIR="${pkgdir}" AM_UPDATE_INFO_DIR=no install
+  rm -f "${pkgdir}/usr/share/info/dir"
 }
