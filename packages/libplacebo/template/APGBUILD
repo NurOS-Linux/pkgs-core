@@ -5,14 +5,14 @@ pkgver=6.338.2
 pkgrel=1
 pkgdesc="Reusable library for GPU-accelerated video/image rendering primitives"
 arch=('x86_64')
-url="https://code.videolan.org/videolan/libplacebo"
+url="https://github.com/haasn/libplacebo"
 license=('LGPL-2.1-or-later')
-depends=('glibc' 'vulkan-headers')
+depends=('glibc')
 makedepends=('meson' 'ninja' 'pkgconf' 'python')
-source=("https://code.videolan.org/videolan/libplacebo/-/archive/v${pkgver}/${pkgname}-v${pkgver}.tar.bz2")
+source=("https://github.com/haasn/libplacebo/archive/refs/tags/v${pkgver}.tar.gz")
 
 prepare() {
-  local dir="${srcdir}/${pkgname}-v${pkgver}"
+  local dir="${srcdir}/${pkgname}-${pkgver}"
   if [ ! -d "${dir}" ]; then
     echo "Error: ${dir} not found" >&2
     return 1
@@ -20,7 +20,7 @@ prepare() {
 }
 
 build() {
-  cd "${srcdir}/${pkgname}-v${pkgver}"
+  cd "${srcdir}/${pkgname}-${pkgver}"
 
   meson setup build \
     --prefix=/usr \
@@ -36,7 +36,7 @@ build() {
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-v${pkgver}"
+  cd "${srcdir}/${pkgname}-${pkgver}"
 
   DESTDIR="${pkgdir}" ninja -C build install
   rm -f "${pkgdir}/usr/share/info/dir"
