@@ -2,7 +2,7 @@
 
 pkgname=xorg-server
 pkgver=21.1.16
-pkgrel=1
+pkgrel=2
 pkgdesc="X.Org X server"
 arch=('x86_64')
 url="https://xorg.freedesktop.org/"
@@ -49,6 +49,9 @@ package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
   DESTDIR="${pkgdir}" ninja -C build install
+
+  # Ensure symlink /usr/bin/X -> Xorg
+  ln -sf Xorg "${pkgdir}/usr/bin/X"
 
   # Ensure setuid on Xorg binary for running from unprivileged TTY if needed
   chmod u+s "${pkgdir}/usr/bin/Xorg" 2>/dev/null || true
