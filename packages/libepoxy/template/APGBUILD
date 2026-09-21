@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libepoxy
+pkgver=1.5.10
+pkgrel=1
+pkgdesc="Library handling OpenGL function pointer management"
+arch=('x86_64')
+url="https://github.com/anholt/libepoxy"
+license=('MIT')
+depends=('glibc' 'libx11')
+makedepends=('meson' 'ninja' 'pkgconf' 'python')
+source=("https://github.com/anholt/libepoxy/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --buildtype=release \
+    -Dtests=false \
+    -Dglx=yes \
+    -Degl=no
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
