@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libevent
+pkgver=2.1.12
+pkgrel=1
+pkgdesc="An event notification library"
+arch=('x86_64')
+url="https://libevent.org/"
+license=('BSD-3-Clause')
+depends=('glibc' 'openssl')
+source=("https://github.com/libevent/libevent/releases/download/release-${pkgver}-stable/libevent-${pkgver}-stable.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/libevent-${pkgver}-stable"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/libevent-${pkgver}-stable"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --disable-static
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/libevent-${pkgver}-stable"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
