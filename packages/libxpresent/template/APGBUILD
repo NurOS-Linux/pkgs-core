@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libxpresent
+pkgver=1.0.1
+pkgrel=1
+pkgdesc="X Present Extension library"
+arch=('x86_64')
+url="https://xorg.freedesktop.org/"
+license=('HPND-sell-variant')
+depends=('glibc' 'libx11' 'libxext' 'libxfixes' 'libxrandr')
+makedepends=('pkgconf' 'xorgproto')
+source=("https://xorg.freedesktop.org/archive/individual/lib/libXpresent-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/libXpresent-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/libXpresent-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --disable-static
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/libXpresent-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
