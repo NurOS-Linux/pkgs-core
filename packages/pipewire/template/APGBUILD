@@ -1,0 +1,48 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pipewire
+pkgver=1.2.7
+pkgrel=1
+pkgdesc="Low-latency audio/video router and processor"
+arch=('x86_64')
+url="https://pipewire.org/"
+license=('MIT')
+depends=('glibc' 'alsa-lib' 'eudev' 'libdrm' 'opus')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://gitlab.freedesktop.org/pipewire/pipewire/-/archive/${pkgver}/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Ddocs=disabled \
+    -Dman=disabled \
+    -Dtests=disabled \
+    -Dexamples=disabled \
+    -Dsystemd=disabled \
+    -Dudev=enabled \
+    -Dalsa=enabled \
+    -Dpipewire-alsa=enabled \
+    -Dsession-managers=[]
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
