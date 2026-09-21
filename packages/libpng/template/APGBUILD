@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libpng
+pkgver=1.6.47
+pkgrel=1
+pkgdesc="A collection of routines used to create and manipulate PNG format images"
+arch=('x86_64')
+url="http://www.libpng.org/pub/png/libpng.html"
+license=('Libpng')
+depends=('glibc' 'zlib')
+makedepends=('autoconf' 'automake' 'libtool')
+source=("https://github.com/pnggroup/libpng/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  autoreconf -fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
