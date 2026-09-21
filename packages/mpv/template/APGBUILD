@@ -7,7 +7,10 @@ pkgdesc="Command line video player"
 arch=('x86_64')
 url="https://mpv.io/"
 license=('GPL-2.0-or-later')
-depends=('glibc' 'ffmpeg' 'alsa-lib' 'libx11' 'libxext' 'libxrandr' 'libxinerama' 'libxkbcommon' 'libass')
+depends=(
+  'glibc' 'ffmpeg' 'alsa-lib' 'libx11' 'libxext' 'libxrandr'
+  'libxinerama' 'libxkbcommon' 'libass' 'libxscrnsaver' 'libxpresent'
+)
 makedepends=('meson' 'ninja' 'pkgconf' 'python')
 source=("https://github.com/mpv-player/mpv/archive/refs/tags/v${pkgver}.tar.gz")
 
@@ -22,6 +25,7 @@ prepare() {
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
+  rm -rf build
   meson setup build \
     --prefix=/usr \
     --sysconfdir=/etc \
