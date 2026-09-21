@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=swayidle
+pkgver=1.8.0
+pkgrel=1
+pkgdesc="Idle management daemon for Wayland"
+arch=('x86_64')
+url="https://github.com/swaywm/swayidle"
+license=('MIT')
+depends=('glibc' 'wayland' 'wayland-protocols')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://github.com/swaywm/swayidle/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --buildtype=release \
+    -Dman-pages=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
