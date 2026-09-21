@@ -1,0 +1,17 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ttf-inter
+pkgver=4.1
+pkgrel=1
+pkgdesc="A typeface specially designed for user interfaces"
+arch=('any')
+url="https://rsms.me/inter/"
+license=('OFL')
+depends=()
+makedepends=('unzip')
+source=("https://github.com/rsms/inter/releases/download/v${pkgver}/Inter-${pkgver}.zip")
+
+package() {
+  install -dm755 "${pkgdir}/usr/share/fonts/TTF"
+  find "${srcdir}" -type f \( -name "*.ttf" -o -name "*.otf" \) -exec install -m644 {} "${pkgdir}/usr/share/fonts/TTF/" \;
+}
