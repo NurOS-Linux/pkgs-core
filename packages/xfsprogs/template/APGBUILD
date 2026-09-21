@@ -1,0 +1,48 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=xfsprogs
+pkgver=7.2.0
+pkgrel=1
+pkgdesc="XFS filesystem userspace utilities"
+arch=('x86_64')
+url="https://xfs.wiki.kernel.org/"
+license=('GPL-2.0-only' 'LGPL-2.1-only')
+depends=('glibc' 'util-linux' 'readline')
+makedepends=('pkgconf')
+source=("https://kernel.org/pub/linux/utils/fs/xfs/xfsprogs/xfsprogs-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --sbindir=/usr/bin \
+    --bindir=/usr/bin \
+    --enable-readline=yes \
+    --enable-editline=no
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DIST_ROOT="${pkgdir}" PKG_ROOT_SBIN_DIR=/usr/bin PKG_SBIN_DIR=/usr/bin install
+  make DIST_ROOT="${pkgdir}" PKG_ROOT_SBIN_DIR=/usr/bin PKG_SBIN_DIR=/usr/bin install-dev
+
+  if [ -d "${pkgdir}/sbin" ]; then
+    mv "${pkgdir}/sbin"/* "${pkgdir}/usr/bin/" 2>/dev/null || true
+    rmdir "${pkgdir}/sbin" 2>/dev/null || true
+  fi
+
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
