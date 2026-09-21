@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=opus
+pkgver=1.5.2
+pkgrel=1
+pkgdesc="Interactive audio codec designed for interactive speech and audio transmission"
+arch=('x86_64')
+url="https://opus-codec.org/"
+license=('BSD-3-Clause')
+depends=('glibc')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://downloads.xiph.org/releases/opus/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  meson setup build \
+    --prefix=/usr \
+    --buildtype=release \
+    -Dextra-programs=disabled \
+    -Dtests=disabled \
+    -Ddocs=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
