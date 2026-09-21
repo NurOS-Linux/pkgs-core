@@ -1,0 +1,45 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=wget2
+pkgver=2.2.0
+pkgrel=1
+pkgdesc="Successor of GNU Wget, a file and recursive website downloader"
+arch=('x86_64')
+url="https://gitlab.com/gnuwget/wget2"
+license=('GPL-3.0-or-later' 'LGPL-3.0-or-later')
+depends=('glibc' 'openssl' 'zlib' 'zstd' 'xz' 'bzip2')
+makedepends=('pkgconf')
+source=("https://ftp.gnu.org/gnu/wget/wget2-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --with-ssl=openssl \
+    --with-zlib \
+    --with-bzip2 \
+    --with-lzma \
+    --with-zstd \
+    --disable-doc
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  # Provide compatibility symlink wget -> wget2 if needed
+  ln -sf wget2 "${pkgdir}/usr/bin/wget"
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
