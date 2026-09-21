@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libsm
+pkgver=1.2.5
+pkgrel=1
+pkgdesc="X11 Session Management library"
+arch=('x86_64')
+url="https://xorg.freedesktop.org/"
+license=('MIT')
+depends=('glibc' 'libice')
+makedepends=('pkgconf' 'xorgproto' 'xtrans' 'util-macros')
+source=("https://xorg.freedesktop.org/releases/individual/lib/libSM-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/libSM-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/libSM-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --disable-docs \
+    --disable-static
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/libSM-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
