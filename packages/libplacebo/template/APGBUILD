@@ -45,6 +45,9 @@ prepare() {
       break
     fi
   done
+
+  # When vulkan is disabled, do not include vulkan/stubs.c (it requires vulkan/vulkan.h)
+  sed -i "s/sources += 'vulkan\/stubs.c'//" "${dir}/src/vulkan/meson.build"
 }
 
 build() {
@@ -57,12 +60,13 @@ build() {
     -Ddemos=false \
     -Dtests=false \
     -Dvulkan=disabled \
+    -Dvk-proc-addr=disabled \
     -Dopengl=disabled \
     -Dshaderc=disabled \
     -Dlcms=disabled \
     -Dunwind=disabled
 
-  ninja -C build -v
+  ninja -C build
 }
 
 package() {
