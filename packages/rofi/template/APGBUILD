@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=rofi
+pkgver=1.7.8
+pkgrel=1
+pkgdesc="A window switcher, application launcher and dmenu replacement"
+arch=('x86_64')
+url="https://github.com/davatorium/rofi"
+license=('MIT')
+depends=(
+  'glibc' 'glib-2.0' 'pango' 'cairo' 'gdk-pixbuf' 'libxkbcommon'
+  'xcb-util' 'xcb-util-wm' 'xcb-util-cursor' 'startup-notification'
+)
+makedepends=('pkgconf')
+source=("https://github.com/davatorium/rofi/releases/download/${pkgver}/rofi-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --disable-check
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
