@@ -1,0 +1,44 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=wlroots
+pkgver=0.18.2
+pkgrel=1
+pkgdesc="Modular Wayland compositor library"
+arch=('x86_64')
+url="https://gitlab.freedesktop.org/wlroots/wlroots"
+license=('MIT')
+depends=(
+  'glibc' 'wayland' 'wayland-protocols' 'libdrm' 'libxkbcommon'
+  'pixman' 'seatd' 'eudev' 'libinput' 'libdisplay-info' 'libliftoff'
+)
+makedepends=('meson' 'ninja' 'pkgconf' 'glslang')
+source=("https://gitlab.freedesktop.org/wlroots/wlroots/-/archive/${pkgver}/wlroots-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --buildtype=release \
+    -Dexamples=false \
+    -Dbackends=drm,libinput \
+    -Drenderers=gles2,pixman
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
