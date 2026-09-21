@@ -22,6 +22,7 @@ prepare() {
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
+  rm -rf build
   meson setup build \
     --prefix=/usr \
     --buildtype=release \
@@ -32,7 +33,7 @@ build() {
     -Dshaderc=disabled \
     -Dlcms=disabled
 
-  ninja -C build
+  ninja -C build -v
 }
 
 package() {
