@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libxinerama
+pkgver=1.1.5
+pkgrel=1
+pkgdesc="X11 Xinerama extension library"
+arch=('x86_64')
+url="https://xorg.freedesktop.org/"
+license=('MIT')
+depends=('glibc' 'libx11' 'libxext')
+makedepends=('pkgconf' 'xorgproto' 'util-macros')
+source=("https://xorg.freedesktop.org/releases/individual/lib/libXinerama-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/libXinerama-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/libXinerama-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --disable-static
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/libXinerama-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
