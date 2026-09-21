@@ -1,0 +1,43 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=freetype
+pkgver=2.13.3
+pkgrel=1
+pkgdesc="Font rasterization engine"
+arch=('x86_64')
+url="https://www.freetype.org/"
+license=('FTL OR GPL-2.0-or-later')
+depends=('glibc' 'zlib' 'bzip2' 'libpng')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://download.savannah.gnu.org/releases/freetype/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --buildtype=release \
+    -Dharfbuzz=disabled \
+    -Dbrotli=disabled \
+    -Dpng=disabled \
+    -Dzlib=enabled \
+    -Dbzip2=enabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
