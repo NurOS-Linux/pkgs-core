@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=zip
+pkgver=3.0
+pkgrel=1
+pkgdesc="A compressor/archiver for creating and modifying zipfiles"
+arch=('x86_64')
+url="http://www.info-zip.org/Zip.html"
+license=('Info-ZIP')
+depends=('glibc' 'bzip2')
+source=("https://mirrors.kernel.org/debian/pool/main/z/zip/zip_${pkgver}.orig.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}30"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}30"
+
+  make -f unix/Makefile generic_gcc
+}
+
+package() {
+  cd "${srcdir}/${pkgname}30"
+
+  make -f unix/Makefile prefix="${pkgdir}/usr" MANDIR="${pkgdir}/usr/share/man/man1" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
