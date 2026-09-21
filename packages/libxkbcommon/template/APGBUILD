@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libxkbcommon
+pkgver=1.7.0
+pkgrel=1
+pkgdesc="Keymap handling library for tools and X/Wayland clients"
+arch=('x86_64')
+url="https://xkbcommon.org/"
+license=('MIT')
+depends=('glibc' 'xkeyboard-config')
+makedepends=('meson' 'ninja' 'pkgconf' 'bison')
+source=("https://xkbcommon.org/download/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --buildtype=release \
+    -Denable-docs=false \
+    -Denable-wayland=false \
+    -Denable-xkbregistry=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
