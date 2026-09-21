@@ -1,0 +1,17 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ttf-iosevka
+pkgver=32.5.0
+pkgrel=1
+pkgdesc="Versatile typeface for code, from code"
+arch=('any')
+url="https://typeof.net/Iosevka/"
+license=('OFL')
+depends=()
+makedepends=('unzip')
+source=("https://github.com/be5invis/Iosevka/releases/download/v${pkgver}/PkgTTF-Iosevka-${pkgver}.zip")
+
+package() {
+  install -dm755 "${pkgdir}/usr/share/fonts/TTF"
+  find "${srcdir}" -type f -name "*.ttf" -exec install -m644 {} "${pkgdir}/usr/share/fonts/TTF/" \;
+}
