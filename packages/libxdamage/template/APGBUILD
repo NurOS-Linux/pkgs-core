@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libxdamage
+pkgver=1.1.6
+pkgrel=1
+pkgdesc="X11 damaged region extension library"
+arch=('x86_64')
+url="https://xorg.freedesktop.org/"
+license=('MIT')
+depends=('glibc' 'libx11' 'libxfixes')
+makedepends=('pkgconf')
+source=("https://xorg.freedesktop.org/archive/individual/lib/libXdamage-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/libXdamage-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/libXdamage-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --disable-static
+
+  make
+}
+
+package() {
+  cd "${srcdir}/libXdamage-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
