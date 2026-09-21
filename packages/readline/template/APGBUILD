@@ -38,4 +38,5 @@ package() {
   ln -sf /bin/false "${fakebin}/install-info"
 
   PATH="${fakebin}:${PATH}" make DESTDIR="${pkgdir}" SHLIB_LIBS="-lncursesw" install
+  rm -f "${pkgdir}/usr/share/info/dir"
 }
