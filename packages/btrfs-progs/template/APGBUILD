@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=btrfs-progs
+pkgver=7.1
+pkgrel=1
+pkgdesc="Btrfs filesystem userspace utilities"
+arch=('x86_64')
+url="https://btrfs.readthedocs.io/"
+license=('GPL-2.0-only')
+depends=('glibc' 'util-linux' 'e2fsprogs' 'lzo' 'zlib' 'zstd')
+makedepends=('pkgconf')
+source=("https://kernel.org/pub/linux/kernel/people/kdave/btrfs-progs/btrfs-progs-v${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-v${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-v${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --sbindir=/usr/bin \
+    --bindir=/usr/bin \
+    --disable-documentation \
+    --disable-backtrace \
+    --disable-zoned
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-v${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
