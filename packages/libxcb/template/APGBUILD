@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libxcb
+pkgver=1.17.0
+pkgrel=1
+pkgdesc="X11 client-side library based on XCB protocol"
+arch=('x86_64')
+url="https://xcb.freedesktop.org/"
+license=('MIT')
+depends=('glibc' 'libxau' 'libxdmcp')
+makedepends=('pkgconf' 'python' 'xcb-proto' 'xorgproto' 'util-macros')
+source=("https://xorg.freedesktop.org/releases/individual/lib/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  PYTHON=/usr/bin/python3 ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --enable-xinput \
+    --disable-static
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
