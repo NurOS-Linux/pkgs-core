@@ -1,0 +1,16 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ttf-nerd-fonts-symbols
+pkgver=3.3.0
+pkgrel=1
+pkgdesc="High number of extra glyphs/icons from popular 'iconic fonts' (Nerd Fonts Symbols only)"
+arch=('any')
+url="https://nerdfonts.com/"
+license=('MIT')
+depends=()
+source=("https://github.com/ryanoasis/nerd-fonts/releases/download/v${pkgver}/NerdFontsSymbolsOnly.tar.xz")
+
+package() {
+  install -dm755 "${pkgdir}/usr/share/fonts/TTF"
+  find "${srcdir}" -type f -name "*.ttf" -exec install -m644 {} "${pkgdir}/usr/share/fonts/TTF/" \;
+}
