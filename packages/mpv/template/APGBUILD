@@ -1,13 +1,13 @@
 # Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
 
 pkgname=mpv
-pkgver=0.39.0
+pkgver=0.36.0
 pkgrel=1
 pkgdesc="Command line video player"
 arch=('x86_64')
 url="https://mpv.io/"
 license=('GPL-2.0-or-later')
-depends=('glibc' 'ffmpeg' 'alsa-lib' 'libx11' 'libxext' 'libxrandr' 'libxinerama' 'libxkbcommon')
+depends=('glibc' 'ffmpeg' 'alsa-lib' 'libx11' 'libxext' 'libxrandr' 'libxinerama' 'libxkbcommon' 'libass')
 makedepends=('meson' 'ninja' 'pkgconf' 'python')
 source=("https://github.com/mpv-player/mpv/archive/refs/tags/v${pkgver}.tar.gz")
 
@@ -28,6 +28,8 @@ build() {
     --buildtype=release \
     -Dalsa=enabled \
     -Dx11=enabled \
+    -Dlibplacebo=disabled \
+    -Dlibplacebo-next=disabled \
     -Dwayland=disabled \
     -Ddrm=disabled \
     -Dmanpage-build=disabled
