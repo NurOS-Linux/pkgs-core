@@ -1,0 +1,17 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ttf-intel-one-mono
+pkgver=1.4.0
+pkgrel=1
+pkgdesc="An expressive monospaced font family for clarity and legibility by Intel"
+arch=('any')
+url="https://github.com/intel/intel-one-mono"
+license=('OFL')
+depends=()
+makedepends=('unzip')
+source=("https://github.com/intel/intel-one-mono/releases/download/V${pkgver}/ttf.zip")
+
+package() {
+  install -dm755 "${pkgdir}/usr/share/fonts/TTF"
+  find "${srcdir}" -type f -name "*.ttf" -exec install -m644 {} "${pkgdir}/usr/share/fonts/TTF/" \;
+}
