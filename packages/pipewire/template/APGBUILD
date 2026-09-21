@@ -32,6 +32,7 @@ build() {
     -Dtests=disabled \
     -Dexamples=disabled \
     -Dsystemd=disabled \
+    -Ddbus=disabled \
     -Dudev=enabled \
     -Dalsa=enabled \
     -Dpipewire-alsa=enabled \
