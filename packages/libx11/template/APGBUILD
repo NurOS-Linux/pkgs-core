@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libx11
+pkgver=1.8.12
+pkgrel=1
+pkgdesc="Core X11 protocol client library"
+arch=('x86_64')
+url="https://xorg.freedesktop.org/"
+license=('MIT')
+depends=('glibc' 'libxcb')
+makedepends=('pkgconf' 'xorgproto' 'util-macros' 'xorgproto')
+source=("https://xorg.freedesktop.org/releases/individual/lib/libX11-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/libX11-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/libX11-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --disable-specs \
+    --disable-static
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/libX11-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
