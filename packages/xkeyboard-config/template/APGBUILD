@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=xkeyboard-config
+pkgver=2.44
+pkgrel=1
+pkgdesc="X keyboard configuration database"
+arch=('any')
+url="https://www.freedesktop.org/wiki/Software/XKeyboardConfig"
+license=('MIT')
+makedepends=('meson' 'ninja' 'pkgconf' 'python')
+source=("https://xorg.freedesktop.org/releases/individual/data/xkeyboard-config/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --buildtype=release \
+    -Dxorg-rules-symlinks=true
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
