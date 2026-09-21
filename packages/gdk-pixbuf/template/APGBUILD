@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gdk-pixbuf
+pkgver=2.42.12
+pkgrel=1
+pkgdesc="An image loading library"
+arch=('x86_64')
+url="https://gitlab.gnome.org/GNOME/gdk-pixbuf"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'glib-2.0' 'libpng' 'libjpeg-turbo' 'shared-mime-info')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://gitlab.gnome.org/GNOME/gdk-pixbuf/-/archive/${pkgver}/gdk-pixbuf-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --buildtype=release \
+    -Dintrospection=disabled \
+    -Dman=false \
+    -Dbuiltin_loaders=all
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
