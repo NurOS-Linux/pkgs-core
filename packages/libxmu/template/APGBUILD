@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libxmu
+pkgver=1.2.1
+pkgrel=1
+pkgdesc="X11 miscellaneous micro-utility library"
+arch=('x86_64')
+url="https://xorg.freedesktop.org/"
+license=('MIT')
+depends=('glibc' 'libx11' 'libxt' 'libxext')
+makedepends=('pkgconf' 'xorgproto' 'util-macros')
+source=("https://xorg.freedesktop.org/releases/individual/lib/libXmu-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/libXmu-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/libXmu-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --disable-docs \
+    --disable-specs \
+    --disable-static
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/libXmu-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
