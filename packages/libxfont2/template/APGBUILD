@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libxfont2
+pkgver=2.0.7
+pkgrel=1
+pkgdesc="X font 2 Library"
+arch=('x86_64')
+url="https://xorg.freedesktop.org/"
+license=('MIT')
+depends=('glibc' 'freetype' 'zlib')
+makedepends=('pkgconf' 'xorgproto' 'xtrans' 'util-macros')
+source=("https://xorg.freedesktop.org/releases/individual/lib/libXfont2-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/libXfont2-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/libXfont2-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --disable-devel-docs \
+    --disable-static
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/libXfont2-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
