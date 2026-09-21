@@ -1,0 +1,43 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=cairo
+pkgver=1.18.2
+pkgrel=1
+pkgdesc="2D graphics library with support for multiple output devices"
+arch=('x86_64')
+url="https://cairographics.org/"
+license=('LGPL-2.1-only' 'MPL-1.1')
+depends=(
+  'glibc' 'fontconfig' 'freetype' 'libpng' 'pixman'
+  'libx11' 'libxext' 'libxrender' 'libxcb' 'zlib'
+)
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://gitlab.freedesktop.org/cairo/cairo/-/archive/${pkgver}/cairo-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --buildtype=release \
+    -Dtee=disabled \
+    -Dtests=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
