@@ -1,0 +1,47 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=wpa_supplicant
+pkgver=2.11
+pkgrel=1
+pkgdesc="WPA/WPA2/IEEE 802.1X Supplicant for wireless network authentication"
+arch=('x86_64')
+url="https://w1.fi/wpa_supplicant/"
+license=('BSD-3-Clause')
+depends=('glibc' 'openssl' 'libnl' 'readline')
+makedepends=('pkgconf')
+source=("https://w1.fi/releases/wpa_supplicant-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}/${pkgname}"
+
+  cp defconfig .config
+
+  # Enable netlink and nl80211
+  sed -i 's/^#CONFIG_DRIVER_NL80211=y/CONFIG_DRIVER_NL80211=y/' .config
+  sed -i 's/^#CONFIG_LIBNL32=y/CONFIG_LIBNL32=y/' .config
+  sed -i 's/^#CONFIG_READLINE=y/CONFIG_READLINE=y/' .config
+  sed -i 's/^#CONFIG_CTRL_IFACE=y/CONFIG_CTRL_IFACE=y/' .config
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}/${pkgname}"
+
+  install -Dm755 wpa_supplicant "${pkgdir}/usr/bin/wpa_supplicant"
+  install -Dm755 wpa_cli "${pkgdir}/usr/bin/wpa_cli"
+  install -Dm755 wpa_passphrase "${pkgdir}/usr/bin/wpa_passphrase"
+
+  install -dm755 "${pkgdir}/etc/wpa_supplicant"
+  install -m600 wpa_supplicant.conf "${pkgdir}/etc/wpa_supplicant/wpa_supplicant.conf.example"
+
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
