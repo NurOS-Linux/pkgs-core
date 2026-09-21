@@ -1,0 +1,18 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=fzf
+pkgver=0.74.4
+pkgrel=1
+pkgdesc="General-purpose command-line fuzzy finder"
+arch=('x86_64')
+url="https://github.com/junegunn/fzf"
+license=('MIT')
+depends=('glibc' 'bash')
+source=("https://github.com/junegunn/fzf/releases/download/v${pkgver}/fzf-${pkgver}-linux_amd64.tar.gz")
+
+package() {
+  cd "${srcdir}"
+
+  install -Dm755 fzf "${pkgdir}/usr/bin/fzf"
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
