@@ -1,0 +1,47 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=zsh
+pkgver=5.9
+pkgrel=1
+pkgdesc="A very advanced and programmable command interpreter (shell)"
+arch=('x86_64')
+url="https://www.zsh.org/"
+license=('MIT-like')
+depends=('glibc' 'ncurses' 'pcre2' 'gdbm')
+makedepends=('ncurses' 'pcre2')
+source=("https://sourceforge.net/projects/zsh/files/zsh/${pkgver}/zsh-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc/zsh \
+    --enable-etcdir=/etc/zsh \
+    --enable-zshenv=/etc/zsh/zshenv \
+    --enable-zprofile=/etc/zsh/zprofile \
+    --enable-zshrc=/etc/zsh/zshrc \
+    --enable-zlogin=/etc/zsh/zlogin \
+    --enable-zlogout=/etc/zsh/zlogout \
+    --enable-pcre \
+    --enable-cap \
+    --enable-multibyte \
+    --with-tcsetpgrp
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
