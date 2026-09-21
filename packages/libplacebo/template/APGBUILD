@@ -11,9 +11,9 @@ depends=('glibc')
 makedepends=('meson' 'ninja' 'pkgconf' 'python')
 source=(
   "https://github.com/haasn/libplacebo/archive/refs/tags/v${pkgver}.tar.gz"
-  "https://github.com/pallets/jinja/archive/refs/tags/3.1.5.tar.gz"
-  "https://github.com/pallets/markupsafe/archive/refs/tags/3.0.2.tar.gz"
-  "https://github.com/Dav1dde/glad/archive/refs/tags/v2.0.8.tar.gz"
+  "jinja-3.1.5.tar.gz::https://github.com/pallets/jinja/archive/refs/tags/3.1.5.tar.gz"
+  "markupsafe-3.0.2.tar.gz::https://github.com/pallets/markupsafe/archive/refs/tags/3.0.2.tar.gz"
+  "glad-2.0.8.tar.gz::https://github.com/Dav1dde/glad/archive/refs/tags/v2.0.8.tar.gz"
 )
 
 prepare() {
@@ -27,9 +27,15 @@ prepare() {
   rm -rf "${dir}/3rdparty/jinja" "${dir}/3rdparty/markupsafe" "${dir}/3rdparty/glad"
   mkdir -p "${dir}/3rdparty"
 
-  mv "${srcdir}/jinja-3.1.5" "${dir}/3rdparty/jinja"
-  mv "${srcdir}/markupsafe-3.0.2" "${dir}/3rdparty/markupsafe"
-  mv "${srcdir}/glad-2.0.8" "${dir}/3rdparty/glad"
+  if [ -d "${srcdir}/jinja-3.1.5" ]; then
+    cp -r "${srcdir}/jinja-3.1.5" "${dir}/3rdparty/jinja"
+  fi
+  if [ -d "${srcdir}/markupsafe-3.0.2" ]; then
+    cp -r "${srcdir}/markupsafe-3.0.2" "${dir}/3rdparty/markupsafe"
+  fi
+  if [ -d "${srcdir}/glad-2.0.8" ]; then
+    cp -r "${srcdir}/glad-2.0.8" "${dir}/3rdparty/glad"
+  fi
 }
 
 build() {
