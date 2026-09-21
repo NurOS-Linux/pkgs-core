@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=7zip
+pkgver=24.09
+pkgrel=1
+pkgdesc="7-Zip file archiver with a high compression ratio"
+arch=('x86_64')
+url="https://www.7-zip.org/"
+license=('LGPL-2.1-or-later' 'BSD-3-Clause')
+depends=('glibc')
+source=("https://github.com/ip7z/7zip/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}/CPP/7zip/Bundles/Alone2"
+
+  make -f ../../cmpl_gcc.mak
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 CPP/7zip/Bundles/Alone2/b/g/7zz "${pkgdir}/usr/bin/7zz"
+  ln -s 7zz "${pkgdir}/usr/bin/7z"
+}
