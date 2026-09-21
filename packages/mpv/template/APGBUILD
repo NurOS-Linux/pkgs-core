@@ -38,7 +38,7 @@ build() {
     -Ddrm=disabled \
     -Dmanpage-build=disabled
 
-  ninja -C build
+  ninja -C build -v
 }
 
 package() {
