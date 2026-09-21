@@ -1,0 +1,43 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=picom
+pkgver=12.5
+pkgrel=1
+pkgdesc="A lightweight compositor for X11"
+arch=('x86_64')
+url="https://github.com/yshui/picom"
+license=('MPL-2.0' 'MIT')
+depends=(
+  'glibc' 'libev' 'libconfig' 'pixman' 'pcre2' 'libx11'
+  'libxcb' 'xcb-util-renderutil' 'xcb-util-image'
+)
+makedepends=('meson' 'ninja' 'pkgconf' 'uthash')
+source=("https://github.com/yshui/picom/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --buildtype=release \
+    -Dwith_docs=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
