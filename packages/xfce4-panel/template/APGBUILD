@@ -9,7 +9,7 @@ url="https://docs.xfce.org/xfce/xfce4-panel/start"
 license=('GPL-2.0-or-later' 'LGPL-2.1-or-later')
 depends=(
   'glibc' 'glib' 'gtk3' 'libxfce4util' 'libxfce4ui' 'xfconf'
-  'garcon' 'exo' 'libwnck' 'cairo' 'pango'
+  'garcon' 'exo' 'libwnck' 'libxfce4windowing' 'cairo' 'pango'
 )
 makedepends=('pkgconf')
 source=("https://archive.xfce.org/src/xfce/${pkgname}/${pkgver%.*}/${pkgname}-${pkgver}.tar.bz2")
