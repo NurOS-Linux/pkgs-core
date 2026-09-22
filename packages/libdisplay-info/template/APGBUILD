@@ -2,7 +2,7 @@
 
 pkgname=libdisplay-info
 pkgver=0.4.0
-pkgrel=1
+pkgrel=2
 pkgdesc="EDID and DisplayID library"
 arch=('x86_64')
 url="https://gitlab.freedesktop.org/emersion/libdisplay-info"
@@ -25,6 +25,7 @@ build() {
   rm -rf build
   meson setup build \
     --prefix=/usr \
+    --libdir=/usr/lib \
     --buildtype=release
 
   ninja -C build
