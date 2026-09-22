@@ -1,0 +1,44 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=dbus
+pkgver=1.16.0
+pkgrel=1
+pkgdesc="Freedesktop.org message bus system"
+arch=('x86_64')
+url="https://wiki.freedesktop.org/www/Software/dbus/"
+license=('AFL-2.1' 'GPL-2.0-or-later')
+depends=('glibc' 'expat')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://dbus.freedesktop.org/releases/dbus/dbus-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dxml_docs=disabled \
+    -Ddoxygen_docs=disabled \
+    -Dmodular_tests=disabled \
+    -Dsystemd=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}

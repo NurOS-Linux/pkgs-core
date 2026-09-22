@@ -31,13 +31,15 @@ build() {
     --prefix=/usr \
     --sysconfdir=/etc \
     --buildtype=release \
+    --wrap-mode=nofallback \
     -Dintrospection=false \
     -Ddemos=false \
     -Dexamples=false \
     -Dtests=false \
     -Dman=false \
     -Dx11_backend=true \
-    -Dwayland_backend=false
+    -Dwayland_backend=false \
+    -Dprint_backends=file
 
   ninja -C build
 }
