@@ -1,7 +1,7 @@
 # Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
 
 pkgname=xfconf
-pkgver=4.18.3
+pkgver=4.20.0
 pkgrel=1
 pkgdesc="Hierarchical, channel-based configuration storage system for Xfce"
 arch=('x86_64')
@@ -9,7 +9,7 @@ url="https://docs.xfce.org/xfce/xfconf/start"
 license=('GPL-2.0-only' 'LGPL-2.0-or-later')
 depends=('glibc' 'glib' 'libxfce4util' 'dbus')
 makedepends=('pkgconf')
-source=("https://archive.xfce.org/src/xfce/xfconf/4.18/xfconf-${pkgver}.tar.bz2")
+source=("https://archive.xfce.org/src/xfce/${pkgname}/${pkgver%.*}/${pkgname}-${pkgver}.tar.bz2")
 
 prepare() {
   local dir="${srcdir}/${pkgname}-${pkgver}"
