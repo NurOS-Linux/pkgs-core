@@ -1,7 +1,7 @@
 # Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
 
 pkgname=xfwm4
-pkgver=4.18.0
+pkgver=4.20.0
 pkgrel=1
 pkgdesc="Window manager of the Xfce project"
 arch=('x86_64')
@@ -13,7 +13,7 @@ depends=(
   'libxdamage' 'libxfixes' 'libepoxy'
 )
 makedepends=('pkgconf')
-source=("https://archive.xfce.org/src/xfce/xfwm4/4.18/xfwm4-${pkgver}.tar.bz2")
+source=("https://archive.xfce.org/src/xfce/${pkgname}/${pkgver%.*}/${pkgname}-${pkgver}.tar.bz2")
 
 prepare() {
   local dir="${srcdir}/${pkgname}-${pkgver}"
@@ -25,6 +25,8 @@ prepare() {
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
+
+  export PKG_CONFIG_PATH="/usr/lib/pkgconfig:/usr/share/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
 
   ./configure \
     --prefix=/usr \
