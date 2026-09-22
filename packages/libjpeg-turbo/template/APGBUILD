@@ -2,7 +2,7 @@
 
 pkgname=libjpeg-turbo
 pkgver=3.1.0
-pkgrel=1
+pkgrel=2
 pkgdesc="MMX/SSE2 accelerated library for manipulating JPEG image files"
 arch=('x86_64')
 url="https://libjpeg-turbo.org/"
