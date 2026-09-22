@@ -1,0 +1,36 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=perl-xml-parser
+pkgver=2.47
+pkgrel=1
+pkgdesc="A Perl module for parsing XML documents"
+arch=('x86_64')
+url="https://metacpan.org/release/XML-Parser"
+license=('Artistic-1.0-Perl' 'GPL-1.0-or-later')
+depends=('glibc' 'perl' 'expat')
+makedepends=('make')
+source=("https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/XML-Parser-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/XML-Parser-${pkgver}"
+
+  perl Makefile.PL INSTALLDIRS=vendor
+  make
+}
+
+package() {
+  cd "${srcdir}/XML-Parser-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+  find "${pkgdir}" -name '.packlist' -delete
+  find "${pkgdir}" -name '*.pod' -delete
+}

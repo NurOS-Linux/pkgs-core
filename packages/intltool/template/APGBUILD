@@ -1,0 +1,34 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=intltool
+pkgver=0.51.0
+pkgrel=1
+pkgdesc="Internationalization tool collection"
+arch=('x86_64')
+url="https://launchpad.net/intltool"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'perl' 'perl-xml-parser')
+makedepends=('make')
+source=("https://launchpad.net/intltool/trunk/${pkgver}/+download/intltool-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
