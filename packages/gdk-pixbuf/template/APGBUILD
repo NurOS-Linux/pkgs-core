@@ -22,10 +22,14 @@ prepare() {
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
+  export PKG_CONFIG_PATH="/usr/lib64/pkgconfig:/usr/lib/pkgconfig:${PKG_CONFIG_PATH}"
+
   rm -rf build
   meson setup build \
     --prefix=/usr \
+    --libdir=/usr/lib \
     --buildtype=release \
+    --wrap-mode=nofallback \
     -Dintrospection=disabled \
     -Dman=false \
     -Dgtk_doc=false \
