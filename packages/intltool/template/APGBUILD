@@ -2,14 +2,17 @@
 
 pkgname=intltool
 pkgver=0.51.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Internationalization tool collection"
 arch=('x86_64')
 url="https://launchpad.net/intltool"
 license=('GPL-2.0-or-later')
 depends=('glibc' 'perl' 'perl-xml-parser')
-makedepends=('make')
-source=("https://launchpad.net/intltool/trunk/${pkgver}/+download/intltool-${pkgver}.tar.gz")
+makedepends=('make' 'patch')
+source=(
+  "https://launchpad.net/intltool/trunk/${pkgver}/+download/intltool-${pkgver}.tar.gz"
+  "intltool-0.51.0-perl-5.26.patch"
+)
 
 prepare() {
   local dir="${srcdir}/${pkgname}-${pkgver}"
@@ -17,6 +20,9 @@ prepare() {
     echo "Error: ${dir} not found" >&2
     return 1
   fi
+
+  cd "${dir}"
+  patch -Np1 -i "${srcdir}/intltool-0.51.0-perl-5.26.patch"
 }
 
 build() {
