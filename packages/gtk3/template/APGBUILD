@@ -28,7 +28,6 @@ build() {
 
   export PKG_CONFIG_PATH="/usr/lib64/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
 
-  rm -rf build
   meson setup build \
     --prefix=/usr \
     --libdir=/usr/lib \
@@ -41,17 +40,18 @@ build() {
     -Dtests=false \
     -Dinstalled_tests=false \
     -Dman=false \
+    -Dgtk_doc=false \
     -Dx11_backend=true \
     -Dwayland_backend=false \
     -Dprint_backends=file \
     -Dtracker3=false
 
-  meson compile -C build
+  ninja -C build -v
 }
 
 package() {
   cd "${srcdir}/gtk+-${pkgver}"
 
-  DESTDIR="${pkgdir}" meson install -C build --no-rebuild
+  DESTDIR="${pkgdir}" ninja -C build install
   rm -f "${pkgdir}/usr/share/info/dir"
 }
