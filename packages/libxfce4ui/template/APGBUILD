@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libxfce4ui
+pkgver=4.18.6
+pkgrel=1
+pkgdesc="Widgets library for the Xfce desktop environment"
+arch=('x86_64')
+url="https://docs.xfce.org/xfce/libxfce4ui/start"
+license=('LGPL-2.0-or-later')
+depends=('glibc' 'glib' 'gtk3' 'libxfce4util' 'xfconf' 'libx11' 'libsm' 'libice')
+makedepends=('pkgconf')
+source=("https://archive.xfce.org/src/xfce/libxfce4ui/4.18/libxfce4ui-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --sbindir=/usr/bin \
+    --disable-gtk-doc \
+    --disable-introspection \
+    --disable-vala \
+    --disable-gladeui2
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
