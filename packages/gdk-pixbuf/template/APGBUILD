@@ -7,7 +7,7 @@ pkgdesc="An image loading library"
 arch=('x86_64')
 url="https://gitlab.gnome.org/GNOME/gdk-pixbuf"
 license=('LGPL-2.1-or-later')
-depends=('glibc' 'glib-2.0' 'libpng' 'libjpeg-turbo' 'shared-mime-info')
+depends=('glibc' 'glib' 'libpng' 'libjpeg-turbo' 'shared-mime-info')
 makedepends=('meson' 'ninja' 'pkgconf')
 source=("https://gitlab.gnome.org/GNOME/gdk-pixbuf/-/archive/${pkgver}/gdk-pixbuf-${pkgver}.tar.bz2")
 
@@ -28,6 +28,10 @@ build() {
     --buildtype=release \
     -Dintrospection=disabled \
     -Dman=false \
+    -Dgtk_doc=false \
+    -Ddocs=false \
+    -Dtests=false \
+    -Dinstalled_tests=false \
     -Dbuiltin_loaders=all
 
   ninja -C build
