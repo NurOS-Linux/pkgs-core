@@ -1,7 +1,7 @@
 # Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
 
 pkgname=exo
-pkgver=4.18.0
+pkgver=4.20.0
 pkgrel=1
 pkgdesc="Application development library for Xfce"
 arch=('x86_64')
@@ -9,7 +9,7 @@ url="https://docs.xfce.org/xfce/exo/start"
 license=('GPL-2.0-or-later' 'LGPL-2.0-or-later')
 depends=('glibc' 'glib' 'gtk3' 'libxfce4util' 'libxfce4ui')
 makedepends=('pkgconf')
-source=("https://archive.xfce.org/src/xfce/exo/4.18/exo-${pkgver}.tar.bz2")
+source=("https://archive.xfce.org/src/xfce/${pkgname}/${pkgver%.*}/${pkgname}-${pkgver}.tar.bz2")
 
 prepare() {
   local dir="${srcdir}/${pkgname}-${pkgver}"
