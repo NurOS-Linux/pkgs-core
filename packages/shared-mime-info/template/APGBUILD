@@ -8,7 +8,7 @@ arch=('x86_64')
 url="https://gitlab.freedesktop.org/xdg/shared-mime-info"
 license=('GPL-2.0-or-later')
 depends=('glibc' 'glib' 'libxml2')
-makedepends=('meson' 'ninja' 'pkgconf' 'itstool')
+makedepends=('meson' 'ninja' 'pkgconf')
 source=("https://gitlab.freedesktop.org/xdg/shared-mime-info/-/archive/${pkgver}/shared-mime-info-${pkgver}.tar.bz2")
 
 prepare() {
@@ -26,7 +26,8 @@ build() {
   meson setup build \
     --prefix=/usr \
     --buildtype=release \
-    -Dsubprojects=false
+    -Dbuild-tests=false \
+    -Dupdate-mimedb=false
 
   ninja -C build
 }
