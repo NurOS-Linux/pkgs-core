@@ -8,7 +8,7 @@ arch=('x86_64')
 url="http://www.libpng.org/pub/png/libpng.html"
 license=('Libpng')
 depends=('glibc' 'zlib')
-makedepends=('autoconf' 'automake' 'libtool')
+makedepends=('cmake' 'ninja' 'pkgconf')
 source=("https://github.com/pnggroup/libpng/archive/refs/tags/v${pkgver}.tar.gz")
 
 prepare() {
@@ -17,24 +17,25 @@ prepare() {
     echo "Error: ${dir} not found" >&2
     return 1
   fi
-
-  cd "${dir}"
-  autoreconf -fi
 }
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  ./configure \
-    --prefix=/usr \
-    --disable-static
+  rm -rf build
+  cmake -B build -S . \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DPNG_SHARED=ON \
+    -DPNG_STATIC=OFF \
+    -DPNG_TESTS=OFF
 
-  make
+  cmake --build build
 }
 
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
-  make DESTDIR="${pkgdir}" install
+  DESTDIR="${pkgdir}" cmake --install build
   rm -f "${pkgdir}/usr/share/info/dir"
 }
