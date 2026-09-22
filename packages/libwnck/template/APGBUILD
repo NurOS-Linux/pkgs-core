@@ -1,7 +1,7 @@
 # Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
 
 pkgname=libwnck
-pkgver=43.0
+pkgver=43.3
 pkgrel=1
 pkgdesc="Window Navigator Construction Kit library for X11 desktops"
 arch=('x86_64')
@@ -9,7 +9,7 @@ url="https://gitlab.gnome.org/GNOME/libwnck"
 license=('LGPL-2.0-or-later')
 depends=('glibc' 'glib' 'gtk3' 'cairo' 'libx11' 'libxres')
 makedepends=('meson' 'ninja' 'pkgconf')
-source=("https://download.gnome.org/sources/libwnck/43/libwnck-${pkgver}.tar.xz")
+source=("https://download.gnome.org/sources/libwnck/${pkgver%.*}/libwnck-${pkgver}.tar.xz")
 
 prepare() {
   local dir="${srcdir}/${pkgname}-${pkgver}"
@@ -21,6 +21,8 @@ prepare() {
 
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
+
+  export PKG_CONFIG_PATH="/usr/lib/pkgconfig:/usr/share/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
 
   rm -rf build
   meson setup build \
