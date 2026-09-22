@@ -1,0 +1,44 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libxfce4windowing
+pkgver=4.20.7
+pkgrel=1
+pkgdesc="Windowing concept abstraction library for X11 and Wayland"
+arch=('x86_64')
+url="https://docs.xfce.org/xfce/libxfce4windowing/start"
+license=('LGPL-2.0-or-later')
+depends=('glibc' 'glib' 'gtk3' 'gdk-pixbuf' 'libx11' 'libwnck')
+makedepends=('pkgconf')
+source=("https://archive.xfce.org/src/xfce/${pkgname}/${pkgver%.*}/${pkgname}-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  export PKG_CONFIG_PATH="/usr/lib/pkgconfig:/usr/share/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --sbindir=/usr/bin \
+    --enable-x11 \
+    --disable-wayland \
+    --disable-gtk-doc \
+    --disable-introspection
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
