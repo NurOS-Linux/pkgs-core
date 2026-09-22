@@ -46,12 +46,12 @@ build() {
     -Dprint_backends=file \
     -Dtracker3=false
 
-  ninja -C build
+  meson compile -C build
 }
 
 package() {
   cd "${srcdir}/gtk+-${pkgver}"
 
-  DESTDIR="${pkgdir}" ninja -C build install
+  DESTDIR="${pkgdir}" meson install -C build --no-rebuild
   rm -f "${pkgdir}/usr/share/info/dir"
 }
