@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libxfce4util
+pkgver=4.18.2
+pkgrel=1
+pkgdesc="Basic utility library for the Xfce desktop environment"
+arch=('x86_64')
+url="https://docs.xfce.org/xfce/libxfce4util/start"
+license=('LGPL-2.0-or-later')
+depends=('glibc' 'glib')
+makedepends=('pkgconf')
+source=("https://archive.xfce.org/src/xfce/libxfce4util/4.18/libxfce4util-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --sbindir=/usr/bin \
+    --disable-gtk-doc \
+    --disable-introspection
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
