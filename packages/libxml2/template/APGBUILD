@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libxml2
+pkgver=2.13.5
+pkgrel=1
+pkgdesc="XML parsing library, version 2"
+arch=('x86_64')
+url="https://gitlab.gnome.org/GNOME/libxml2"
+license=('MIT')
+depends=('glibc' 'zlib' 'xz')
+makedepends=('meson' 'ninja' 'pkgconf' 'python')
+source=("https://download.gnome.org/sources/libxml2/2.13/libxml2-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --buildtype=release \
+    -Dpython=disabled \
+    -Ddocs=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
