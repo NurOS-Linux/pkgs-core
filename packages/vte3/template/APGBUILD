@@ -1,0 +1,46 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=vte3
+pkgver=0.84.1
+pkgrel=1
+pkgdesc="Virtual Terminal Emulator widget for GTK3"
+arch=('x86_64')
+url="https://wiki.gnome.org/Apps/Terminal/VTE"
+license=('LGPL-3.0-or-later')
+depends=('glibc' 'glib' 'gtk3' 'pango' 'cairo' 'pcre2' 'gnutls' 'fribidi')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://download.gnome.org/sources/vte/${pkgver%.*}/vte-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/vte-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/vte-${pkgver}"
+
+  export PKG_CONFIG_PATH="/usr/lib/pkgconfig:/usr/share/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --libdir=/usr/lib \
+    --buildtype=release \
+    -Dgtk3=true \
+    -Dgtk4=false \
+    -Dgir=false \
+    -Dvapi=false \
+    -Ddocs=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/vte-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
