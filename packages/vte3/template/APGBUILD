@@ -2,12 +2,12 @@
 
 pkgname=vte3
 pkgver=0.78.7
-pkgrel=1
+pkgrel=2
 pkgdesc="Virtual Terminal Emulator widget for GTK3"
 arch=('x86_64')
 url="https://wiki.gnome.org/Apps/Terminal/VTE"
 license=('LGPL-3.0-or-later')
-depends=('glibc' 'glib' 'gtk3' 'pango' 'cairo' 'pcre2' 'gnutls' 'fribidi' 'lz4')
+depends=('glibc' 'glib' 'gtk3' 'pango' 'cairo' 'pcre2' 'fribidi' 'lz4')
 makedepends=('meson' 'ninja' 'pkgconf')
 source=("https://download.gnome.org/sources/vte/${pkgver%.*}/vte-${pkgver}.tar.xz")
 
@@ -31,6 +31,7 @@ build() {
     --buildtype=release \
     -Dgtk3=true \
     -Dgtk4=false \
+    -Dgnutls=false \
     -Dgir=false \
     -Dvapi=false \
     -Ddocs=false
