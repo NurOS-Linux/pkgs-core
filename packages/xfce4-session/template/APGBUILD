@@ -9,7 +9,7 @@ url="https://docs.xfce.org/xfce/xfce4-session/start"
 license=('GPL-2.0-or-later')
 depends=(
   'glibc' 'glib' 'gtk3' 'libxfce4util' 'libxfce4ui' 'xfconf'
-  'libxfce4windowing' 'libwnck' 'libsm' 'libice' 'polkit'
+  'libxfce4windowing' 'libwnck' 'libsm' 'libice' 'iceauth' 'polkit'
 )
 makedepends=('pkgconf')
 source=("https://archive.xfce.org/src/xfce/${pkgname}/${pkgver%.*}/${pkgname}-${pkgver}.tar.bz2")
