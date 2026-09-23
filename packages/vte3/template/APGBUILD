@@ -2,7 +2,7 @@
 
 pkgname=vte3
 pkgver=0.78.7
-pkgrel=3
+pkgrel=4
 pkgdesc="Virtual Terminal Emulator widget for GTK3"
 arch=('x86_64')
 url="https://wiki.gnome.org/Apps/Terminal/VTE"
@@ -33,6 +33,7 @@ build() {
     -Dgtk4=false \
     -Dgnutls=false \
     -Dicu=false \
+    -D_systemd=false \
     -Dgir=false \
     -Dvapi=false \
     -Ddocs=false
