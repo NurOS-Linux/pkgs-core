@@ -1,7 +1,7 @@
 # Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
 
 pkgname=xfce4-terminal
-pkgver=1.1.5
+pkgver=1.1.4
 pkgrel=1
 pkgdesc="Modern terminal emulator primarily for the Xfce desktop environment"
 arch=('x86_64')
@@ -9,7 +9,7 @@ url="https://docs.xfce.org/apps/xfce4-terminal/start"
 license=('GPL-2.0-or-later')
 depends=('glibc' 'glib' 'gtk3' 'libxfce4ui' 'xfconf' 'vte3' 'pcre2')
 makedepends=('pkgconf')
-source=("https://archive.xfce.org/src/apps/xfce4-terminal/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
+source=("https://archive.xfce.org/src/apps/xfce4-terminal/${pkgver%.*}/${pkgname}-${pkgver}.tar.bz2")
 
 prepare() {
   local dir="${srcdir}/${pkgname}-${pkgver}"
