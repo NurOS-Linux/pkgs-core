@@ -1,0 +1,26 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=nim
+pkgver=2.2.12
+pkgrel=1
+pkgdesc="A statically typed compiled systems programming language"
+arch=('x86_64')
+url="https://nim-lang.org/"
+license=('MIT')
+depends=('glibc' 'gcc')
+provides=('nimble' 'nimsuggest')
+source=("https://nim-lang.org/download/${pkgname}-${pkgver}-linux_x64.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  sh install.sh "${pkgdir}/usr"
+}
