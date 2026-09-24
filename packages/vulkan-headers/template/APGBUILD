@@ -1,0 +1,35 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=vulkan-headers
+pkgver=1.4.362
+pkgrel=1
+pkgdesc="Vulkan header files and API registry"
+arch=('x86_64')
+url="https://www.vulkan.org/"
+license=('Apache-2.0')
+depends=()
+makedepends=('cmake' 'ninja')
+source=("https://github.com/KhronosGroup/Vulkan-Headers/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/Vulkan-Headers-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/Vulkan-Headers-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_INSTALL_PREFIX=/usr
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/Vulkan-Headers-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
