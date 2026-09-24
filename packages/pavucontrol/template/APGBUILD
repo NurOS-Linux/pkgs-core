@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pavucontrol
+pkgver=6.2
+pkgrel=1
+pkgdesc="PulseAudio / PipeWire Volume Control"
+arch=('x86_64')
+url="https://freedesktop.org/software/pulseaudio/pavucontrol/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'gcc' 'gtkmm3' 'libsigc++' 'libpulse' 'libcanberra')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://gitlab.freedesktop.org/pulseaudio/pavucontrol/-/archive/v${pkgver}/pavucontrol-v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-v${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-v${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --buildtype=release \
+    -Dlynx=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-v${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
