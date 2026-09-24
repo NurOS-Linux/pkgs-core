@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=aria2
+pkgver=1.37.0
+pkgrel=1
+pkgdesc="Download utility that supports HTTP(S), FTP, BitTorrent, and Metalink"
+arch=('x86_64')
+url="https://aria2.github.io/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'gcc' 'openssl' 'zlib' 'libxml2')
+makedepends=('pkgconf')
+source=("https://github.com/aria2/aria2/releases/download/release-${pkgver}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --with-openssl \
+    --with-libxml2 \
+    --without-gnutls \
+    --without-libnettle
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
