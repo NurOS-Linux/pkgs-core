@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=iotop
+pkgver=1.31
+pkgrel=1
+pkgdesc="Top-like I/O monitor in C"
+arch=('x86_64')
+url="https://github.com/Tomas-M/iotop"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'ncurses')
+makedepends=('pkgconf')
+source=("https://github.com/Tomas-M/iotop/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make STRIP=true
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr DESTDIR="${pkgdir}" install
+}
