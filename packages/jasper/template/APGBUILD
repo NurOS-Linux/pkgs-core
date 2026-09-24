@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=jasper
+pkgver=4.2.9
+pkgrel=1
+pkgdesc="Software-based implementation of the codec specified in the JPEG-2000 Part-1 standard"
+arch=('x86_64')
+url="https://jasper-software.github.io/jasper/"
+license=('JasPer-2.0')
+depends=('glibc' 'libjpeg-turbo')
+makedepends=('cmake' 'ninja')
+source=("https://github.com/jasper-software/jasper/archive/refs/tags/version-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-version-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-version-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+    -DJAS_ENABLE_DOC=OFF \
+    -DJAS_ENABLE_PROGRAMS=ON
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-version-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
