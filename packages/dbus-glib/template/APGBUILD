@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=dbus-glib
+pkgver=0.114
+pkgrel=1
+pkgdesc="GLib bindings for D-Bus"
+arch=('x86_64')
+url="https://dbus.freedesktop.org/"
+license=('AFL-2.1 OR GPL-2.0-or-later')
+depends=('glibc' 'dbus' 'glib' 'expat')
+makedepends=('pkgconf')
+source=("https://dbus.freedesktop.org/releases/${pkgname}/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --disable-static
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
