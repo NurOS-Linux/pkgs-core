@@ -1,0 +1,16 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=deno
+pkgver=2.9.7
+pkgrel=1
+pkgdesc="A modern and secure runtime for JavaScript and TypeScript"
+arch=('x86_64')
+url="https://deno.land/"
+license=('MIT')
+depends=('glibc')
+makedepends=('unzip')
+source=("https://github.com/denoland/deno/releases/download/v${pkgver}/deno-x86_64-unknown-linux-gnu.zip")
+
+package() {
+  install -Dm755 "${srcdir}/deno" "${pkgdir}/usr/bin/deno"
+}
