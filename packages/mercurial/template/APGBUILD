@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=mercurial
+pkgver=7.2.4
+pkgrel=1
+pkgdesc="A free, distributed source control management tool"
+arch=('x86_64')
+url="https://www.mercurial-scm.org/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'python')
+makedepends=('python')
+provides=('hg')
+source=("https://www.mercurial-scm.org/release/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  python3 setup.py build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  python3 setup.py install --root="${pkgdir}" --prefix=/usr --optimize=1
+}
