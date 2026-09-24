@@ -1,0 +1,29 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=zig
+pkgver=0.14.0
+pkgrel=1
+pkgdesc="A general-purpose programming language and toolchain for maintaining robust, optimal, and reusable software"
+arch=('x86_64')
+url="https://ziglang.org/"
+license=('MIT')
+depends=('glibc')
+source=("https://ziglang.org/download/${pkgver}/zig-linux-x86_64-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/zig-linux-x86_64-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/zig-linux-x86_64-${pkgver}"
+
+  install -dm755 "${pkgdir}/usr/lib/zig"
+  cp -a lib/* "${pkgdir}/usr/lib/zig/"
+
+  install -Dm755 zig "${pkgdir}/usr/bin/zig"
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
