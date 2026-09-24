@@ -1,0 +1,44 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=networkmanager
+pkgver=1.58.0
+pkgrel=1
+pkgdesc="Network connection manager and user applications"
+arch=('x86_64')
+url="https://networkmanager.dev/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'glib' 'dbus' 'libnl' 'libndp' 'curl' 'gnutls' 'jansson')
+makedepends=('meson' 'ninja' 'pkgconf')
+provides=('NetworkManager')
+source=("https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/archive/${pkgver}/NetworkManager-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/NetworkManager-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/NetworkManager-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dintrospection=false \
+    -Ddocs=false \
+    -Dtests=no \
+    -Dsystemdsystemunitdir=no
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/NetworkManager-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
