@@ -1,0 +1,31 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=vlang
+pkgver=0.5.2
+pkgrel=1
+pkgdesc="Simple, fast, safe, compiled language for developing maintainable software"
+arch=('x86_64')
+url="https://vlang.io/"
+license=('MIT')
+depends=('glibc' 'gcc')
+makedepends=('unzip')
+provides=('v')
+source=("https://github.com/vlang/v/releases/download/${pkgver}/v_linux.zip")
+
+prepare() {
+  local dir="${srcdir}/v"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/v"
+
+  install -dm755 "${pkgdir}/usr/lib/vlang"
+  cp -r * "${pkgdir}/usr/lib/vlang/"
+
+  install -dm755 "${pkgdir}/usr/bin"
+  ln -sf /usr/lib/vlang/v "${pkgdir}/usr/bin/v"
+}
