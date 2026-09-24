@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=lazygit
+pkgver=0.65.1
+pkgrel=1
+pkgdesc="Simple terminal UI for git commands"
+arch=('x86_64')
+url="https://github.com/jesseduffield/lazygit"
+license=('MIT')
+depends=('glibc' 'git')
+makedepends=('go')
+source=("https://github.com/jesseduffield/lazygit/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  export CGO_ENABLED=0
+  go build -trimpath -ldflags="-s -w -X main.version=${pkgver}" -o lazygit
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 lazygit "${pkgdir}/usr/bin/lazygit"
+}
