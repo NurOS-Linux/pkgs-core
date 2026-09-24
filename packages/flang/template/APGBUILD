@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=flang
+pkgver=22.1.8
+pkgrel=1
+pkgdesc="Fortran frontend for LLVM"
+arch=('x86_64')
+url="https://flang.llvm.org/"
+license=('Apache-2.0 WITH LLVM-exception')
+depends=('llvm' 'clang' 'glibc' 'gcc')
+makedepends=('llvm' 'clang' 'cmake' 'ninja' 'python')
+source=("https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}/llvm-project-${pkgver}.src.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/llvm-project-${pkgver}.src"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/llvm-project-${pkgver}.src"
+
+  cmake -B build -S flang -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DLLVM_DIR=/usr/lib/cmake/llvm \
+    -DClang_DIR=/usr/lib/cmake/clang \
+    -DLLVM_LINK_LLVM_DYLIB=ON
+
+  ninja -C build -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/llvm-project-${pkgver}.src"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
