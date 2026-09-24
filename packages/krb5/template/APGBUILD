@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=krb5
+pkgver=1.22.2
+pkgrel=1
+pkgdesc="The Kerberos network authentication system"
+arch=('x86_64')
+url="https://web.mit.edu/kerberos/"
+license=('MIT')
+depends=('glibc' 'openssl' 'libverto')
+makedepends=('pkgconf')
+source=("https://kerberos.org/dist/krb5/${pkgver%.*}/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}/src"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}/src"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var/lib \
+    --mandir=/usr/share/man \
+    --with-system-verto \
+    --without-systemd
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}/src"
+
+  make DESTDIR="${pkgdir}" install
+}
