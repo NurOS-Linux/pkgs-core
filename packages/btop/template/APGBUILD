@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=btop
+pkgver=1.4.7
+pkgrel=1
+pkgdesc="Resource monitor that shows usage and stats for processor, memory, disks, network and processes"
+arch=('x86_64')
+url="https://github.com/aristocratos/btop"
+license=('Apache-2.0')
+depends=('glibc' 'gcc')
+makedepends=()
+source=("https://github.com/aristocratos/btop/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr STRIP=true
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr DESTDIR="${pkgdir}" install
+}
