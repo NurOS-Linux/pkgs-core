@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=modemmanager
+pkgver=1.24.0
+pkgrel=1
+pkgdesc="Broadband modem management service"
+arch=('x86_64')
+url="https://www.freedesktop.org/wiki/Software/ModemManager/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'glib' 'libgudev' 'polkit')
+makedepends=('meson' 'ninja' 'pkgconf')
+provides=('ModemManager')
+source=("https://gitlab.freedesktop.org/mobile-broadband/ModemManager/-/archive/${pkgver}/ModemManager-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/ModemManager-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/ModemManager-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --buildtype=release \
+    -Dintrospection=false \
+    -Dsystemdsystemunitdir=no
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/ModemManager-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
