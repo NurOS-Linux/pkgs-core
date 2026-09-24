@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=tinycc
+pkgver=0.9.27
+pkgrel=1
+pkgdesc="Tiny C Compiler: Small, fast, and embeddable C99 compiler"
+arch=('x86_64')
+url="https://bellard.org/tcc/"
+license=('LGPL-2.1-or-later')
+depends=('glibc')
+makedepends=()
+provides=('tcc')
+source=("https://download.savannah.nongnu.org/releases/tinycc/tcc-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/tcc-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/tcc-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --extra-cflags="-fPIC"
+
+  make
+}
+
+package() {
+  cd "${srcdir}/tcc-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
