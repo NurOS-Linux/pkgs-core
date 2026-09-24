@@ -1,0 +1,59 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=qt6
+pkgver=6.11.2
+pkgrel=1
+pkgdesc="A cross-platform application and UI software development framework (full monolithic build)"
+arch=('x86_64')
+url="https://www.qt.io/"
+license=('LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only')
+depends=(
+  'glibc' 'gcc' 'glib' 'zlib' 'zstd' 'libpng' 'libjpeg-turbo' 'sqlite' 'pcre2'
+  'libx11' 'libxcb' 'xcb-util' 'xcb-util-image' 'xcb-util-keysyms'
+  'xcb-util-renderutil' 'xcb-util-wm' 'libxext' 'libxkbcommon' 'libxkbcommon-x11'
+  'fontconfig' 'freetype' 'harfbuzz' 'dbus' 'openssl' 'icu' 'brotli'
+)
+makedepends=('cmake' 'ninja' 'pkgconf' 'python' 'perl')
+provides=('qt6-base' 'qt6-declarative' 'qt6-svg' 'qt6-shadertools')
+source=("https://download.qt.io/official_releases/qt/${pkgver%.*}/${pkgver}/single/qt-everywhere-src-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/qt-everywhere-src-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/qt-everywhere-src-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DINSTALL_BINDIR=bin \
+    -DINSTALL_INCLUDEDIR=include/qt6 \
+    -DINSTALL_LIBDIR=lib \
+    -DINSTALL_ARCHDATADIR=lib/qt6 \
+    -DINSTALL_PLUGINSDIR=lib/qt6/plugins \
+    -DINSTALL_QMLDIR=lib/qt6/qml \
+    -DINSTALL_EXAMPLESDIR=share/doc/qt6/examples \
+    -DFEATURE_openssl_linked=ON \
+    -DFEATURE_system_zlib=ON \
+    -DFEATURE_system_pcre2=ON \
+    -DFEATURE_system_freetype=ON \
+    -DFEATURE_system_harfbuzz=ON \
+    -DFEATURE_system_libpng=ON \
+    -DFEATURE_system_libjpeg=ON \
+    -DFEATURE_system_sqlite=ON \
+    -DBUILD_TESTING=OFF \
+    -DQT_BUILD_EXAMPLES=OFF
+
+  ninja -C build -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/qt-everywhere-src-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
