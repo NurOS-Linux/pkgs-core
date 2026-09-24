@@ -1,0 +1,44 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=mariadb
+pkgver=13.0.2
+pkgrel=1
+pkgdesc="Fast and robust relational database server"
+arch=('x86_64')
+url="https://mariadb.org/"
+license=('GPL-2.0-only')
+depends=('glibc' 'gcc' 'openssl' 'zlib' 'zstd' 'brotli' 'pcre2' 'ncurses')
+makedepends=('cmake' 'ninja' 'pkgconf')
+source=("https://archive.mariadb.org/mariadb-${pkgver}/source/mariadb-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DINSTALL_SYSCONFDIR=/etc \
+    -DINSTALL_DOCDIR=share/doc/mariadb \
+    -DINSTALL_MANDIR=share/man \
+    -DPLUGIN_ROCKSDB=NO \
+    -DPLUGIN_TOKUDB=NO \
+    -DWITH_SYSTEMD=no \
+    -DWITH_SSL=system \
+    -DWITH_ZLIB=system
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
