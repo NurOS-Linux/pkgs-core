@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=hyprland
+pkgver=0.56.2
+pkgrel=1
+pkgdesc="A dynamic tiling Wayland compositor that doesn't sacrifice on its looks"
+arch=('x86_64')
+url="https://hyprland.org/"
+license=('BSD-3-Clause')
+depends=(
+  'glibc' 'gcc' 'wayland' 'wayland-protocols' 'cairo' 'pango' 'libxkbcommon'
+  'libdrm' 'libinput' 'mesa' 'pixman' 'tomlplusplus' 're2'
+)
+makedepends=('cmake' 'ninja' 'pkgconf')
+source=("https://github.com/hyprwm/Hyprland/releases/download/v${pkgver}/source-v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/hyprland-source"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/hyprland-source"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DNO_SYSTEMD=true
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/hyprland-source"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
