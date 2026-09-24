@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=adwaita-icon-theme
+pkgver=48.1
+pkgrel=1
+pkgdesc="GNOME standard icons"
+arch=('x86_64')
+url="https://gitlab.gnome.org/GNOME/adwaita-icon-theme"
+license=('CC-BY-SA-3.0' 'LGPL-3.0-or-later')
+depends=()
+makedepends=('meson' 'ninja')
+source=("https://download.gnome.org/sources/adwaita-icon-theme/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --buildtype=release
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
