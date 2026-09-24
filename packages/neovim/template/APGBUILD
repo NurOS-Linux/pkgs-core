@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=neovim
+pkgver=0.12.5
+pkgrel=1
+pkgdesc="Vim-fork focused on extensibility and usability"
+arch=('x86_64')
+url="https://neovim.io/"
+license=('Apache-2.0' 'Vim')
+depends=('glibc' 'libvterm' 'libuv' 'msgpack-c' 'unibilium' 'luajit' 'tree-sitter')
+makedepends=('cmake' 'ninja' 'pkgconf' 'gperf')
+provides=('nvim')
+source=("https://github.com/neovim/neovim/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DENABLE_LIBINTL=OFF
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
