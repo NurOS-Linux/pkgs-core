@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=waybar
+pkgver=0.15.0
+pkgrel=1
+pkgdesc="Highly customizable Wayland bar for Sway and Wlroots based compositors"
+arch=('x86_64')
+url="https://github.com/Alexays/Waybar"
+license=('MIT')
+depends=('glibc' 'gcc' 'wayland' 'gtkmm3' 'libsigc++' 'jsoncpp' 'libfmt' 'spdlog' 'libpulse' 'libnl')
+makedepends=('meson' 'ninja' 'pkgconf' 'wayland-protocols')
+source=("https://github.com/Alexays/Waybar/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/Waybar-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/Waybar-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --buildtype=release \
+    -Dtests=disabled \
+    -Dman-pages=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/Waybar-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
