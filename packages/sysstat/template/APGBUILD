@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=sysstat
+pkgver=12.8.0
+pkgrel=1
+pkgdesc="Performance monitoring tools for Linux (sar, iostat, mpstat, pidstat)"
+arch=('x86_64')
+url="https://sysstat.github.io/"
+license=('GPL-2.0-or-later')
+depends=('glibc')
+makedepends=()
+source=("https://github.com/sysstat/sysstat/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --mandir=/usr/share/man \
+    --disable-man-group
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
