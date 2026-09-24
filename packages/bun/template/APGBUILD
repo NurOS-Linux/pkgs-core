@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=bun
+pkgver=1.4.2
+pkgrel=1
+pkgdesc="Incredibly fast JavaScript/TypeScript runtime, bundler, test runner and package manager"
+arch=('x86_64')
+url="https://bun.sh/"
+license=('MIT')
+depends=('glibc')
+makedepends=('unzip')
+source=("https://github.com/oven-sh/bun/releases/download/bun-v${pkgver}/bun-linux-x64.zip")
+
+prepare() {
+  local dir="${srcdir}/bun-linux-x64"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/bun-linux-x64"
+
+  install -Dm755 bun "${pkgdir}/usr/bin/bun"
+  ln -sf bun "${pkgdir}/usr/bin/bunx"
+}
