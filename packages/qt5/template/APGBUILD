@@ -1,0 +1,64 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=qt5
+pkgver=5.15.19
+pkgrel=1
+pkgdesc="A cross-platform application and UI software development framework (full monolithic build)"
+arch=('x86_64')
+url="https://www.qt.io/"
+license=('LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only')
+depends=(
+  'glibc' 'gcc' 'glib' 'zlib' 'libpng' 'libjpeg-turbo' 'sqlite' 'pcre2'
+  'libx11' 'libxcb' 'xcb-util' 'xcb-util-image' 'xcb-util-keysyms'
+  'xcb-util-renderutil' 'xcb-util-wm' 'libxext' 'libxkbcommon' 'libxkbcommon-x11'
+  'fontconfig' 'freetype' 'harfbuzz' 'dbus' 'openssl'
+)
+makedepends=('pkgconf' 'python' 'perl')
+provides=('qt5-base' 'qt5-declarative' 'qt5-svg' 'qt5-x11extras')
+source=("https://download.qt.io/archive/qt/${pkgver%.*}/${pkgver}/single/qt-everywhere-opensource-src-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/qt-everywhere-src-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/qt-everywhere-src-${pkgver}"
+
+  ./configure \
+    -prefix /usr \
+    -sysconfdir /etc/xdg \
+    -bindir /usr/bin \
+    -headerdir /usr/include/qt5 \
+    -archdatadir /usr/lib/qt5 \
+    -plugindir /usr/lib/qt5/plugins \
+    -importdir /usr/lib/qt5/imports \
+    -qmldir /usr/lib/qt5/qml \
+    -examplesdir /usr/share/doc/qt5/examples \
+    -opensource \
+    -confirm-license \
+    -release \
+    -shared \
+    -strip \
+    -system-zlib \
+    -system-libpng \
+    -system-libjpeg \
+    -system-pcre \
+    -system-freetype \
+    -system-harfbuzz \
+    -system-sqlite \
+    -no-rpath \
+    -nomake examples \
+    -nomake tests
+
+  make -j"$(nproc)"
+}
+
+package() {
+  cd "${srcdir}/qt-everywhere-src-${pkgver}"
+
+  make INSTALL_ROOT="${pkgdir}" install
+}
