@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pekwm
+pkgver=0.4.1
+pkgrel=1
+pkgdesc="A very light, fast, functional and flexible window manager"
+arch=('x86_64')
+url="https://www.pekwm.se/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'gcc' 'libx11' 'libxext' 'libxinerama' 'libxrandr' 'libxft' 'libxpm' 'libpng' 'libjpeg-turbo')
+makedepends=('cmake' 'ninja' 'pkgconf')
+source=("https://github.com/pekwm/pekwm/archive/refs/tags/release-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-release-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-release-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_SYSCONFDIR=/etc
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-release-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
