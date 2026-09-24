@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=lua
+pkgver=5.4.7
+pkgrel=1
+pkgdesc="Powerful, efficient, lightweight, embeddable scripting language"
+arch=('x86_64')
+url="https://www.lua.org/"
+license=('MIT')
+depends=('glibc' 'readline')
+makedepends=()
+source=("https://www.lua.org/ftp/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make linux-readline MYCFLAGS="-fPIC"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make INSTALL_TOP="${pkgdir}/usr" INSTALL_MAN="${pkgdir}/usr/share/man/man1" install
+  install -Dm644 doc/readme.html "${pkgdir}/usr/share/doc/${pkgname}/readme.html"
+}
