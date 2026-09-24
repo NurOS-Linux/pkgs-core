@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=upower
+pkgver=1.91.4
+pkgrel=1
+pkgdesc="Abstraction for enumerating power devices, listening to device events and querying history and statistics"
+arch=('x86_64')
+url="https://upower.freedesktop.org/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'glib' 'libgudev' 'libusb')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://gitlab.freedesktop.org/upower/upower/-/archive/v${pkgver}/upower-v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-v${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-v${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --buildtype=release \
+    -Dintrospection=disabled \
+    -Dman=false \
+    -Dsystemdsystemunitdir=no
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-v${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
