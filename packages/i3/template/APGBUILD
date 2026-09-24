@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=i3
+pkgver=4.25.1
+pkgrel=1
+pkgdesc="An improved, dynamic, tiling window manager"
+arch=('x86_64')
+url="https://i3wm.org/"
+license=('BSD-3-Clause')
+depends=('glibc' 'libev' 'libx11' 'libxcb' 'xcb-util' 'xcb-util-cursor' 'xcb-util-keysyms' 'xcb-util-wm' 'xcb-util-xrm' 'libpcre2' 'pango' 'cairo' 'startup-notification' 'libxkbcommon' 'libxkbcommon-x11')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://i3wm.org/downloads/i3-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --buildtype=release \
+    -Ddocs=false \
+    -Dmans=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
