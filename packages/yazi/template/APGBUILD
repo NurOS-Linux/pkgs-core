@@ -1,0 +1,36 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=yazi
+pkgver=26.9.1
+pkgrel=1
+pkgdesc="Blazing fast terminal file manager written in Rust, based on async I/O"
+arch=('x86_64')
+url="https://yazi-rs.github.io/"
+license=('MIT')
+depends=('glibc' 'gcc')
+makedepends=('cargo')
+source=("https://github.com/sxyazi/yazi/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  cargo fetch --locked
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cargo build --frozen --release -p yazi-cli -p yazi-fm
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 "target/release/yazi" "${pkgdir}/usr/bin/yazi"
+  install -Dm755 "target/release/ya" "${pkgdir}/usr/bin/ya"
+}
