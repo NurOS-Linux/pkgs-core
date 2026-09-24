@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=fossil
+pkgver=2.28
+pkgrel=1
+pkgdesc="Simple, high-reliability, distributed software configuration management system"
+arch=('x86_64')
+url="https://fossil-scm.org/"
+license=('BSD-2-Clause')
+depends=('glibc' 'zlib' 'openssl')
+makedepends=()
+source=("https://fossil-scm.org/home/tarball/version-${pkgver}/fossil-src-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/fossil-src-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/fossil-src-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --json \
+    --with-openssl=auto
+
+  make
+}
+
+package() {
+  cd "${srcdir}/fossil-src-${pkgver}"
+
+  install -Dm755 fossil "${pkgdir}/usr/bin/fossil"
+}
