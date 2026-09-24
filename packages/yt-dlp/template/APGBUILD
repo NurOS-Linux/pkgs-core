@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=yt-dlp
+pkgver=2026.08.19
+pkgrel=1
+pkgdesc="A feature-rich command-line audio/video downloader"
+arch=('any')
+url="https://github.com/yt-dlp/yt-dlp"
+license=('Unlicense')
+depends=('python' 'ffmpeg')
+makedepends=('python')
+provides=('youtube-dl')
+source=("https://github.com/yt-dlp/yt-dlp/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  python3 setup.py build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  python3 setup.py install --root="${pkgdir}" --prefix=/usr --optimize=1
+}
