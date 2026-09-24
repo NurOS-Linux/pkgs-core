@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=polkit
+pkgver=127
+pkgrel=1
+pkgdesc="Application development toolkit for controlling system-wide privileges"
+arch=('x86_64')
+url="https://github.com/polkit-org/polkit"
+license=('LGPL-2.0-or-later')
+depends=('glibc' 'glib' 'expat' 'duktape')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://github.com/polkit-org/polkit/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --buildtype=release \
+    -Dintrospection=false \
+    -Dman=false \
+    -Dsession_tracking=ConsoleKit
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
