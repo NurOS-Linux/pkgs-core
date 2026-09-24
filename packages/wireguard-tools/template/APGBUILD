@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=wireguard-tools
+pkgver=1.0.20260223
+pkgrel=1
+pkgdesc="Next generation secure network tunnel: userspace tools"
+arch=('x86_64')
+url="https://www.wireguard.com/"
+license=('GPL-2.0-only')
+depends=('glibc' 'bash' 'iproute2')
+makedepends=()
+source=("https://git.zx2c4.com/wireguard-tools/snapshot/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}/src"
+
+  make WITH_SYSTEMD=no
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}/src"
+
+  make PREFIX=/usr SYSCONFDIR=/etc WITH_SYSTEMD=no DESTDIR="${pkgdir}" install
+}
