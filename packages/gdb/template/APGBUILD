@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gdb
+pkgver=17.2
+pkgrel=1
+pkgdesc="The GNU Debugger"
+arch=('x86_64')
+url="https://www.gnu.org/software/gdb/"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'gcc' 'ncurses' 'readline' 'zlib' 'zstd' 'expat' 'gmp' 'mpfr')
+makedepends=('pkgconf' 'texinfo')
+source=("https://ftp.gnu.org/gnu/gdb/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --disable-nls \
+    --with-system-readline \
+    --with-system-zlib \
+    --with-system-gdbinit=/etc/gdb/gdbinit
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
