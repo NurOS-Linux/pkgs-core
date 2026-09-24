@@ -1,0 +1,26 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=docker
+pkgver=29.8.1
+pkgrel=1
+pkgdesc="Pack, ship and run any application as a lightweight container"
+arch=('x86_64')
+url="https://www.docker.com/"
+license=('Apache-2.0')
+depends=('glibc' 'iptables' 'iproute2')
+source=("https://download.docker.com/linux/static/stable/x86_64/docker-${pkgver}.tgz")
+
+prepare() {
+  local dir="${srcdir}/docker"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/docker"
+
+  install -dm755 "${pkgdir}/usr/bin"
+  install -m755 containerd containerd-shim-runc-v2 ctr docker docker-init docker-proxy dockerd runc "${pkgdir}/usr/bin/"
+}
