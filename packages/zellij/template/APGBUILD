@@ -1,0 +1,35 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=zellij
+pkgver=0.45.1
+pkgrel=1
+pkgdesc="A terminal workspace with batteries included"
+arch=('x86_64')
+url="https://zellij.dev/"
+license=('MIT')
+depends=('glibc' 'gcc')
+makedepends=('cargo')
+source=("https://github.com/zellij-org/zellij/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  cargo fetch --locked
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cargo build --frozen --release
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 "target/release/zellij" "${pkgdir}/usr/bin/zellij"
+}
