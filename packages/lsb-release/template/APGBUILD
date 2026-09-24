@@ -1,0 +1,28 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=lsb-release
+pkgver=1.4
+pkgrel=1
+pkgdesc="Linux Standard Base release reporting utility"
+arch=('x86_64')
+url="https://wiki.linuxfoundation.org/lsb/start"
+license=('GPL-2.0-or-later')
+depends=('bash')
+makedepends=()
+provides=('lsb')
+source=("https://sourceforge.net/projects/lsb/files/lsb_release/${pkgver}/lsb-release-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 lsb_release "${pkgdir}/usr/bin/lsb_release"
+  install -Dm644 lsb_release.1 "${pkgdir}/usr/share/man/man1/lsb_release.1"
+}
