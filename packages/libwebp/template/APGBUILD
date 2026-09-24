@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libwebp
+pkgver=1.6.0
+pkgrel=1
+pkgdesc="WebP library and conversion tools"
+arch=('x86_64')
+url="https://developers.google.com/speed/webp"
+license=('BSD-3-Clause')
+depends=('glibc' 'libpng' 'libjpeg-turbo' 'libtiff')
+makedepends=('cmake' 'ninja')
+source=("https://storage.googleapis.com/downloads.webmproject.org/releases/webp/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+    -DBUILD_SHARED_LIBS=ON \
+    -DWEBP_BUILD_WEBPINFO=ON \
+    -DWEBP_BUILD_WEBPMUX=ON \
+    -DWEBP_BUILD_EXTRAS=ON
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
