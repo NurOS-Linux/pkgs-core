@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=iso-codes
+pkgver=4.20.1
+pkgrel=1
+pkgdesc="Lists of the country, language, and currency names in XML and JSON format with translations"
+arch=('any')
+url="https://salsa.debian.org/iso-codes-team/iso-codes"
+license=('LGPL-2.1-or-later')
+depends=()
+makedepends=('python')
+source=("https://salsa.debian.org/iso-codes-team/iso-codes/-/archive/v${pkgver}/iso-codes-v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-v${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-v${pkgver}"
+
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-v${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
