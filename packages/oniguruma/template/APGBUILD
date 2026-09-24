@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=oniguruma
+pkgver=6.9.10
+pkgrel=1
+pkgdesc="Modern and flexible regular expressions library"
+arch=('x86_64')
+url="https://github.com/kkos/oniguruma"
+license=('BSD-2-Clause')
+depends=('glibc')
+makedepends=('pkgconf')
+source=("https://github.com/kkos/oniguruma/releases/download/v${pkgver}/onig-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/onig-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/onig-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --disable-static
+
+  make
+}
+
+package() {
+  cd "${srcdir}/onig-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
