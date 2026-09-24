@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=icu
+pkgver=78.3
+pkgrel=1
+pkgdesc="International Components for Unicode library"
+arch=('x86_64')
+url="https://icu.unicode.org/"
+license=('Unicode-3.0')
+depends=('glibc' 'gcc')
+makedepends=()
+source=("https://github.com/unicode-org/icu/releases/download/release-${pkgver/./-}/icu4c-${pkgver/./_}-src.tgz")
+
+prepare() {
+  local dir="${srcdir}/icu/source"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/icu/source"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --sbindir=/usr/bin \
+    --mandir=/usr/share/man
+
+  make
+}
+
+package() {
+  cd "${srcdir}/icu/source"
+
+  make DESTDIR="${pkgdir}" install
+}
