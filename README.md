@@ -12,7 +12,7 @@ Package build recipes for the NurOS Juldyz edition.
 
 This repository contains official package build recipes exclusively for the NurOS Juldyz edition.
 
-All package recipes follow the PKGBUILD format. Packages are built into `.apg` packages using the `apgbuild` tool.
+All package recipes follow the APGBUILD format. Packages are built into `.apg` packages using the `apgbuild` tool.
 
 * **git.nuros.org** ([utils/apgbuild](https://git.nuros.org/utils/apgbuild)): primary repository.
 * **GitHub** ([NurOS-Linux/apgbuild](https://github.com/NurOS-Linux/apgbuild)): mirror.
@@ -28,7 +28,7 @@ packages/
     template/
 ```
 
-* `packages/<package_name>/template/`: contains the PKGBUILD recipe and build templates.
+* `packages/<package_name>/template/`: contains the APGBUILD recipe and build templates.
 * `packages/<package_name>/files/`: contains additional source assets, configuration files, patches, and service files.
 
 ## License
