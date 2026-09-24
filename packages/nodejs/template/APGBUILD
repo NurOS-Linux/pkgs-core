@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=nodejs
+pkgver=26.10.0
+pkgrel=1
+pkgdesc="JavaScript runtime built on V8 engine"
+arch=('x86_64')
+url="https://nodejs.org/"
+license=('MIT')
+depends=('glibc' 'gcc')
+provides=('npm' 'npx')
+source=("https://nodejs.org/dist/v${pkgver}/node-v${pkgver}-linux-x64.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/node-v${pkgver}-linux-x64"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/node-v${pkgver}-linux-x64"
+
+  install -dm755 "${pkgdir}/usr"
+  cp -r bin include lib share "${pkgdir}/usr/"
+}
