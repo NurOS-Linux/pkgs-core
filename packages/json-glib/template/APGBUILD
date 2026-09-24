@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=json-glib
+pkgver=1.10.8
+pkgrel=1
+pkgdesc="JSON library for GLib"
+arch=('x86_64')
+url="https://wiki.gnome.org/Projects/JsonGlib"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'glib')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://download.gnome.org/sources/json-glib/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --buildtype=release \
+    -Dintrospection=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
