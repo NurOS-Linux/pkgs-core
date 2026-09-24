@@ -1,0 +1,50 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=mesa
+pkgver=26.2.3
+pkgrel=1
+pkgdesc="An open-source implementation of the OpenGL, Vulkan and OpenCL specifications"
+arch=('x86_64')
+url="https://www.mesa3d.org/"
+license=('MIT')
+depends=(
+  'glibc' 'gcc' 'libdrm' 'libx11' 'libxext' 'libxdamage' 'libxfixes'
+  'libxshmfence' 'libxxf86vm' 'libxrandr' 'libxcb' 'libxshmfence'
+  'expat' 'zlib' 'zstd' 'llvm' 'vulkan-headers'
+)
+makedepends=('meson' 'ninja' 'pkgconf' 'python' 'bison' 'flex' 'glslang')
+source=("https://archive.mesa3d.org/mesa-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --buildtype=release \
+    -Dplatforms=x11,wayland \
+    -Dgallium-drivers=swrast,radeonsi,r600,nouveau,virgl,iris,crocus,zink \
+    -Dvulkan-drivers=amd,intel,swrast \
+    -Dglx=dri \
+    -Degl=enabled \
+    -Dgbm=enabled \
+    -Dgles1=disabled \
+    -Dgles2=enabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
