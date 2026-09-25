@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=cryptsetup
+pkgver=2.8.8
+pkgrel=1
+pkgdesc="Userspace setup tool for transparent encryption of block devices using dm-crypt"
+arch=('x86_64')
+url="https://gitlab.com/cryptsetup/cryptsetup"
+license=('GPL-2.0-or-later' 'LGPL-2.1-or-later')
+depends=('glibc' 'device-mapper' 'json-c' 'openssl' 'popt' 'util-linux')
+makedepends=('pkgconf')
+source=("https://www.kernel.org/pub/linux/utils/cryptsetup/v${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sbindir=/usr/bin \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --disable-static \
+    --disable-ssh-token \
+    --disable-asciidoc \
+    --with-crypto_backend=openssl
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
