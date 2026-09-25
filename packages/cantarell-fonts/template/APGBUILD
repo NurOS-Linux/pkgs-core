@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=cantarell-fonts
+pkgver=0.311
+pkgrel=1
+pkgdesc="Humanist sans serif font designed for GNOME"
+arch=('any')
+url="https://gitlab.gnome.org/GNOME/cantarell-fonts"
+license=('OFL-1.1')
+depends=('fontconfig')
+makedepends=('meson' 'ninja')
+source=("https://download.gnome.org/sources/${pkgname}/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  rm -rf build
+  meson setup build --prefix=/usr
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  DESTDIR="${pkgdir}" ninja -C build install
+}
