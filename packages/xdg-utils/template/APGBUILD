@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=xdg-utils
+pkgver=1.2.1
+pkgrel=1
+pkgdesc="Basic desktop integration functions from freedesktop.org"
+arch=('any')
+url="https://www.freedesktop.org/wiki/Software/xdg-utils/"
+license=('MIT')
+depends=('sh')
+makedepends=()
+source=("https://gitlab.freedesktop.org/xdg/xdg-utils/-/archive/v${pkgver}/${pkgname}-v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-v${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-v${pkgver}"
+
+  ./configure --prefix=/usr --mandir=/usr/share/man
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-v${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
