@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=catch2
+pkgver=3.16.0
+pkgrel=1
+pkgdesc="C++ test framework"
+arch=('x86_64')
+url="https://github.com/catchorg/Catch2"
+license=('BSL-1.0')
+depends=('glibc' 'gcc')
+makedepends=('cmake' 'ninja' 'python')
+source=("https://github.com/catchorg/Catch2/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/Catch2-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/Catch2-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DBUILD_SHARED_LIBS=ON \
+    -DCATCH_INSTALL_DOCS=OFF \
+    -DCATCH_INSTALL_EXTRAS=ON \
+    -DBUILD_TESTING=OFF
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/Catch2-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
