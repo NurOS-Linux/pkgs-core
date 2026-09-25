@@ -1,0 +1,36 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libtasn1
+pkgver=4.21.0
+pkgrel=1
+pkgdesc="ASN.1 library used by GnuTLS and p11-kit"
+arch=('x86_64')
+url="https://www.gnu.org/software/libtasn1/"
+license=('LGPL-2.1-or-later' 'GPL-3.0-or-later')
+depends=('glibc')
+makedepends=('pkgconf')
+source=("https://ftp.gnu.org/gnu/libtasn1/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
