@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=p11-kit
+pkgver=0.26.5
+pkgrel=1
+pkgdesc="Library to work with PKCS#11 modules"
+arch=('x86_64')
+url="https://p11-glue.github.io/p11-glue/p11-kit.html"
+license=('BSD-3-Clause')
+depends=('glibc' 'libtasn1' 'libffi')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://github.com/p11-glue/p11-kit/releases/download/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --buildtype=release \
+    -Dtrust_paths=/etc/ssl/certs/ca-certificates.crt \
+    -Dsystemd=disabled
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  DESTDIR="${pkgdir}" ninja -C build install
+}
