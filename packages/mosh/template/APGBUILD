@@ -1,0 +1,36 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=mosh
+pkgver=1.4.0
+pkgrel=1
+pkgdesc="Mobile shell that supports roaming and intelligent local echo"
+arch=('x86_64')
+url="https://mosh.org/"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'gcc' 'protobuf' 'ncurses' 'zlib' 'openssl' 'perl')
+makedepends=('pkgconf')
+source=("https://mosh.org/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
