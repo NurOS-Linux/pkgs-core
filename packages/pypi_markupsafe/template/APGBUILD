@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_markupsafe
+pkgver=3.0.3
+pkgrel=1
+pkgdesc="Safely add untrusted strings to HTML/XML markup."
+arch=('x86_64')
+url="https://github.com/pallets/markupsafe/"
+license=('BSD-3-Clause')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools' 'gcc')
+provides=('markupsafe')
+source=("https://files.pythonhosted.org/packages/7e/99/7690b6d4034fffd95959cbe0c02de8deb3098cc577c67bb6a24fe5d7caa7/markupsafe-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/markupsafe-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/markupsafe-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
