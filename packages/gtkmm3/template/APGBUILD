@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gtkmm3
+pkgver=3.24.11
+pkgrel=1
+pkgdesc="C++ bindings for GTK 3"
+arch=('x86_64')
+url="https://gitlab.gnome.org/GNOME/gtkmm"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'gcc' 'glibmm' 'cairomm' 'pangomm' 'atkmm' 'gtk3' 'gdk-pixbuf')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://download.gnome.org/sources/gtkmm/${pkgver%.*}/gtkmm-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/gtkmm-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/gtkmm-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dbuild-demos=false \
+    -Dbuild-tests=false \
+    -Dbuild-documentation=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/gtkmm-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
