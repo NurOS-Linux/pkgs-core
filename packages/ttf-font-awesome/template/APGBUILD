@@ -1,0 +1,28 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ttf-font-awesome
+pkgver=6.5.2
+pkgrel=1
+pkgdesc="Iconic font designed for Bootstrap and modern desktop applications"
+arch=('any')
+url="https://fontawesome.com/"
+license=('OFL-1.1')
+depends=('fontconfig')
+makedepends=()
+provides=('fontawesome' 'font-awesome')
+source=("https://use.fontawesome.com/releases/v${pkgver}/fontawesome-free-${pkgver}-desktop.zip")
+
+prepare() {
+  local dir="${srcdir}/fontawesome-free-${pkgver}-desktop"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/fontawesome-free-${pkgver}-desktop"
+
+  install -dm755 "${pkgdir}/usr/share/fonts/font-awesome"
+  install -m644 otfs/*.otf "${pkgdir}/usr/share/fonts/font-awesome/"
+}
