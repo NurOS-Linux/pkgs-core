@@ -1,0 +1,31 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=python-lsp-server
+pkgver=1.15.0
+pkgrel=1
+pkgdesc="Fork of the Python Language Server"
+arch=('any')
+url="https://github.com/python-lsp/python-lsp-server"
+license=('MIT')
+depends=('python' 'pypi_setuptools')
+makedepends=('python')
+provides=('pylsp')
+source=("https://files.pythonhosted.org/packages/source/p/python-lsp-server/python-lsp-server-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  python3 setup.py build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  python3 setup.py install --root="${pkgdir}" --prefix=/usr --optimize=1
+}
