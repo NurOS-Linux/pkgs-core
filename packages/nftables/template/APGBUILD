@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=nftables
+pkgver=1.1.7
+pkgrel=1
+pkgdesc="Netfilter tables userspace tools"
+arch=('x86_64')
+url="https://netfilter.org/projects/nftables/"
+license=('GPL-2.0-only')
+depends=('glibc' 'gmp' 'readline')
+makedepends=('pkgconf' 'bison' 'flex')
+source=("https://netfilter.org/projects/nftables/files/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sbindir=/usr/bin \
+    --sysconfdir=/etc \
+    --disable-man-doc
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
