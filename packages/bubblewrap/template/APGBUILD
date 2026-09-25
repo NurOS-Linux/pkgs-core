@@ -1,0 +1,45 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=bubblewrap
+pkgver=0.13.0
+pkgrel=1
+pkgdesc="Unprivileged sandboxing tool"
+arch=('x86_64')
+url="https://github.com/containers/bubblewrap"
+license=('LGPL-2.0-or-later')
+depends=('glibc' 'libcap')
+provides=('bwrap')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://github.com/containers/bubblewrap/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dman=disabled \
+    -Dbash_completion=disabled \
+    -Dzsh_completion=disabled \
+    -Dselinux=disabled \
+    -Dtests=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
