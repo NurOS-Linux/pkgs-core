@@ -1,0 +1,28 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ttf-ubuntu-font-family
+pkgver=0.83
+pkgrel=1
+pkgdesc="Ubuntu Font Family"
+arch=('any')
+url="https://design.ubuntu.com/font/"
+license=('custom:UbuntuFontLicence')
+depends=('fontconfig')
+makedepends=()
+provides=('ubuntu-font')
+source=("https://assets.ubuntu.com/v1/fad7939b-ubuntu-font-family-${pkgver}.zip")
+
+prepare() {
+  local dir="${srcdir}/ubuntu-font-family-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/ubuntu-font-family-${pkgver}"
+
+  install -dm755 "${pkgdir}/usr/share/fonts/ubuntu"
+  install -m644 *.ttf "${pkgdir}/usr/share/fonts/ubuntu/"
+}
