@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=powertop
+pkgver=2.16
+pkgrel=1
+pkgdesc="Tool to diagnose power consumption and power management"
+arch=('x86_64')
+url="https://github.com/fenrus75/powertop"
+license=('GPL-2.0-only')
+depends=('glibc' 'gcc' 'libnl' 'ncurses' 'pciutils' 'zlib')
+makedepends=('autoconf' 'automake' 'libtool' 'pkgconf' 'gettext')
+source=("https://github.com/fenrus75/powertop/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  autoreconf -fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sbindir=/usr/bin
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
