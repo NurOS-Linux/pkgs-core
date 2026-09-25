@@ -1,0 +1,48 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=xdg-desktop-portal
+pkgver=1.22.1
+pkgrel=1
+pkgdesc="Desktop integration portal service for sandboxed applications"
+arch=('x86_64')
+url="https://flatpak.github.io/xdg-desktop-portal/"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'glib' 'dbus' 'json-glib' 'fuse3' 'gdk-pixbuf' 'gst-plugins-base' 'pipewire' 'libgudev' 'bubblewrap')
+makedepends=('meson' 'ninja' 'pkgconf' 'gettext' 'flatpak')
+source=("https://github.com/flatpak/xdg-desktop-portal/releases/download/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Ddocumentation=disabled \
+    -Dman-pages=disabled \
+    -Dtests=disabled \
+    -Dsystemd=disabled \
+    -Dgeoclue=disabled \
+    -Dgudev=enabled \
+    -Dflatpak-interfaces=enabled \
+    -Dsandboxed-image-validation=enabled \
+    -Dsandboxed-sound-validation=enabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
