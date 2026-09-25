@@ -1,0 +1,34 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=heaptrack
+pkgver=1.3.0
+pkgrel=1
+pkgdesc="A heap memory profiler for Linux"
+arch=('x86_64')
+url="https://github.com/KDE/heaptrack"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'gcc' 'zlib' 'zstd' 'boost')
+makedepends=('cmake' 'ninja' 'pkgconf' 'extra-cmake-modules')
+source=("https://download.kde.org/stable/${pkgname}/${pkgver}/src/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DHEAPTRACK_BUILD_GUI=OFF
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  DESTDIR="${pkgdir}" ninja -C build install
+}
