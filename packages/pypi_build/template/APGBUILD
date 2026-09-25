@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_build
+pkgver=1.6.1
+pkgrel=1
+pkgdesc="A simple, correct Python build frontend"
+arch=('any')
+url="https://pypi.org/project/build/"
+license=('MIT')
+depends=('python' 'pypi_packaging' 'pypi_pyproject_hooks')
+makedepends=('python' 'pypi_pip' 'pypi_flit_core')
+provides=('build')
+source=("https://files.pythonhosted.org/packages/bd/67/4898a44ea4f3f8e213b0954ec0aa0a16971d62a6212d6ea3931e97115b99/build-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/build-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/build-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
