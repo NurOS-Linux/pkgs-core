@@ -1,0 +1,36 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=delta
+pkgver=0.19.2
+pkgrel=1
+pkgdesc="A viewer for git and diff output"
+arch=('x86_64')
+url="https://github.com/dandavison/delta"
+license=('MIT')
+depends=('glibc' 'gcc' 'git')
+makedepends=('cargo')
+provides=('git-delta')
+source=("https://github.com/dandavison/delta/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  cargo fetch --locked
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cargo build --frozen --release
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 "target/release/delta" "${pkgdir}/usr/bin/delta"
+}
