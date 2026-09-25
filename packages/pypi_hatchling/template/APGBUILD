@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_hatchling
+pkgver=1.32.4
+pkgrel=1
+pkgdesc="Modern, extensible Python build backend"
+arch=('any')
+url="https://hatch.pypa.io/latest/"
+license=('MIT')
+depends=('python' 'pypi_packaging' 'pypi_pathspec' 'pypi_pluggy' 'pypi_tomlkit' 'pypi_trove_classifiers')
+makedepends=('python' 'pypi_pip')
+provides=('hatchling')
+source=("https://files.pythonhosted.org/packages/f6/97/b5312f01a8c6daf729a9d272dd442e0c546dbcc630495788786c4b567ed0/hatchling-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/hatchling-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/hatchling-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
