@@ -1,0 +1,50 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libsoup3
+pkgver=3.6.6
+pkgrel=1
+pkgdesc="HTTP client/server library for GNOME"
+arch=('x86_64')
+url="https://gitlab.gnome.org/GNOME/libsoup"
+license=('LGPL-2.0-or-later')
+depends=(
+  'glibc' 'glib' 'glib-networking' 'libpsl' 'nghttp2' 'sqlite' 'brotli'
+  'libxml2' 'zlib'
+)
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://download.gnome.org/sources/libsoup/${pkgver%.*}/libsoup-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/libsoup-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/libsoup-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dintrospection=disabled \
+    -Dvapi=disabled \
+    -Ddocs=disabled \
+    -Dtests=false \
+    -Dsysprof=disabled \
+    -Dgssapi=disabled \
+    -Dntlm=disabled \
+    -Dtls_check=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/libsoup-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
