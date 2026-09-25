@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libxpm
+pkgver=3.5.19
+pkgrel=1
+pkgdesc="X11 pixmap library"
+arch=('x86_64')
+url="https://xorg.freedesktop.org/"
+license=('MIT')
+depends=('glibc' 'libx11' 'libxext' 'libxt')
+makedepends=('pkgconf' 'xorgproto' 'util-macros' 'gettext')
+source=("https://www.x.org/releases/individual/lib/libXpm-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/libXpm-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/libXpm-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static
+
+  make
+}
+
+package() {
+  cd "${srcdir}/libXpm-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
