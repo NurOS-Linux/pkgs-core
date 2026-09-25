@@ -1,0 +1,31 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ipset
+pkgver=7.24
+pkgrel=1
+pkgdesc="Manage IP sets in the Linux kernel"
+arch=('x86_64')
+url="https://ipset.netfilter.org/"
+license=('GPL-2.0-only')
+depends=('glibc' 'libmnl')
+makedepends=('pkgconf')
+source=("https://ipset.netfilter.org/${pkgname}-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr --sbindir=/usr/bin --sysconfdir=/etc
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
