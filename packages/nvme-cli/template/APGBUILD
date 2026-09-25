@@ -1,0 +1,43 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=nvme-cli
+pkgver=3.1
+pkgrel=1
+pkgdesc="NVM Express user space tooling for Linux"
+arch=('x86_64')
+url="https://github.com/linux-nvme/nvme-cli"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'libnvme' 'json-c' 'openssl' 'zlib')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://github.com/linux-nvme/nvme-cli/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Ddocs=false \
+    -Dudevrulesdir=/usr/lib/udev/rules.d \
+    -Dsystemddir=/usr/lib/systemd \
+    -Dhtmldir=/usr/share/doc
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
