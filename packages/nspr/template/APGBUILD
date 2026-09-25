@@ -1,0 +1,31 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=nspr
+pkgver=4.40
+pkgrel=1
+pkgdesc="Netscape Portable Runtime"
+arch=('x86_64')
+url="https://developer.mozilla.org/docs/Mozilla/Projects/NSPR"
+license=('MPL-2.0')
+depends=('glibc')
+makedepends=()
+source=("https://ftp.mozilla.org/pub/nspr/releases/v${pkgver}/src/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}/nspr"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}/nspr"
+  ./configure --prefix=/usr --enable-64bit
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}/nspr"
+  make DESTDIR="${pkgdir}" install
+}
