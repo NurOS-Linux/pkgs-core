@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=inih
+pkgver=62
+pkgrel=1
+pkgdesc="Simple INI file parser library"
+arch=('x86_64')
+url="https://github.com/benhoyt/inih"
+license=('BSD-3-Clause')
+depends=('glibc')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://github.com/benhoyt/inih/archive/refs/tags/r${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/inih-r${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/inih-r${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Ddistro_install=true \
+    -Dwith_INIReader=true
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/inih-r${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
