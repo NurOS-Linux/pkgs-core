@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=apr
+pkgver=1.7.6
+pkgrel=1
+pkgdesc="Apache Portable Runtime library"
+arch=('x86_64')
+url="https://apr.apache.org/"
+license=('Apache-2.0')
+depends=('glibc' 'util-linux')
+makedepends=('pkgconf')
+source=("https://archive.apache.org/dist/apr/${pkgname}-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --with-installbuilddir=/usr/share/apr-1/build
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
