@@ -1,0 +1,25 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=papirus-icon-theme
+pkgver=20260801
+pkgrel=1
+pkgdesc="Pixel-perfect icon theme for Linux"
+arch=('any')
+url="https://github.com/PapirusDevelopmentTeam/papirus-icon-theme"
+license=('GPL-3.0-only')
+depends=('hicolor-icon-theme')
+makedepends=()
+source=("https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
