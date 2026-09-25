@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=spirv-tools
+pkgver=2026.3
+pkgrel=1
+pkgdesc="API and commands for processing SPIR-V modules"
+arch=('x86_64')
+url="https://github.com/KhronosGroup/SPIRV-Tools"
+license=('Apache-2.0')
+depends=('glibc' 'gcc')
+makedepends=('cmake' 'ninja' 'python' 'spirv-headers')
+source=("https://github.com/KhronosGroup/SPIRV-Tools/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/SPIRV-Tools-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/SPIRV-Tools-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DSPIRV_WERROR=OFF \
+    -DSPIRV_SKIP_TESTS=ON \
+    -DSPIRV-Headers_SOURCE_DIR=/usr \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DSPIRV_TOOLS_BUILD_STATIC=OFF
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/SPIRV-Tools-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
