@@ -1,0 +1,44 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gcr-4
+pkgver=4.4.1
+pkgrel=1
+pkgdesc="Library for displaying certificates and crypto UI"
+arch=('x86_64')
+url="https://gitlab.gnome.org/GNOME/gcr"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'glib' 'gnupg' 'libgcrypt' 'libsecret' 'p11-kit')
+makedepends=('meson' 'ninja' 'pkgconf' 'gettext')
+source=("https://download.gnome.org/sources/gcr/${pkgver%.*}/gcr-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/gcr-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/gcr-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dintrospection=false \
+    -Dvapi=false \
+    -Dgtk_doc=false \
+    -Dgtk4=false \
+    -Dsystemd=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/gcr-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
