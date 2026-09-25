@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=desktop-file-utils
+pkgver=0.28
+pkgrel=1
+pkgdesc="Command line utilities for working with desktop entries"
+arch=('x86_64')
+url="https://www.freedesktop.org/wiki/Software/desktop-file-utils/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'glib')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://gitlab.freedesktop.org/xdg/desktop-file-utils/-/archive/${pkgver}/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --buildtype=release
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
