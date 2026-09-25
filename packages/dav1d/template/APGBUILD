@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=dav1d
+pkgver=1.5.4
+pkgrel=1
+pkgdesc="AV1 cross-platform decoder focused on speed and correctness"
+arch=('x86_64')
+url="https://code.videolan.org/videolan/dav1d"
+license=('BSD-2-Clause')
+depends=('glibc')
+makedepends=('meson' 'ninja' 'nasm')
+source=("https://code.videolan.org/videolan/dav1d/-/archive/${pkgver}/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --buildtype=release \
+    -Denable_tests=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
