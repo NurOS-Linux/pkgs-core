@@ -1,0 +1,30 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=binwalk
+pkgver=3.1.0
+pkgrel=1
+pkgdesc="Firmware analysis and extraction tool"
+arch=('any')
+url="https://github.com/ReFirmLabs/binwalk"
+license=('MIT')
+depends=('python' 'pypi_setuptools')
+makedepends=('python')
+source=("https://github.com/ReFirmLabs/binwalk/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  python3 setup.py build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  python3 setup.py install --root="${pkgdir}" --prefix=/usr --optimize=1
+}
