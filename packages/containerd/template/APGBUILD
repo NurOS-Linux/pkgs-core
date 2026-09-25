@@ -1,0 +1,30 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=containerd
+pkgver=2.4.0
+pkgrel=1
+pkgdesc="An open and reliable container runtime"
+arch=('x86_64')
+url="https://containerd.io/"
+license=('Apache-2.0')
+depends=('glibc' 'runc')
+makedepends=('go')
+source=("https://github.com/containerd/containerd/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" PREFIX=/usr install
+}
