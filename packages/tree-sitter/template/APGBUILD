@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=tree-sitter
+pkgver=0.27.0
+pkgrel=1
+pkgdesc="Incremental parsing library"
+arch=('x86_64')
+url="https://tree-sitter.github.io/tree-sitter/"
+license=('MIT')
+depends=('glibc')
+makedepends=('pkgconf')
+source=("https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}"/usr/lib/libtree-sitter.a
+}
