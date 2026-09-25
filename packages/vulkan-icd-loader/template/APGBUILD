@@ -1,0 +1,35 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=vulkan-icd-loader
+pkgver=1.4.304
+pkgrel=1
+pkgdesc="Vulkan Installable Client Driver (ICD) Loader"
+arch=('x86_64')
+url="https://www.vulkan.org/"
+license=('Apache-2.0')
+depends=('glibc' 'vulkan-headers')
+makedepends=('cmake' 'ninja' 'python')
+provides=('libvulkan.so')
+source=("https://github.com/KhronosGroup/Vulkan-Loader/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/Vulkan-Loader-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/Vulkan-Loader-${pkgver}"
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DBUILD_TESTS=OFF
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/Vulkan-Loader-${pkgver}"
+  DESTDIR="${pkgdir}" ninja -C build install
+}
