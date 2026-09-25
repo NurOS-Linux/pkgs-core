@@ -1,0 +1,43 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libzip
+pkgver=1.11.4
+pkgrel=1
+pkgdesc="C library for reading, creating and modifying zip archives"
+arch=('x86_64')
+url="https://libzip.org/"
+license=('BSD-3-Clause')
+depends=('glibc' 'zlib' 'bzip2' 'xz' 'zstd' 'openssl')
+makedepends=('cmake' 'ninja')
+source=("https://github.com/nih-at/libzip/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DBUILD_DOC=OFF \
+    -DBUILD_EXAMPLES=OFF \
+    -DBUILD_REGRESS=OFF \
+    -DBUILD_TOOLS=ON \
+    -DENABLE_GNUTLS=OFF \
+    -DENABLE_MBEDTLS=OFF
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
