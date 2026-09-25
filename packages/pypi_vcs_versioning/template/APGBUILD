@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_vcs_versioning
+pkgver=2.5.0
+pkgrel=1
+pkgdesc="the blessed package to manage your versions by vcs metadata"
+arch=('any')
+url="https://github.com/pypa/setuptools-scm"
+license=('MIT')
+depends=('python' 'pypi_packaging')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools' 'pypi_packaging')
+provides=('vcs-versioning')
+source=("https://files.pythonhosted.org/packages/6f/a0/6977bb418312ad30f27e522c5040604d4bbf7e40ccd5a11d333afe549354/vcs_versioning-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/vcs_versioning-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/vcs_versioning-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
