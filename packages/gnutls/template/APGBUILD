@@ -1,0 +1,47 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gnutls
+pkgver=3.8.13
+pkgrel=1
+pkgdesc="GNU Transport Layer Security library"
+arch=('x86_64')
+url="https://www.gnutls.org/"
+license=('LGPL-2.1-or-later' 'GPL-3.0-or-later')
+depends=('glibc' 'nettle' 'gmp' 'libtasn1' 'libunistring' 'libidn2' 'p11-kit' 'zlib' 'zstd' 'brotli')
+makedepends=('pkgconf')
+source=("https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static \
+    --disable-guile \
+    --disable-doc \
+    --disable-tests \
+    --disable-libdane \
+    --without-tpm \
+    --without-tpm2 \
+    --with-zlib \
+    --with-zstd \
+    --with-brotli \
+    --with-default-trust-store-file=/etc/ssl/certs/ca-certificates.crt \
+    --with-default-trust-store-pkcs11="pkcs11:"
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
