@@ -1,0 +1,31 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_wheel
+pkgver=0.48.0
+pkgrel=1
+pkgdesc="A built-package format for Python"
+arch=('any')
+url="https://github.com/pypa/wheel"
+license=('MIT')
+depends=('python' 'pypi_setuptools')
+makedepends=('python')
+provides=('wheel')
+source=("https://files.pythonhosted.org/packages/source/w/wheel/wheel-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/wheel-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/wheel-${pkgver}"
+  python3 setup.py build
+}
+
+package() {
+  cd "${srcdir}/wheel-${pkgver}"
+  python3 setup.py install --root="${pkgdir}" --prefix=/usr --optimize=1
+}
