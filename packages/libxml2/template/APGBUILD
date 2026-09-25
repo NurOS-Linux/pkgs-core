@@ -7,7 +7,7 @@ pkgdesc="XML parsing library, version 2"
 arch=('x86_64')
 url="https://gitlab.gnome.org/GNOME/libxml2"
 license=('MIT')
-depends=('glibc' 'zlib' 'xz')
+depends=('glibc' 'zlib' 'xz' 'python')
 makedepends=('pkgconf')
 source=("https://download.gnome.org/sources/libxml2/2.13/libxml2-${pkgver}.tar.xz")
 
@@ -25,7 +25,7 @@ build() {
   ./configure \
     --prefix=/usr \
     --sysconfdir=/etc \
-    --without-python \
+    --with-python \
     --disable-static
 
   make
