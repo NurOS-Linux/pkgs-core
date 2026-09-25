@@ -1,0 +1,30 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=luajit
+pkgver=2.1.ROLLING
+pkgrel=1
+pkgdesc="Just-in-Time Compiler for Lua"
+arch=('x86_64')
+url="https://luajit.org/"
+license=('MIT')
+depends=('glibc')
+makedepends=()
+source=("https://github.com/LuaJIT/LuaJIT/archive/refs/heads/v2.1.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/LuaJIT-2.1"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/LuaJIT-2.1"
+  make PREFIX=/usr
+}
+
+package() {
+  cd "${srcdir}/LuaJIT-2.1"
+  make PREFIX=/usr DESTDIR="${pkgdir}" install
+}
