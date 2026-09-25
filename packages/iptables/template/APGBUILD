@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=iptables
+pkgver=1.8.13
+pkgrel=1
+pkgdesc="Linux kernel packet control tool"
+arch=('x86_64')
+url="https://netfilter.org/projects/iptables/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'libpcap')
+makedepends=('pkgconf')
+source=("https://netfilter.org/projects/iptables/files/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sbindir=/usr/bin \
+    --sysconfdir=/etc \
+    --disable-nftables \
+    --enable-bpf-compiler=no
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
