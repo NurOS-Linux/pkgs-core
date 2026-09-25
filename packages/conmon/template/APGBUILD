@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=conmon
+pkgver=2.2.1
+pkgrel=1
+pkgdesc="OCI container runtime monitor"
+arch=('x86_64')
+url="https://github.com/containers/conmon"
+license=('Apache-2.0')
+depends=('glibc' 'glib' 'libseccomp' 'libcap')
+makedepends=('pkgconf')
+source=("https://github.com/containers/conmon/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr CFLAGS="-std=c99 -O2 -Wall -Wextra"
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr DESTDIR="${pkgdir}" install.bin
+}
