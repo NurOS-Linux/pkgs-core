@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=samurai
+pkgver=1.3
+pkgrel=1
+pkgdesc="Ninja-compatible build tool written in C"
+arch=('x86_64')
+url="https://github.com/michaelforney/samurai"
+license=('Apache-2.0')
+depends=('glibc')
+makedepends=()
+source=("https://github.com/michaelforney/samurai/releases/download/${pkgver}/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr DESTDIR="${pkgdir}" install
+}
