@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libpsl
+pkgver=0.23.3
+pkgrel=1
+pkgdesc="Public Suffix List library"
+arch=('x86_64')
+url="https://rockdaboot.github.io/libpsl/"
+license=('MIT')
+depends=('glibc' 'libidn2' 'libunistring')
+makedepends=('pkgconf' 'python')
+source=("https://github.com/rockdaboot/libpsl/releases/download/${pkgver}/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static \
+    --disable-gtk-doc \
+    --enable-runtime=libidn2 \
+    --enable-builtin=libidn2
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
