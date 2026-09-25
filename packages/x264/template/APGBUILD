@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=x264
+pkgver=r3223
+pkgrel=1
+pkgdesc="Free library and application for encoding video streams into the H.264/MPEG-4 AVC format"
+arch=('x86_64')
+url="https://www.videolan.org/developers/x264.html"
+license=('GPL-2.0-or-later')
+depends=('glibc')
+makedepends=('nasm')
+source=("https://code.videolan.org/videolan/x264/-/archive/master/x264-master.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/x264-master"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/x264-master"
+
+  ./configure \
+    --prefix=/usr \
+    --enable-shared \
+    --enable-pic \
+    --disable-cli
+
+  make
+}
+
+package() {
+  cd "${srcdir}/x264-master"
+
+  make DESTDIR="${pkgdir}" install
+}
