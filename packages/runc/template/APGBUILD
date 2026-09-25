@@ -1,0 +1,30 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=runc
+pkgver=1.5.1
+pkgrel=1
+pkgdesc="CLI tool for spawning and running containers according to the OCI specification"
+arch=('x86_64')
+url="https://github.com/opencontainers/runc"
+license=('Apache-2.0')
+depends=('glibc' 'libseccomp')
+makedepends=('go' 'pkgconf')
+source=("https://github.com/opencontainers/runc/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  install -Dm755 runc "${pkgdir}/usr/bin/runc"
+}
