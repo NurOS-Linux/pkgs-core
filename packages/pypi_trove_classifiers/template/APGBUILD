@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_trove_classifiers
+pkgver=2026.9.21.13
+pkgrel=1
+pkgdesc="Canonical source for classifiers on PyPI (pypi.org)."
+arch=('any')
+url="https://github.com/pypa/trove-classifiers"
+license=('Apache-2.0')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools' 'pypi_calver')
+provides=('trove-classifiers')
+source=("https://files.pythonhosted.org/packages/bf/93/af436dfaa845cab5d96f0adbc1e4f3730532d37fa249e4eb796fb1d7fc82/trove_classifiers-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/trove_classifiers-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/trove_classifiers-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
