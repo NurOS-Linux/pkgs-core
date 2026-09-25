@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=glibmm
+pkgver=2.66.10
+pkgrel=1
+pkgdesc="C++ bindings for GLib"
+arch=('x86_64')
+url="https://gitlab.gnome.org/GNOME/glibmm"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'gcc' 'glib' 'libsigc++')
+makedepends=('meson' 'ninja' 'pkgconf' 'perl')
+source=("https://download.gnome.org/sources/glibmm/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dbuild-documentation=false \
+    -Dbuild-examples=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
