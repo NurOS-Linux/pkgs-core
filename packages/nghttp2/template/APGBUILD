@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=nghttp2
+pkgver=1.70.0
+pkgrel=1
+pkgdesc="Framing layer of HTTP/2 and HTTP/3 implementation in C"
+arch=('x86_64')
+url="https://nghttp2.org/"
+license=('MIT')
+depends=('glibc')
+makedepends=('cmake' 'ninja' 'pkgconf')
+provides=('libnghttp2')
+source=("https://github.com/nghttp2/nghttp2/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+    -DENABLE_APP=OFF \
+    -DENABLE_EXAMPLES=OFF \
+    -DENABLE_FAILMALLOC=OFF
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
