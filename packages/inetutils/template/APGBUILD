@@ -1,0 +1,43 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=inetutils
+pkgver=2.8
+pkgrel=1
+pkgdesc="A collection of common network programs"
+arch=('x86_64')
+url="https://www.gnu.org/software/inetutils/"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'readline' 'ncurses')
+makedepends=()
+provides=('telnet' 'ftp' 'ping' 'traceroute')
+source=("https://ftp.gnu.org/gnu/inetutils/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure \
+    --prefix=/usr \
+    --sbindir=/usr/bin \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --disable-servers \
+    --disable-logger \
+    --disable-whois \
+    --disable-rsh \
+    --disable-rcp \
+    --disable-rexec
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
