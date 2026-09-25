@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=bluez
+pkgver=5.87
+pkgrel=1
+pkgdesc="Daemons for the bluetooth protocol stack"
+arch=('x86_64')
+url="http://www.bluez.org/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'dbus' 'glib' 'readline' 'libical' 'ell')
+makedepends=('pkgconf')
+provides=('bluez-utils')
+source=("https://www.kernel.org/pub/linux/bluetooth/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --enable-library \
+    --enable-deprecated \
+    --disable-systemd
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
