@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_packaging
+pkgver=26.3
+pkgrel=1
+pkgdesc="Core utilities for Python packages"
+arch=('any')
+url="https://github.com/pypa/packaging"
+license=('Apache-2.0 OR BSD-2-Clause')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_flit_core')
+provides=('packaging')
+source=("https://files.pythonhosted.org/packages/7d/fa/3944b40b07da9ce895c0e6303a5ab7d53da063554f534556b134a54d6093/packaging-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/packaging-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/packaging-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
