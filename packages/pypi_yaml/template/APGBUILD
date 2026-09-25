@@ -1,0 +1,31 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_yaml
+pkgver=6.0.3
+pkgrel=1
+pkgdesc="YAML parser and emitter for Python"
+arch=('x86_64')
+url="https://pyyaml.org/"
+license=('MIT')
+depends=('python' 'libyaml')
+makedepends=('python' 'pypi_setuptools' 'pypi_wheel')
+provides=('pyyaml')
+source=("https://files.pythonhosted.org/packages/source/P/PyYAML/pyyaml-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/pyyaml-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/pyyaml-${pkgver}"
+  python3 setup.py build
+}
+
+package() {
+  cd "${srcdir}/pyyaml-${pkgver}"
+  python3 setup.py install --root="${pkgdir}" --prefix=/usr --optimize=1
+}
