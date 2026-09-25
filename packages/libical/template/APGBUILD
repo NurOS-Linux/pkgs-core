@@ -1,0 +1,43 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libical
+pkgver=4.0.5
+pkgrel=1
+pkgdesc="Implementation of iCalendar protocols and data formats"
+arch=('x86_64')
+url="https://libical.github.io/libical/"
+license=('LGPL-2.1-only')
+depends=('glibc' 'icu' 'libxml2')
+makedepends=('cmake' 'ninja' 'perl')
+source=("https://github.com/libical/libical/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DICAL_GLIB=OFF \
+    -DICAL_BUILD_DOCS=OFF \
+    -DLIBICAL_BUILD_TESTING=OFF \
+    -DLIBICAL_BUILD_EXAMPLES=OFF \
+    -DGOBJECT_INTROSPECTION=OFF \
+    -DICAL_GLIB_VAPI=OFF
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
