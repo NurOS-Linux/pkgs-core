@@ -1,0 +1,44 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=glib-networking
+pkgver=2.90.0
+pkgrel=1
+pkgdesc="Network-related GIO modules for GLib"
+arch=('x86_64')
+url="https://gitlab.gnome.org/GNOME/glib-networking"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'glib' 'gnutls' 'gsettings-desktop-schemas')
+makedepends=('meson' 'ninja' 'pkgconf' 'gettext')
+source=("https://download.gnome.org/sources/glib-networking/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dopenssl=disabled \
+    -Dgnutls=enabled \
+    -Dlibproxy=disabled \
+    -Dgnome_proxy=disabled \
+    -Dinstalled_tests=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
