@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_pluggy
+pkgver=1.6.0
+pkgrel=1
+pkgdesc="plugin and hook calling mechanisms for python"
+arch=('any')
+url="https://pypi.org/project/pluggy/"
+license=('MIT')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools' 'pypi_setuptools_scm')
+provides=('pluggy')
+source=("https://files.pythonhosted.org/packages/f9/e2/3e91f31a7d2b083fe6ef3fa267035b518369d9511ffab804f839851d2779/pluggy-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/pluggy-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/pluggy-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
