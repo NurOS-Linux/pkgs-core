@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=openal
+pkgver=1.25.2
+pkgrel=1
+pkgdesc="Cross-platform 3D audio library"
+arch=('x86_64')
+url="https://openal-soft.org/"
+license=('LGPL-2.0-or-later')
+depends=('glibc' 'gcc' 'alsa-lib' 'pipewire' 'libsndfile')
+makedepends=('cmake' 'ninja' 'pkgconf')
+source=("https://github.com/kcat/openal-soft/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/openal-soft-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/openal-soft-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DALSOFT_EXAMPLES=OFF \
+    -DALSOFT_INSTALL_EXAMPLES=OFF \
+    -DALSOFT_INSTALL_UTILS=ON \
+    -DALSOFT_UTILS=ON
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/openal-soft-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
