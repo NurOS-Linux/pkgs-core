@@ -1,0 +1,51 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=device-mapper
+pkgver=2.03.42
+pkgrel=1
+pkgdesc="Device mapper userspace library and tools"
+arch=('x86_64')
+url="https://sourceware.org/lvm2/"
+license=('GPL-2.0-only' 'LGPL-2.1-only')
+depends=('glibc' 'eudev')
+makedepends=('pkgconf')
+source=("https://sourceware.org/pub/lvm2/LVM2.${pkgver}.tgz")
+
+prepare() {
+  local dir="${srcdir}/LVM2.${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/LVM2.${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --sbindir=/usr/bin \
+    --with-udevdir=/usr/lib/udev/rules.d \
+    --with-default-pid-dir=/run \
+    --with-default-dm-run-dir=/run \
+    --with-default-run-dir=/run/lvm \
+    --with-default-locking-dir=/run/lock/lvm \
+    --enable-pkgconfig \
+    --enable-cmdlib \
+    --enable-dmeventd \
+    --enable-lvmpolld \
+    --enable-udev_sync \
+    --enable-udev_rules \
+    --without-systemd \
+    --without-libnvme
+
+  make device-mapper
+}
+
+package() {
+  cd "${srcdir}/LVM2.${pkgver}"
+
+  make DESTDIR="${pkgdir}" install_device-mapper
+}
