@@ -1,0 +1,26 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=tlp
+pkgver=1.10.2
+pkgrel=1
+pkgdesc="Advanced power management for Linux laptops"
+arch=('x86_64')
+url="https://linrunner.de/tlp/"
+license=('GPL-2.0-or-later')
+depends=('bash' 'ethtool' 'iw' 'pciutils' 'usbutils' 'util-linux' 'kmod')
+makedepends=()
+source=("https://github.com/linrunner/TLP/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/TLP-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/TLP-${pkgver}"
+
+  make DESTDIR="${pkgdir}" TLP_SBIN=/usr/bin TLP_ULIB=/usr/lib/udev TLP_NO_INIT=1 TLP_WITH_SYSTEMD=0 TLP_WITH_ELOGIND=0 install install-man
+}
