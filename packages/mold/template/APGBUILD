@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=mold
+pkgver=2.42.1
+pkgrel=1
+pkgdesc="Fast modern linker"
+arch=('x86_64')
+url="https://github.com/rui314/mold"
+license=('MIT')
+depends=('glibc' 'gcc' 'zlib' 'zstd')
+makedepends=('cmake' 'ninja')
+source=("https://github.com/rui314/mold/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DMOLD_USE_MIMALLOC=OFF \
+    -DMOLD_MOSTLY_STATIC=OFF \
+    -DBUILD_TESTING=OFF
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
