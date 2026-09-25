@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pangomm
+pkgver=2.46.5
+pkgrel=1
+pkgdesc="C++ bindings for Pango"
+arch=('x86_64')
+url="https://gitlab.gnome.org/GNOME/pangomm"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'gcc' 'glibmm' 'cairomm' 'pango')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://download.gnome.org/sources/pangomm/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dbuild-documentation=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
