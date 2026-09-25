@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_calver
+pkgver=2025.10.20
+pkgrel=1
+pkgdesc="Setuptools extension for CalVer package versions"
+arch=('any')
+url="https://github.com/di/calver"
+license=('Apache-2.0')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools')
+provides=('calver')
+source=("https://files.pythonhosted.org/packages/4a/96/0c57e3e228ffc54074867406b659b197678674f1f0bf600d114965289834/calver-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/calver-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/calver-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
