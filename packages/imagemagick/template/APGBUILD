@@ -1,0 +1,55 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=imagemagick
+pkgver=7.1.2.31
+pkgrel=1
+pkgdesc="Tools and libraries for image manipulation"
+arch=('x86_64')
+url="https://imagemagick.org/"
+license=('Apache-2.0')
+depends=(
+  'glibc' 'gcc' 'lcms2' 'libjpeg-turbo' 'libpng' 'libtiff' 'libwebp'
+  'libxml2' 'freetype' 'fontconfig' 'zlib' 'bzip2' 'xz'
+)
+makedepends=('pkgconf')
+source=("https://github.com/ImageMagick/ImageMagick/archive/refs/tags/${pkgver%.*}-${pkgver##*.}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/ImageMagick-${pkgver%.*}-${pkgver##*.}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/ImageMagick-${pkgver%.*}-${pkgver##*.}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --disable-static \
+    --enable-shared \
+    --enable-hdri \
+    --with-modules \
+    --with-magick-plus-plus=yes \
+    --with-perl=no \
+    --with-x=no \
+    --with-rsvg=no \
+    --with-openexr=no \
+    --with-djvu=no \
+    --with-lqr=no \
+    --with-fftw=no \
+    --with-pango=no \
+    --with-wmf=no \
+    --with-gslib=no
+
+  make
+}
+
+package() {
+  cd "${srcdir}/ImageMagick-${pkgver%.*}-${pkgver##*.}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
