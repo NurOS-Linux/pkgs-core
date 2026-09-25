@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_iniconfig
+pkgver=2.3.0
+pkgrel=1
+pkgdesc="brain-dead simple config-ini parsing"
+arch=('any')
+url="https://github.com/pytest-dev/iniconfig"
+license=('MIT')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools' 'pypi_setuptools_scm')
+provides=('iniconfig')
+source=("https://files.pythonhosted.org/packages/72/34/14ca021ce8e5dfedc35312d08ba8bf51fdd999c576889fc2c24cb97f4f10/iniconfig-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/iniconfig-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/iniconfig-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
