@@ -1,0 +1,34 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=bear
+pkgver=4.2.2
+pkgrel=1
+pkgdesc="Tool that generates a compilation database for clang tooling"
+arch=('x86_64')
+url="https://github.com/rizsotto/Bear"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'gcc' 'grpc' 'protobuf' 'spdlog' 'fmt')
+makedepends=('cmake' 'ninja' 'pkgconf')
+source=("https://github.com/rizsotto/Bear/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/Bear-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/Bear-${pkgver}"
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DENABLE_UNIT_TESTS=OFF
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/Bear-${pkgver}"
+  DESTDIR="${pkgdir}" ninja -C build install
+}
