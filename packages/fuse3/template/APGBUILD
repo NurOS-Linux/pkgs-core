@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=fuse3
+pkgver=3.17.4
+pkgrel=1
+pkgdesc="Interface for userspace programs to export a filesystem to the Linux kernel"
+arch=('x86_64')
+url="https://github.com/libfuse/libfuse"
+license=('LGPL-2.1-only')
+depends=('glibc')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://github.com/libfuse/libfuse/releases/download/fuse-${pkgver}/fuse-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/fuse-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/fuse-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --buildtype=release \
+    -Dexamples=false \
+    -Duseroot=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/fuse-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
