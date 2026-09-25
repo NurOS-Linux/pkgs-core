@@ -1,0 +1,36 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libidn2
+pkgver=2.3.8
+pkgrel=1
+pkgdesc="Free software implementation of IDNA2008 and TR46"
+arch=('x86_64')
+url="https://www.gnu.org/software/libidn/"
+license=('GPL-2.0-or-later' 'LGPL-3.0-or-later')
+depends=('glibc' 'libunistring')
+makedepends=('pkgconf')
+source=("https://ftp.gnu.org/gnu/libidn/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
