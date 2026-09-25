@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=apr-util
+pkgver=1.6.5
+pkgrel=1
+pkgdesc="Apache Portable Runtime utility library"
+arch=('x86_64')
+url="https://apr.apache.org/"
+license=('Apache-2.0')
+depends=('glibc' 'apr' 'expat' 'gdbm' 'openssl')
+makedepends=('pkgconf')
+source=("https://archive.apache.org/dist/apr/${pkgname}-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --with-apr=/usr \
+    --with-gdbm=/usr \
+    --with-openssl=/usr \
+    --with-crypto \
+    --with-expat=/usr
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
