@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=nss-mdns
+pkgver=0.15.1
+pkgrel=1
+pkgdesc="glibc NSS plugin for multicast DNS name resolution"
+arch=('x86_64')
+url="https://github.com/lathiat/nss-mdns"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'avahi')
+makedepends=('autoconf' 'automake' 'libtool' 'pkgconf')
+source=("https://github.com/lathiat/nss-mdns/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  autoreconf -fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --libdir=/usr/lib \
+    --sysconfdir=/etc
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
