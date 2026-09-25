@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=hostapd
+pkgver=2.12
+pkgrel=1
+pkgdesc="IEEE 802.11 access point and authentication server daemon"
+arch=('x86_64')
+url="https://w1.fi/hostapd/"
+license=('BSD-3-Clause')
+depends=('glibc' 'libnl' 'openssl')
+makedepends=('pkgconf')
+source=("https://w1.fi/releases/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cd hostapd
+  cp defconfig .config
+  sed -i -e "s|^#CONFIG_LIBNL32=y|CONFIG_LIBNL32=y|" -e "s|^#CONFIG_IEEE80211AC=y|CONFIG_IEEE80211AC=y|" -e "s|^#CONFIG_IEEE80211AX=y|CONFIG_IEEE80211AX=y|" -e "s|^#CONFIG_ACS=y|CONFIG_ACS=y|" -e "s|^#CONFIG_SAE=y|CONFIG_SAE=y|" .config
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 hostapd/hostapd "${pkgdir}/usr/bin/hostapd"
+  install -Dm755 hostapd/hostapd_cli "${pkgdir}/usr/bin/hostapd_cli"
+  install -Dm644 hostapd/hostapd.conf "${pkgdir}/etc/hostapd/hostapd.conf"
+}
