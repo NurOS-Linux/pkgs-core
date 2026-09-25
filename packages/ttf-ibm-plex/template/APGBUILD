@@ -1,0 +1,18 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ttf-ibm-plex
+pkgver=6.4.0
+pkgrel=1
+pkgdesc="IBM Plex typeface family"
+arch=('any')
+url="https://github.com/IBM/plex"
+license=('OFL-1.1')
+depends=('fontconfig')
+makedepends=()
+provides=('ibm-plex')
+source=("https://github.com/IBM/plex/releases/download/v${pkgver}/OpenType.zip")
+
+package() {
+  install -dm755 "${pkgdir}/usr/share/fonts/ibm-plex"
+  find "${srcdir}" -name "*.otf" -exec install -Dm644 {} "${pkgdir}/usr/share/fonts/ibm-plex/" \;
+}
