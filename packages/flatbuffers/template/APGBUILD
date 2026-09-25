@@ -1,0 +1,34 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=flatbuffers
+pkgver=25.12.19
+pkgrel=1
+pkgdesc="An efficient cross platform serialization library"
+arch=('x86_64')
+url="https://flatbuffers.dev/"
+license=('Apache-2.0')
+depends=('glibc' 'gcc')
+makedepends=('cmake' 'ninja')
+source=("https://github.com/google/flatbuffers/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DFLATBUFFERS_BUILD_TESTS=OFF
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  DESTDIR="${pkgdir}" ninja -C build install
+}
