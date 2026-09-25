@@ -1,0 +1,51 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=docbook-xml
+pkgver=4.5
+pkgrel=1
+pkgdesc="DocBook XML DTD"
+arch=('x86_64')
+url="https://docbook.org/"
+license=('MIT')
+depends=('libxml2')
+makedepends=('unzip' 'libxml2')
+install=docbook-xml.install
+source=("https://www.oasis-open.org/docbook/xml/${pkgver}/docbook-xml-${pkgver}.zip")
+
+prepare() {
+  if [ ! -f "${srcdir}/docbookx.dtd" ]; then
+    echo "Error: ${srcdir}/docbookx.dtd not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  local dtddir="/usr/share/xml/docbook/xml-dtd-${pkgver}"
+  local catalog="${pkgdir}/etc/xml/docbook-xml"
+
+  install -dm755 "${pkgdir}${dtddir}"
+  cp -dr --no-preserve=ownership \
+    "${srcdir}"/docbook.cat \
+    "${srcdir}"/*.dtd \
+    "${srcdir}"/*.mod \
+    "${srcdir}"/ent \
+    "${pkgdir}${dtddir}/"
+
+  install -dm755 "${pkgdir}/etc/xml"
+  xmlcatalog --noout --create "${catalog}"
+  xmlcatalog --noout --add "public" \
+    "-//OASIS//DTD DocBook XML V${pkgver}//EN" \
+    "file://${dtddir}/docbookx.dtd" "${catalog}"
+  xmlcatalog --noout --add "rewriteSystem" \
+    "http://www.oasis-open.org/docbook/xml/${pkgver}" \
+    "file://${dtddir}" "${catalog}"
+  xmlcatalog --noout --add "rewriteURI" \
+    "http://www.oasis-open.org/docbook/xml/${pkgver}" \
+    "file://${dtddir}" "${catalog}"
+  xmlcatalog --noout --add "rewriteSystem" \
+    "http://docbook.org/xml/${pkgver}" \
+    "file://${dtddir}" "${catalog}"
+  xmlcatalog --noout --add "rewriteURI" \
+    "http://docbook.org/xml/${pkgver}" \
+    "file://${dtddir}" "${catalog}"
+}
