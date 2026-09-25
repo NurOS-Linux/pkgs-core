@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ccache
+pkgver=4.14
+pkgrel=1
+pkgdesc="A compiler cache"
+arch=('x86_64')
+url="https://ccache.dev/"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'gcc' 'zstd' 'hiredis')
+makedepends=('cmake' 'ninja')
+source=("https://github.com/ccache/ccache/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DREDIS_STORAGE_BACKEND=OFF \
+    -DENABLE_TESTING=OFF
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
