@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=yajl
+pkgver=2.1.0
+pkgrel=1
+pkgdesc="Yet Another JSON Library"
+arch=('x86_64')
+url="https://lloyd.github.io/yajl/"
+license=('ISC')
+depends=('glibc')
+makedepends=('cmake' 'ninja')
+source=("https://github.com/lloyd/yajl/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
