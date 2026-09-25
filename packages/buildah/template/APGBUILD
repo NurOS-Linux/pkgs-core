@@ -1,0 +1,30 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=buildah
+pkgver=1.45.0
+pkgrel=1
+pkgdesc="A tool that facilitates building OCI images"
+arch=('x86_64')
+url="https://buildah.io/"
+license=('Apache-2.0')
+depends=('glibc' 'runc' 'conmon')
+makedepends=('go' 'pkgconf' 'btrfs-progs' 'gpgme')
+source=("https://github.com/containers/buildah/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make PREFIX=/usr
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make PREFIX=/usr DESTDIR="${pkgdir}" install
+}
