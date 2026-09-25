@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=nmap
+pkgver=7.991
+pkgrel=1
+pkgdesc="Utility for network discovery and security auditing"
+arch=('x86_64')
+url="https://nmap.org/"
+license=('LicenseRef-Nmap')
+depends=('glibc' 'gcc' 'libpcap' 'pcre2' 'openssl' 'libssh2' 'zlib')
+makedepends=('pkgconf')
+source=("https://nmap.org/dist/${pkgname}-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --without-zenmap \
+    --without-ndiff \
+    --with-libpcap=/usr \
+    --with-libpcre=/usr \
+    --with-openssl=/usr \
+    --with-libssh2=/usr
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
