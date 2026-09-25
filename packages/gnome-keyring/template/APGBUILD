@@ -1,0 +1,44 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gnome-keyring
+pkgver=51.1
+pkgrel=1
+pkgdesc="Keyring daemon for storing passwords and secrets"
+arch=('x86_64')
+url="https://gitlab.gnome.org/GNOME/gnome-keyring"
+license=('GPL-2.0-or-later')
+depends=(
+  'glibc' 'glib' 'dbus' 'gcr-4' 'libcap-ng' 'libgcrypt' 'linux-pam' 'openssh'
+  'p11-kit'
+)
+makedepends=('meson' 'ninja' 'pkgconf' 'gettext')
+source=("https://download.gnome.org/sources/gnome-keyring/${pkgver%%.*}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dsystemd=disabled \
+    -Dselinux=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
