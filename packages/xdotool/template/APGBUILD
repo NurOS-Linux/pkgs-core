@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=xdotool
+pkgver=4.20260303.1
+pkgrel=1
+pkgdesc="Command line X11 automation tool"
+arch=('x86_64')
+url="https://github.com/jordansissel/xdotool"
+license=('BSD-3-Clause')
+depends=('glibc' 'libx11' 'libxtst' 'libxinerama' 'libxkbcommon' 'libxi')
+makedepends=('pkgconf' 'perl')
+source=("https://github.com/jordansissel/xdotool/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr INSTALLMAN=/usr/share/man
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr INSTALLMAN=/usr/share/man DESTDIR="${pkgdir}" install
+}
