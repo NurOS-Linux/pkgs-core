@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=man-db
+pkgver=2.13.0
+pkgrel=1
+pkgdesc="A database-caching implementation of the manual pager"
+arch=('x86_64')
+url="https://man-db.gitlab.io/man-db/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'gdbm' 'libpipeline' 'groff' 'less')
+makedepends=('pkgconf')
+source=("https://download.savannah.gnu.org/releases/man-db/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --disable-setuid \
+    --with-browser=firefox \
+    --with-systemdtmpfilesdir= \
+    --with-systemdsystemunitdir=
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
