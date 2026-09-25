@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_pygments
+pkgver=2.21.0
+pkgrel=1
+pkgdesc="Pygments is a syntax highlighting package written in Python."
+arch=('any')
+url="https://pygments.org"
+license=('BSD-2-Clause')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_hatchling')
+provides=('pygments')
+source=("https://files.pythonhosted.org/packages/49/2e/ced460408999b33da6b31b0021b0f37d329e202d4169aeb164493778f25b/pygments-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/pygments-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/pygments-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
