@@ -1,0 +1,34 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=breeze-icons
+pkgver=6.30.0
+pkgrel=1
+pkgdesc="Breeze icon theme from KDE"
+arch=('any')
+url="https://invent.kde.org/frameworks/breeze-icons"
+license=('LGPL-3.0-or-later')
+depends=('hicolor-icon-theme')
+makedepends=('cmake' 'ninja' 'extra-cmake-modules')
+source=("https://download.kde.org/stable/frameworks/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DBINARY_ICONS_RESOURCE=OFF
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  DESTDIR="${pkgdir}" ninja -C build install
+}
