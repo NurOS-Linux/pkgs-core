@@ -1,0 +1,35 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=capnproto
+pkgver=1.5.0
+pkgrel=1
+pkgdesc="Insanely fast data interchange format and capability-based RPC system"
+arch=('x86_64')
+url="https://capnproto.org/"
+license=('MIT')
+depends=('glibc' 'gcc')
+makedepends=('cmake' 'ninja')
+source=("https://capnproto.org/capnproto-c++-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/capnproto-c++-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/capnproto-c++-${pkgver}"
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+    -DBUILD_TESTING=OFF
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/capnproto-c++-${pkgver}"
+  DESTDIR="${pkgdir}" ninja -C build install
+}
