@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_asciidoc
+pkgver=10.2.1
+pkgrel=1
+pkgdesc="AsciiDoc is a text document format for writing things."
+arch=('any')
+url="https://github.com/asciidoc/asciidoc-py3"
+license=('GPL-2.0-or-later')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools' 'pypi_wheel')
+provides=('asciidoc')
+source=("https://files.pythonhosted.org/packages/1d/e7/315a82f2d256e9270977aa3c15e8fe281fd7c40b8e2a0b97e0cb61ca8fa0/asciidoc-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/asciidoc-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/asciidoc-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
