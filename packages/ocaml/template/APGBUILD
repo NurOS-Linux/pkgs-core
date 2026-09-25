@@ -1,0 +1,31 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ocaml
+pkgver=5.5.1
+pkgrel=1
+pkgdesc="An industrial strength programming language supporting functional, imperative and object-oriented styles"
+arch=('x86_64')
+url="https://ocaml.org/"
+license=('LGPL-2.1-only WITH OCaml-LGPL-linking-exception')
+depends=('glibc' 'gcc')
+makedepends=()
+source=("https://caml.inria.fr/pub/distrib/ocaml-${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr --mandir=/usr/share/man
+  make world.opt
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
