@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=cairomm
+pkgver=1.14.6
+pkgrel=1
+pkgdesc="C++ bindings for the Cairo graphics library"
+arch=('x86_64')
+url="https://www.cairographics.org/cairomm/"
+license=('LGPL-2.0-or-later')
+depends=('glibc' 'gcc' 'cairo' 'libsigc++' 'freetype' 'fontconfig')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://www.cairographics.org/releases/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dbuild-documentation=false \
+    -Dbuild-examples=false \
+    -Dbuild-tests=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
