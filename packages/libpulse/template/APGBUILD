@@ -1,0 +1,51 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libpulse
+pkgver=17.0
+pkgrel=1
+pkgdesc="PulseAudio client libraries"
+arch=('x86_64')
+url="https://www.freedesktop.org/wiki/Software/PulseAudio/"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'glib' 'libsndfile' 'dbus')
+makedepends=('meson' 'ninja' 'pkgconf' 'perl')
+source=("https://www.freedesktop.org/software/pulseaudio/releases/pulseaudio-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/pulseaudio-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/pulseaudio-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Ddaemon=false \
+    -Ddoxygen=false \
+    -Dman=false \
+    -Dtests=false \
+    -Dbluez5=disabled \
+    -Dx11=disabled \
+    -Dgtk=disabled \
+    -Dalsa=disabled \
+    -Dsystemd=disabled \
+    -Dudev=disabled \
+    -Dglib=enabled \
+    -Ddbus=enabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/pulseaudio-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
