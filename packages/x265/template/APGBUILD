@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=x265
+pkgver=4.3
+pkgrel=1
+pkgdesc="Open Source H.265/HEVC video encoder"
+arch=('x86_64')
+url="https://bitbucket.org/multicoreware/x265_git"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'gcc')
+makedepends=('cmake' 'ninja' 'nasm')
+source=("https://bitbucket.org/multicoreware/x265_git/downloads/x265_${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/x265_${pkgver}/source"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/x265_${pkgver}/source"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+    -DENABLE_SHARED=ON \
+    -DENABLE_CLI=OFF
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/x265_${pkgver}/source"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
