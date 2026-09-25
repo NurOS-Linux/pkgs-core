@@ -1,0 +1,45 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=sdl2
+pkgver=2.32.10
+pkgrel=1
+pkgdesc="Simple DirectMedia Layer version 2"
+arch=('x86_64')
+url="https://www.libsdl.org/"
+license=('Zlib')
+depends=(
+  'glibc' 'alsa-lib' 'libx11' 'libxext' 'libxcursor' 'libxi' 'libxrandr'
+  'libxfixes' 'libxkbcommon' 'wayland' 'mesa' 'libdrm' 'pipewire' 'eudev'
+  'dbus'
+)
+makedepends=('cmake' 'ninja' 'pkgconf' 'wayland-protocols')
+source=("https://github.com/libsdl-org/SDL/releases/download/release-${pkgver}/SDL2-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/SDL2-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/SDL2-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DSDL_STATIC=OFF \
+    -DSDL_TESTS=OFF \
+    -DSDL_INSTALL_TESTS=OFF \
+    -DSDL_RPATH=OFF
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/SDL2-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
