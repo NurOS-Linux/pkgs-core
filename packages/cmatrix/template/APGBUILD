@@ -1,0 +1,36 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=cmatrix
+pkgver=2.0
+pkgrel=1
+pkgdesc="A curses-based scrolling 'Matrix' like screen"
+arch=('x86_64')
+url="https://github.com/abishekvashok/cmatrix"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'ncurses')
+makedepends=('cmake' 'ninja')
+source=("https://github.com/abishekvashok/cmatrix/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
