@@ -1,0 +1,36 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libmnl
+pkgver=1.0.5
+pkgrel=1
+pkgdesc="Minimalistic Netlink communication library"
+arch=('x86_64')
+url="https://netfilter.org/projects/libmnl/"
+license=('LGPL-2.1-or-later')
+depends=('glibc')
+makedepends=('pkgconf')
+source=("https://www.netfilter.org/projects/libmnl/files/${pkgname}-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
