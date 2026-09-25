@@ -1,0 +1,44 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libcanberra
+pkgver=0.30
+pkgrel=1
+pkgdesc="Implementation of the XDG Sound Theme and Name Specifications"
+arch=('x86_64')
+url="https://0pointer.de/lennart/projects/libcanberra/"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'libvorbis' 'libtool' 'alsa-lib' 'libpulse' 'gtk3' 'libx11')
+makedepends=('pkgconf')
+source=("https://0pointer.de/lennart/projects/libcanberra/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static \
+    --disable-oss \
+    --disable-gtk \
+    --enable-gtk3 \
+    --disable-tdb \
+    --disable-lynx \
+    --disable-gstreamer \
+    --with-builtin=dso
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
