@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libtirpc
+pkgver=1.3.8
+pkgrel=1
+pkgdesc="Transport-independent RPC library"
+arch=('x86_64')
+url="https://sourceforge.net/projects/libtirpc/"
+license=('BSD-3-Clause')
+depends=('glibc' 'krb5')
+makedepends=('pkgconf')
+source=("https://downloads.sourceforge.net/project/libtirpc/libtirpc/${pkgver}/${pkgname}-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --disable-static \
+    --disable-gssapi
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
