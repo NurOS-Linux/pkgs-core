@@ -1,0 +1,35 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=clang-format
+pkgver=23.1.2
+pkgrel=1
+pkgdesc="Tool to format C/C++/Java/JavaScript/Objective-C/Protobuf/C# code"
+arch=('x86_64')
+url="https://clang.llvm.org/"
+license=('Apache-2.0 WITH LLVM-exception')
+depends=('glibc' 'gcc')
+makedepends=('cmake' 'ninja' 'python')
+source=("https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}/llvm-project-${pkgver}.src.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/llvm-project-${pkgver}.src"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/llvm-project-${pkgver}.src"
+  cmake -B build -S llvm -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DLLVM_ENABLE_PROJECTS="clang" \
+    -DLLVM_INCLUDE_TESTS=OFF
+  ninja -C build clang-format
+}
+
+package() {
+  cd "${srcdir}/llvm-project-${pkgver}.src"
+  install -Dm755 build/bin/clang-format "${pkgdir}/usr/bin/clang-format"
+}
