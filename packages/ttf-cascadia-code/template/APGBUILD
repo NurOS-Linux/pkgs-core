@@ -3,15 +3,16 @@
 pkgname=ttf-cascadia-code
 pkgver=2407.24
 pkgrel=1
-pkgdesc="Monospaced font designed by Microsoft for Windows Terminal and code editors"
+pkgdesc="Monospaced font by Microsoft with programming ligatures"
 arch=('any')
 url="https://github.com/microsoft/cascadia-code"
-license=('OFL')
-depends=()
-makedepends=('unzip')
+license=('OFL-1.1')
+depends=('fontconfig')
+makedepends=()
+provides=('cascadia-code')
 source=("https://github.com/microsoft/cascadia-code/releases/download/v${pkgver}/CascadiaCode-${pkgver}.zip")
 
 package() {
-  install -dm755 "${pkgdir}/usr/share/fonts/TTF"
-  find "${srcdir}" -type f -name "*.ttf" -exec install -m644 {} "${pkgdir}/usr/share/fonts/TTF/" \;
+  install -dm755 "${pkgdir}/usr/share/fonts/cascadia"
+  find "${srcdir}" -name "*.ttf" -exec install -Dm644 {} "${pkgdir}/usr/share/fonts/cascadia/" \;
 }
