@@ -1,0 +1,35 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ruff
+pkgver=0.16.9
+pkgrel=1
+pkgdesc="Extremely fast Python linter and code formatter"
+arch=('x86_64')
+url="https://docs.astral.sh/ruff/"
+license=('MIT')
+depends=('glibc' 'gcc')
+makedepends=('cargo')
+source=("https://github.com/astral-sh/ruff/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  cargo fetch --locked
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cargo build --frozen --release -p ruff
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 "target/release/ruff" "${pkgdir}/usr/bin/ruff"
+}
