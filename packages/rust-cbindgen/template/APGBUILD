@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=rust-cbindgen
+pkgver=0.29.4
+pkgrel=1
+pkgdesc="A tool for generating C bindings to Rust code"
+arch=('x86_64')
+url="https://github.com/mozilla/cbindgen"
+license=('MPL-2.0')
+depends=('glibc' 'gcc')
+makedepends=('cargo')
+provides=('cbindgen')
+source=("https://github.com/mozilla/cbindgen/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/cbindgen-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+  cd "${dir}"
+  cargo fetch --locked
+}
+
+build() {
+  cd "${srcdir}/cbindgen-${pkgver}"
+  cargo build --frozen --release
+}
+
+package() {
+  cd "${srcdir}/cbindgen-${pkgver}"
+  install -Dm755 "target/release/cbindgen" "${pkgdir}/usr/bin/cbindgen"
+}
