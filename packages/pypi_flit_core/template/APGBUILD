@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_flit_core
+pkgver=4.1.0
+pkgrel=1
+pkgdesc="Distribution-building parts of Flit. See flit package for more information"
+arch=('any')
+url="https://github.com/pypa/flit"
+license=('BSD-3-Clause')
+depends=('python')
+makedepends=('python' 'pypi_pip')
+provides=('flit-core')
+source=("https://files.pythonhosted.org/packages/e7/91/add211b38c357bf1b94900b4f79c34661a92be65c0243d2b0a3393c5092d/flit_core-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/flit_core-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/flit_core-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
