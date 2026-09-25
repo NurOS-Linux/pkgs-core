@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ell
+pkgver=0.83
+pkgrel=1
+pkgdesc="Embedded Linux library"
+arch=('x86_64')
+url="https://git.kernel.org/pub/scm/libs/ell/ell.git"
+license=('LGPL-2.1-or-later')
+depends=('glibc')
+makedepends=('pkgconf')
+source=("https://mirrors.edge.kernel.org/pub/linux/libs/ell/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
