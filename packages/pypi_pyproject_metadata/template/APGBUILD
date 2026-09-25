@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_pyproject_metadata
+pkgver=0.12.1
+pkgrel=1
+pkgdesc="PEP 621 metadata parsing"
+arch=('any')
+url="https://pypi.org/project/pyproject-metadata/"
+license=('MIT')
+depends=('python' 'pypi_packaging')
+makedepends=('python' 'pypi_pip' 'pypi_flit_core')
+provides=('pyproject-metadata')
+source=("https://files.pythonhosted.org/packages/4f/76/1cae539918a7b1746d624c2f01560b793c22cd8c081157505bb9bbf0e34d/pyproject_metadata-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/pyproject_metadata-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/pyproject_metadata-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
