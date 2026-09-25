@@ -1,0 +1,34 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=nss
+pkgver=3.130
+pkgrel=1
+pkgdesc="Mozilla Network Security Services"
+arch=('x86_64')
+url="https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS"
+license=('MPL-2.0')
+depends=('glibc' 'nspr' 'sqlite' 'zlib' 'p11-kit')
+makedepends=('perl' 'python')
+source=("https://ftp.mozilla.org/pub/security/nss/releases/NSS_${pkgver//./_}_RTM/src/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}/nss"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}/nss"
+  ./build.sh --opt --system-sqlite --enable-libpkix --disable-tests
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}/dist"
+  local obj_dir=$(ls -d Linux* | head -n 1)
+  install -dm755 "${pkgdir}/usr/lib" "${pkgdir}/usr/include/nss" "${pkgdir}/usr/bin"
+  install -m755 ${obj_dir}/lib/*.so "${pkgdir}/usr/lib/"
+  install -m644 public/nss/*.h "${pkgdir}/usr/include/nss/"
+  install -m755 ${obj_dir}/bin/* "${pkgdir}/usr/bin/"
+}
