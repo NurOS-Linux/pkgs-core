@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=xdg-desktop-portal-wlr
+pkgver=0.8.4
+pkgrel=1
+pkgdesc="xdg-desktop-portal backend for wlroots-based compositors"
+arch=('x86_64')
+url="https://github.com/emersion/xdg-desktop-portal-wlr"
+license=('MIT')
+depends=('glibc' 'pipewire' 'wayland' 'inih' 'basu' 'mesa' 'libdrm' 'xdg-desktop-portal')
+makedepends=('meson' 'ninja' 'pkgconf' 'wayland-protocols')
+source=("https://github.com/emersion/xdg-desktop-portal-wlr/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dsd-bus-provider=basu \
+    -Dsystemd=disabled \
+    -Dman-pages=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
