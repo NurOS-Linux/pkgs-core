@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=netcat
+pkgver=0.7.1
+pkgrel=1
+pkgdesc="TCP/IP swiss army knife"
+arch=('x86_64')
+url="http://netcat.sourceforge.net/"
+license=('GPL-2.0-or-later')
+depends=('glibc')
+makedepends=()
+provides=('nc')
+source=("https://downloads.sourceforge.net/project/netcat/netcat/${pkgver}/${pkgname}-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr --mandir=/usr/share/man
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
