@@ -1,0 +1,46 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=sdl3
+pkgver=3.4.16
+pkgrel=1
+pkgdesc="Simple DirectMedia Layer version 3"
+arch=('x86_64')
+url="https://www.libsdl.org/"
+license=('Zlib')
+depends=(
+  'glibc' 'alsa-lib' 'libx11' 'libxext' 'libxcursor' 'libxi' 'libxrandr'
+  'libxfixes' 'libxkbcommon' 'wayland' 'mesa' 'libdrm' 'pipewire' 'eudev'
+  'dbus'
+)
+makedepends=('cmake' 'ninja' 'pkgconf' 'wayland-protocols')
+source=("https://github.com/libsdl-org/SDL/releases/download/release-${pkgver}/SDL3-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/SDL3-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/SDL3-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DSDL_STATIC=OFF \
+    -DSDL_TESTS=OFF \
+    -DSDL_INSTALL_TESTS=OFF \
+    -DSDL_EXAMPLES=OFF \
+    -DSDL_RPATH=OFF
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/SDL3-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
