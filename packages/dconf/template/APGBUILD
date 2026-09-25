@@ -1,0 +1,43 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=dconf
+pkgver=51.0
+pkgrel=1
+pkgdesc="Low-level configuration system"
+arch=('x86_64')
+url="https://gitlab.gnome.org/GNOME/dconf"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'glib' 'dbus')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://download.gnome.org/sources/dconf/${pkgver%%.*}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dbash_completion=false \
+    -Dman=false \
+    -Dvapi=false \
+    -Dgtk_doc=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
