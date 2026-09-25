@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=just
+pkgver=1.58.0
+pkgrel=1
+pkgdesc="Just a command runner"
+arch=('x86_64')
+url="https://github.com/casey/just"
+license=('CC0-1.0')
+depends=('glibc')
+makedepends=('cargo')
+source=("https://github.com/casey/just/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+  cd "${dir}"
+  cargo fetch --locked
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  cargo build --frozen --release
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  install -Dm755 "target/release/just" "${pkgdir}/usr/bin/just"
+}
