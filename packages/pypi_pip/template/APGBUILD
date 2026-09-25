@@ -1,0 +1,31 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_pip
+pkgver=26.2.1
+pkgrel=1
+pkgdesc="The PyPA recommended tool for installing Python packages"
+arch=('any')
+url="https://pip.pypa.io/"
+license=('MIT')
+depends=('python')
+makedepends=('python')
+provides=('pip')
+source=("https://files.pythonhosted.org/packages/source/p/pip/pip-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/pip-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/pip-${pkgver}"
+  python3 setup.py build
+}
+
+package() {
+  cd "${srcdir}/pip-${pkgver}"
+  python3 setup.py install --root="${pkgdir}" --prefix=/usr --optimize=1
+}
