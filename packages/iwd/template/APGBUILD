@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=iwd
+pkgver=3.12
+pkgrel=1
+pkgdesc="Internet Wireless Daemon"
+arch=('x86_64')
+url="https://git.kernel.org/pub/scm/network/wireless/iwd.git/"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'ell')
+makedepends=('pkgconf')
+source=("https://kernel.org/pub/linux/network/wireless/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --sbindir=/usr/bin \
+    --disable-systemd-service \
+    --enable-client
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
