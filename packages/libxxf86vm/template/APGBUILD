@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libxxf86vm
+pkgver=1.1.7
+pkgrel=1
+pkgdesc="X11 XFree86-VidModeExtension client library"
+arch=('x86_64')
+url="https://xorg.freedesktop.org/"
+license=('MIT')
+depends=('glibc' 'libx11' 'libxext')
+makedepends=('pkgconf' 'xorgproto' 'util-macros')
+source=("https://www.x.org/releases/individual/lib/libXxf86vm-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/libXxf86vm-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/libXxf86vm-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static
+
+  make
+}
+
+package() {
+  cd "${srcdir}/libXxf86vm-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
