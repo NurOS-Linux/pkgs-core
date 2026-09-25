@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=noto-fonts
+pkgver=2026.09.01
+pkgrel=1
+pkgdesc="Google Noto TTF fonts"
+arch=('any')
+url="https://fonts.google.com/noto"
+license=('OFL-1.1')
+depends=('fontconfig')
+makedepends=()
+source=("https://github.com/notofonts/notofonts.github.io/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/notofonts.github.io-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/notofonts.github.io-${pkgver}"
+
+  install -dm755 "${pkgdir}/usr/share/fonts/noto"
+  find . -name "*.ttf" -exec install -Dm644 {} "${pkgdir}/usr/share/fonts/noto/" \;
+}
