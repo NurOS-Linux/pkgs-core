@@ -1,0 +1,28 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=npm
+pkgver=12.1.0
+pkgrel=1
+pkgdesc="A package manager for JavaScript"
+arch=('any')
+url="https://www.npmjs.com/"
+license=('Artistic-2.0')
+depends=('nodejs')
+makedepends=()
+source=("https://registry.npmjs.org/npm/-/npm-${pkgver}.tgz")
+
+prepare() {
+  local dir="${srcdir}/package"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/package"
+  install -dm755 "${pkgdir}/usr/lib/node_modules/npm" "${pkgdir}/usr/bin"
+  cp -r . "${pkgdir}/usr/lib/node_modules/npm/"
+  ln -sf /usr/lib/node_modules/npm/bin/npm-cli.js "${pkgdir}/usr/bin/npm"
+  ln -sf /usr/lib/node_modules/npm/bin/npx-cli.js "${pkgdir}/usr/bin/npx"
+}
