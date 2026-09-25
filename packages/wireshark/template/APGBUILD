@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=wireshark
+pkgver=4.6.9
+pkgrel=1
+pkgdesc="Network traffic and protocol analyzer"
+arch=('x86_64')
+url="https://www.wireshark.org/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'libpcap' 'glib' 'zlib' 'c-ares' 'gnutls' 'libgcrypt' 'qt6')
+makedepends=('cmake' 'ninja' 'pkgconf' 'python' 'perl')
+provides=('tshark')
+source=("https://www.wireshark.org/download/src/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DBUILD_wireshark=ON \
+    -DBUILD_tshark=ON \
+    -DENABLE_LUA=OFF
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  DESTDIR="${pkgdir}" ninja -C build install
+}
