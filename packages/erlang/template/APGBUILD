@@ -1,0 +1,31 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=erlang
+pkgver=29.1.1
+pkgrel=1
+pkgdesc="General-purpose programming language and runtime environment"
+arch=('x86_64')
+url="https://www.erlang.org/"
+license=('Apache-2.0')
+depends=('glibc' 'ncurses' 'openssl')
+makedepends=('perl')
+source=("https://github.com/erlang/otp/releases/download/OTP-${pkgver}/otp_src_${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/otp_src_${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/otp_src_${pkgver}"
+  ./configure --prefix=/usr --sysconfdir=/etc --without-javac
+  make
+}
+
+package() {
+  cd "${srcdir}/otp_src_${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
