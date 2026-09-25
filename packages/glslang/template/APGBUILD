@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=glslang
+pkgver=16.6.0
+pkgrel=1
+pkgdesc="OpenGL and OpenGL ES shader front end and validator"
+arch=('x86_64')
+url="https://github.com/KhronosGroup/glslang"
+license=('BSD-3-Clause')
+depends=('glibc' 'gcc' 'spirv-tools')
+makedepends=('cmake' 'ninja' 'python' 'spirv-headers')
+source=("https://github.com/KhronosGroup/glslang/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DBUILD_SHARED_LIBS=ON \
+    -DALLOW_EXTERNAL_SPIRV_TOOLS=ON \
+    -DBUILD_EXTERNAL=OFF \
+    -DGLSLANG_TESTS=OFF
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
