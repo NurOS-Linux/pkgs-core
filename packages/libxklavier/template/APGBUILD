@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libxklavier
+pkgver=5.4
+pkgrel=1
+pkgdesc="High-level API for X Keyboard Extension"
+arch=('x86_64')
+url="https://www.freedesktop.org/wiki/Software/LibXklavier/"
+license=('LGPL-2.0-or-later')
+depends=('glibc' 'glib' 'libxml2' 'iso-codes' 'libx11' 'libxi' 'libxkbfile' 'libxrandr' 'xkbcomp')
+makedepends=('pkgconf' 'gettext')
+source=("https://people.freedesktop.org/~svu/${pkgname}-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static \
+    --disable-introspection \
+    --disable-vala \
+    --disable-gtk-doc \
+    --with-xkb-base=/usr/share/X11/xkb \
+    --with-xkb-bin-base=/usr/bin
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
