@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libaio
+pkgver=0.3.113
+pkgrel=1
+pkgdesc="Linux-native asynchronous I/O access library"
+arch=('x86_64')
+url="https://pagure.io/libaio"
+license=('LGPL-2.1-or-later')
+depends=('glibc')
+makedepends=()
+source=("https://releases.pagure.org/libaio/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make prefix=/usr DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}"/usr/lib/libaio.a
+}
