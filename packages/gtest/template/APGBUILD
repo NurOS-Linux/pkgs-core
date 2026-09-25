@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gtest
+pkgver=1.18.0
+pkgrel=1
+pkgdesc="Google C++ testing and mocking framework"
+arch=('x86_64')
+url="https://github.com/google/googletest"
+license=('BSD-3-Clause')
+depends=('glibc' 'gcc')
+makedepends=('cmake' 'ninja')
+source=("https://github.com/google/googletest/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/googletest-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/googletest-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DBUILD_SHARED_LIBS=ON \
+    -DBUILD_GMOCK=ON \
+    -DINSTALL_GTEST=ON
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/googletest-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
