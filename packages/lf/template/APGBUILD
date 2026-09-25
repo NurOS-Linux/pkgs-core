@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=lf
+pkgver=42
+pkgrel=1
+pkgdesc="Terminal file manager written in Go inspired by ranger"
+arch=('x86_64')
+url="https://github.com/gokcehan/lf"
+license=('MIT')
+depends=('glibc')
+makedepends=('go')
+source=("https://github.com/gokcehan/lf/archive/refs/tags/r${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-r${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-r${pkgver}"
+
+  export CGO_ENABLED=0
+  go build -trimpath -ldflags="-s -w -X main.gVersion=r${pkgver}" -o lf
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-r${pkgver}"
+
+  install -Dm755 lf "${pkgdir}/usr/bin/lf"
+}
