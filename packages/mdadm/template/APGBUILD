@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=mdadm
+pkgver=4.4
+pkgrel=1
+pkgdesc="Utility for managing Linux software RAID arrays"
+arch=('x86_64')
+url="https://git.kernel.org/pub/scm/utils/mdadm/mdadm.git"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'eudev')
+makedepends=('pkgconf')
+source=("https://www.kernel.org/pub/linux/utils/raid/mdadm/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make BINDIR=/usr/bin UDEVDIR=/usr/lib/udev
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" BINDIR=/usr/bin UDEVDIR=/usr/lib/udev install
+}
