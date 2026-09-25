@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=fuse-overlayfs
+pkgver=1.18
+pkgrel=1
+pkgdesc="FUSE implementation of overlayfs"
+arch=('x86_64')
+url="https://github.com/containers/fuse-overlayfs"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'fuse3')
+makedepends=('pkgconf' 'autoconf' 'automake' 'libtool')
+source=("https://github.com/containers/fuse-overlayfs/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  autoreconf -fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
