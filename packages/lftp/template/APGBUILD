@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=lftp
+pkgver=4.9.3
+pkgrel=1
+pkgdesc="Sophisticated command line file transfer program"
+arch=('x86_64')
+url="https://lftp.yar.ru/"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'gcc' 'readline' 'gnutls' 'expat' 'zlib' 'libidn2')
+makedepends=('pkgconf' 'gettext')
+source=("https://lftp.yar.ru/ftp/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --with-gnutls \
+    --without-openssl \
+    --with-zlib \
+    --with-readline
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
