@@ -1,0 +1,44 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=db
+pkgver=5.3.28
+pkgrel=1
+pkgdesc="Berkeley DB embedded database library"
+arch=('x86_64')
+url="https://www.oracle.com/database/technologies/related/berkeleydb.html"
+license=('Sleepycat')
+depends=('glibc')
+makedepends=('pkgconf')
+source=("https://download.oracle.com/berkeley-db/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  sed -i "s/__atomic_compare_exchange/__db_atomic_compare_exchange/g" "${dir}/src/dbinc/atomic.h"
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}/build_unix"
+
+  export CFLAGS="${CFLAGS:-} -std=gnu89"
+
+  ../dist/configure \
+    --prefix=/usr \
+    --enable-compat185 \
+    --enable-dbm \
+    --enable-cxx \
+    --disable-static
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}/build_unix"
+
+  make DESTDIR="${pkgdir}" install
+  rm -rf "${pkgdir}/usr/docs"
+}
