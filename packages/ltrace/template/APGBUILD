@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ltrace
+pkgver=0.8.1
+pkgrel=1
+pkgdesc="Tracks runtime library calls in dynamically linked programs"
+arch=('x86_64')
+url="https://ltrace.org/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'elfutils')
+makedepends=()
+source=("https://gitlab.com/cespedes/ltrace/-/archive/${pkgver}/ltrace-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./autogen.sh
+  ./configure --prefix=/usr --sysconfdir=/etc
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
