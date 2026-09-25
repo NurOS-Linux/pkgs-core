@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=nethogs
+pkgver=0.9.0
+pkgrel=1
+pkgdesc="A small 'net top' tool grouping bandwidth by process"
+arch=('x86_64')
+url="https://github.com/raboof/nethogs"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'gcc' 'ncurses' 'libpcap')
+makedepends=()
+source=("https://github.com/raboof/nethogs/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make sbindir=/usr/bin PREFIX=/usr DESTDIR="${pkgdir}" install
+}
