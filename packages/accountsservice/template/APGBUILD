@@ -1,0 +1,46 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=accountsservice
+pkgver=26.27.3
+pkgrel=1
+pkgdesc="D-Bus interface for user account queries and manipulation"
+arch=('x86_64')
+url="https://www.freedesktop.org/wiki/Software/AccountsService/"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'glib' 'polkit' 'shadow')
+makedepends=('meson' 'ninja' 'pkgconf' 'gettext')
+source=("https://gitlab.freedesktop.org/accountsservice/accountsservice/-/archive/${pkgver}/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dsystemdsystemunitdir=no \
+    -Delogind=false \
+    -Dadmin_group=wheel \
+    -Dgtk_doc=false \
+    -Dintrospection=false \
+    -Dvapi=false \
+    -Ddocbook=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
