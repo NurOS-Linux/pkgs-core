@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_pyproject_hooks
+pkgver=1.3.3
+pkgrel=1
+pkgdesc="Wrappers to call pyproject.toml-based build backend hooks."
+arch=('any')
+url="https://github.com/pypa/pyproject-hooks"
+license=('MIT')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_flit_core')
+provides=('pyproject-hooks')
+source=("https://files.pythonhosted.org/packages/6d/5d/f2ddeef4a855a102aaae5e97826a0260007522ab504421b75addfdb1517c/pyproject_hooks-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/pyproject_hooks-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/pyproject_hooks-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
