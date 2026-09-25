@@ -1,0 +1,31 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=swig
+pkgver=4.5.1
+pkgrel=1
+pkgdesc="Generate scripting interfaces to C/C++ code"
+arch=('x86_64')
+url="https://www.swig.org/"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'pcre2')
+makedepends=()
+source=("https://downloads.sourceforge.net/project/swig/swig/swig-${pkgver}/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
