@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=smartmontools
+pkgver=7.5
+pkgrel=1
+pkgdesc="Control and monitor S.M.A.R.T. enabled hard drives"
+arch=('x86_64')
+url="https://www.smartmontools.org/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'gcc' 'libcap-ng')
+makedepends=('pkgconf')
+source=("https://downloads.sourceforge.net/project/smartmontools/smartmontools/${pkgver}/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --sbindir=/usr/bin \
+    --with-libcap-ng=yes \
+    --with-libsystemd=no \
+    --without-systemdsystemunitdir
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
