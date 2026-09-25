@@ -1,0 +1,31 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libxslt
+pkgver=1.1.45
+pkgrel=1
+pkgdesc="XML stylesheet transformation library"
+arch=('x86_64')
+url="https://gitlab.gnome.org/GNOME/libxslt"
+license=('MIT')
+depends=('glibc' 'libxml2')
+makedepends=('pkgconf')
+source=("https://download.gnome.org/sources/${pkgname}/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr --sysconfdir=/etc --without-python
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
