@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=qpdf
+pkgver=12.4.1
+pkgrel=1
+pkgdesc="Tools for structural, content-preserving transformation of PDF files"
+arch=('x86_64')
+url="https://qpdf.sourceforge.io/"
+license=('Apache-2.0')
+depends=('glibc' 'gcc' 'libjpeg-turbo' 'zlib' 'openssl')
+makedepends=('cmake' 'ninja' 'pkgconf')
+source=("https://github.com/qpdf/qpdf/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DBUILD_STATIC_LIBS=OFF \
+    -DREQUIRE_CRYPTO_OPENSSL=ON \
+    -DUSE_IMPLICIT_CRYPTO=OFF \
+    -DINSTALL_MANUAL=OFF \
+    -DBUILD_DOC=OFF
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
