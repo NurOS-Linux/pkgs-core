@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libuv
+pkgver=1.53.0
+pkgrel=1
+pkgdesc="Multi-platform asynchronous I/O library"
+arch=('x86_64')
+url="https://libuv.org/"
+license=('MIT')
+depends=('glibc')
+makedepends=('cmake' 'ninja')
+source=("https://dist.libuv.org/dist/v${pkgver}/libuv-v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-v${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-v${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DBUILD_TESTING=OFF \
+    -DLIBUV_BUILD_SHARED=ON
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-v${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
