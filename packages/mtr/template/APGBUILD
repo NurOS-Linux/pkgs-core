@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=mtr
+pkgver=0.96
+pkgrel=1
+pkgdesc="Network diagnostic tool combining traceroute and ping"
+arch=('x86_64')
+url="https://www.bitwizard.nl/mtr/"
+license=('GPL-2.0-only')
+depends=('glibc' 'ncurses' 'jansson')
+makedepends=('autoconf' 'automake' 'libtool' 'pkgconf')
+source=("https://github.com/traviscross/mtr/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  autoreconf -fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sbindir=/usr/bin \
+    --without-gtk
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
