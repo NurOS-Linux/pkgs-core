@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=xclip
+pkgver=0.13
+pkgrel=1
+pkgdesc="Command line interface to the X11 clipboard"
+arch=('x86_64')
+url="https://github.com/astrand/xclip"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'libx11' 'libxmu')
+makedepends=('autoconf' 'automake' 'pkgconf')
+source=("https://github.com/astrand/xclip/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  autoreconf -fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
