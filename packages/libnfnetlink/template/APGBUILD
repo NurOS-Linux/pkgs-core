@@ -1,0 +1,36 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libnfnetlink
+pkgver=1.0.2
+pkgrel=1
+pkgdesc="Low-level library for netfilter related kernel/userspace communication"
+arch=('x86_64')
+url="https://netfilter.org/projects/libnfnetlink/"
+license=('GPL-2.0-only')
+depends=('glibc')
+makedepends=('pkgconf')
+source=("https://www.netfilter.org/projects/libnfnetlink/files/${pkgname}-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
