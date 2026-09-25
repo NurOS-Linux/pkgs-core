@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=slang
+pkgver=2.3.3
+pkgrel=1
+pkgdesc="S-Lang programming library"
+arch=('x86_64')
+url="https://www.jedsoft.org/slang/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'readline' 'libpng' 'pcre2' 'oniguruma' 'zlib')
+makedepends=('pkgconf')
+source=("https://www.jedsoft.org/releases/slang/${pkgname}-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --with-readline=gnu
+
+  make -j1
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
