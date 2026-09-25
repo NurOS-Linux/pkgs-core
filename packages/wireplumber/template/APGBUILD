@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=wireplumber
+pkgver=0.5.17
+pkgrel=1
+pkgdesc="Session / policy manager implementation for PipeWire"
+arch=('x86_64')
+url="https://pipewire.pages.freedesktop.org/wireplumber/"
+license=('MIT')
+depends=('glibc' 'glib' 'pipewire' 'lua')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://gitlab.freedesktop.org/pipewire/wireplumber/-/archive/${pkgver}/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --buildtype=release \
+    -Dintrospection=disabled \
+    -Ddoc=disabled \
+    -Dsystemd=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
