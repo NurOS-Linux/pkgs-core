@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libnvme
+pkgver=1.16.2
+pkgrel=1
+pkgdesc="C library for NVM Express on Linux"
+arch=('x86_64')
+url="https://github.com/linux-nvme/libnvme"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'json-c' 'openssl' 'keyutils' 'dbus' 'zlib')
+makedepends=('meson' 'ninja' 'pkgconf' 'swig')
+source=("https://github.com/linux-nvme/libnvme/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dpython=disabled \
+    -Dtests=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
