@@ -1,0 +1,50 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=lightdm
+pkgver=1.33.1
+pkgrel=1
+pkgdesc="Cross-desktop display manager"
+arch=('x86_64')
+url="https://github.com/canonical/lightdm"
+license=('GPL-3.0-or-later' 'LGPL-3.0-or-later')
+depends=('glibc' 'glib' 'dbus' 'libxcb' 'libx11' 'libxdmcp' 'libxklavier' 'linux-pam' 'xorg-server' 'xauth')
+makedepends=('pkgconf' 'autoconf' 'automake' 'libtool' 'intltool' 'gettext' 'gtk-doc' 'yelp-tools')
+source=("https://github.com/ubuntu/lightdm/releases/download/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  NOCONFIGURE=1 ./autogen.sh
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --sbindir=/usr/bin \
+    --libexecdir=/usr/lib/lightdm \
+    --disable-static \
+    --disable-tests \
+    --disable-introspection \
+    --disable-vala \
+    --disable-gtk-doc \
+    --disable-libaudit \
+    --disable-liblightdm-qt5 \
+    --disable-liblightdm-qt6
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
