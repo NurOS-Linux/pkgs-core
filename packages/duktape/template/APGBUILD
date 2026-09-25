@@ -1,0 +1,44 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=duktape
+pkgver=2.7.0
+pkgrel=1
+pkgdesc="Embeddable JavaScript engine"
+arch=('x86_64')
+url="https://duktape.org/"
+license=('MIT')
+depends=('glibc')
+makedepends=('pkgconf')
+source=("https://duktape.org/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/duktape-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/duktape-${pkgver}"
+
+  make -f Makefile.sharedlibrary INSTALL_PREFIX=/usr
+}
+
+package() {
+  cd "${srcdir}/duktape-${pkgver}"
+
+  make -f Makefile.sharedlibrary INSTALL_PREFIX="${pkgdir}/usr" install
+  install -dm755 "${pkgdir}/usr/lib/pkgconfig"
+  cat > "${pkgdir}/usr/lib/pkgconfig/duktape.pc" <<EOF
+prefix=/usr
+libdir=\${prefix}/lib
+includedir=\${prefix}/include
+
+Name: duktape
+Description: Embeddable JavaScript engine
+Version: ${pkgver}
+Libs: -L\${libdir} -lduktape
+Cflags: -I\${includedir}
+EOF
+}
