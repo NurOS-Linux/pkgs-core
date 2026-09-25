@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=dmidecode
+pkgver=3.7
+pkgrel=1
+pkgdesc="DMI table decoder"
+arch=('x86_64')
+url="https://www.nongnu.org/dmidecode/"
+license=('GPL-2.0-or-later')
+depends=('glibc')
+makedepends=()
+source=("https://download.savannah.gnu.org/releases/dmidecode/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make prefix=/usr sbindir=/usr/bin DESTDIR="${pkgdir}" install
+}
