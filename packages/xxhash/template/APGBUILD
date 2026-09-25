@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=xxhash
+pkgver=0.8.4
+pkgrel=1
+pkgdesc="Extremely fast non-cryptographic hash algorithm"
+arch=('x86_64')
+url="https://xxhash.com/"
+license=('BSD-2-Clause')
+depends=('glibc')
+makedepends=('pkgconf')
+source=("https://github.com/Cyan4973/xxHash/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/xxHash-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/xxHash-${pkgver}"
+
+  make PREFIX=/usr
+}
+
+package() {
+  cd "${srcdir}/xxHash-${pkgver}"
+
+  make PREFIX=/usr DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}"/usr/lib/libxxhash.a
+}
