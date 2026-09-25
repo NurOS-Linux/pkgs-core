@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=restic
+pkgver=0.19.1
+pkgrel=1
+pkgdesc="Fast, secure, efficient backup program"
+arch=('x86_64')
+url="https://restic.net/"
+license=('BSD-2-Clause')
+depends=('glibc')
+makedepends=('go')
+source=("https://github.com/restic/restic/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  export CGO_ENABLED=0
+  go build -trimpath -ldflags="-s -w -X main.version=${pkgver}" -o restic ./cmd/restic
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 restic "${pkgdir}/usr/bin/restic"
+}
