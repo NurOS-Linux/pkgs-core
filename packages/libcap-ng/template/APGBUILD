@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libcap-ng
+pkgver=0.8.5
+pkgrel=1
+pkgdesc="Library for POSIX capabilities with a simpler API"
+arch=('x86_64')
+url="https://people.redhat.com/sgrubb/libcap-ng/"
+license=('LGPL-2.1-or-later' 'GPL-2.0-or-later')
+depends=('glibc')
+makedepends=('pkgconf')
+source=("https://people.redhat.com/sgrubb/libcap-ng/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static \
+    --without-python3
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
