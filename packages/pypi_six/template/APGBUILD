@@ -1,0 +1,31 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_six
+pkgver=1.17.0
+pkgrel=1
+pkgdesc="Python 2 and 3 compatibility utilities"
+arch=('any')
+url="https://github.com/benjaminp/six"
+license=('MIT')
+depends=('python')
+makedepends=('python')
+provides=('six')
+source=("https://files.pythonhosted.org/packages/source/s/six/six-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/six-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/six-${pkgver}"
+  python3 setup.py build
+}
+
+package() {
+  cd "${srcdir}/six-${pkgver}"
+  python3 setup.py install --root="${pkgdir}" --prefix=/usr --optimize=1
+}
