@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=extra-cmake-modules
+pkgver=6.30.0
+pkgrel=1
+pkgdesc="Extra modules and scripts for CMake"
+arch=('x86_64')
+url="https://invent.kde.org/frameworks/extra-cmake-modules"
+license=('BSD-3-Clause')
+depends=('cmake')
+makedepends=('cmake' 'ninja')
+source=("https://download.kde.org/stable/frameworks/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DBUILD_TESTING=OFF \
+    -DBUILD_HTML_DOCS=OFF \
+    -DBUILD_MAN_DOCS=OFF \
+    -DBUILD_QTHELP_DOCS=OFF
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
