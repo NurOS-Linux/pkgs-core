@@ -1,0 +1,21 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gn
+pkgver=2026.01.15
+pkgrel=1
+pkgdesc="A meta-build system that generates build files for Ninja"
+arch=('x86_64')
+url="https://gn.googlesource.com/gn/"
+license=('BSD-3-Clause')
+depends=('glibc' 'gcc')
+makedepends=('python' 'ninja')
+source=("https://gn.googlesource.com/gn/+archive/master.tar.gz")
+
+build() {
+  python3 build/gen.py --no-static-libstdc++
+  ninja -C out
+}
+
+package() {
+  install -Dm755 out/gn "${pkgdir}/usr/bin/gn"
+}
