@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=spirv-headers
+pkgver=1.4.357.0
+pkgrel=1
+pkgdesc="SPIR-V header files"
+arch=('x86_64')
+url="https://github.com/KhronosGroup/SPIRV-Headers"
+license=('MIT')
+depends=()
+makedepends=('cmake' 'ninja')
+source=("https://github.com/KhronosGroup/SPIRV-Headers/archive/refs/tags/vulkan-sdk-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/SPIRV-Headers-vulkan-sdk-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/SPIRV-Headers-vulkan-sdk-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DSPIRV_HEADERS_ENABLE_TESTS=OFF
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/SPIRV-Headers-vulkan-sdk-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
