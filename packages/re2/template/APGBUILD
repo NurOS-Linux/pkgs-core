@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=re2
+pkgver=2025.11.05
+pkgrel=1
+pkgdesc="Fast, safe, thread-friendly regular expression library"
+arch=('x86_64')
+url="https://github.com/google/re2"
+license=('BSD-3-Clause')
+depends=('glibc' 'gcc' 'abseil-cpp')
+makedepends=('cmake' 'ninja')
+source=("https://github.com/google/re2/archive/refs/tags/${pkgver//./-}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver//./-}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver//./-}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DBUILD_SHARED_LIBS=ON \
+    -DRE2_BUILD_TESTING=OFF
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver//./-}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
