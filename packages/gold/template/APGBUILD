@@ -1,0 +1,35 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gold
+pkgver=2.44
+pkgrel=1
+pkgdesc="GNU gold ELF linker"
+arch=('x86_64')
+url="https://www.gnu.org/software/binutils/"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'zlib')
+makedepends=('bison' 'flex')
+source=("https://ftp.gnu.org/gnu/binutils/binutils-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/binutils-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/binutils-${pkgver}"
+  ./configure \
+    --prefix=/usr \
+    --enable-gold=yes \
+    --enable-ld=no \
+    --disable-werror
+  make all-gold
+}
+
+package() {
+  cd "${srcdir}/binutils-${pkgver}/gold"
+  make DESTDIR="${pkgdir}" install
+}
