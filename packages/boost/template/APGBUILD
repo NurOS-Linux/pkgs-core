@@ -1,0 +1,31 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=boost
+pkgver=1.92.0
+pkgrel=1
+pkgdesc="Free peer-reviewed portable C++ source libraries"
+arch=('x86_64')
+url="https://www.boost.org/"
+license=('BSL-1.0')
+depends=('glibc' 'gcc' 'zlib' 'bzip2' 'zstd')
+makedepends=('python')
+source=("https://boostorg.jfrog.io/artifactory/main/release/${pkgver}/source/boost_${pkgver//./_}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/boost_${pkgver//./_}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/boost_${pkgver//./_}"
+  ./bootstrap.sh --prefix=/usr
+  ./b2 stage -j"$(nproc)" release
+}
+
+package() {
+  cd "${srcdir}/boost_${pkgver//./_}"
+  ./b2 install --prefix="${pkgdir}/usr"
+}
