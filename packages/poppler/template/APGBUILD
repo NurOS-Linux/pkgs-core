@@ -1,0 +1,55 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=poppler
+pkgver=26.09.0
+pkgrel=1
+pkgdesc="PDF rendering library and tools"
+arch=('x86_64')
+url="https://poppler.freedesktop.org/"
+license=('GPL-2.0-only')
+depends=(
+  'glibc' 'gcc' 'cairo' 'fontconfig' 'freetype' 'lcms2' 'libjpeg-turbo'
+  'libpng' 'libtiff' 'nss' 'zlib' 'glib'
+)
+makedepends=('cmake' 'ninja' 'pkgconf')
+source=("https://poppler.freedesktop.org/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DENABLE_QT5=OFF \
+    -DENABLE_QT6=OFF \
+    -DENABLE_BOOST=OFF \
+    -DENABLE_GLIB=ON \
+    -DENABLE_GOBJECT_INTROSPECTION=OFF \
+    -DENABLE_LIBOPENJPEG=none \
+    -DENABLE_GPGME=OFF \
+    -DENABLE_LCMS=ON \
+    -DENABLE_NSS3=ON \
+    -DENABLE_UTILS=ON \
+    -DBUILD_GTK_TESTS=OFF \
+    -DBUILD_QT5_TESTS=OFF \
+    -DBUILD_QT6_TESTS=OFF \
+    -DBUILD_CPP_TESTS=OFF \
+    -DBUILD_MANUAL_TESTS=OFF
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
