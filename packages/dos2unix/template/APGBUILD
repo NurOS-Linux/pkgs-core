@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=dos2unix
+pkgver=7.5.7
+pkgrel=1
+pkgdesc="Text file format converter (DOS/Mac to Unix and vice versa)"
+arch=('x86_64')
+url="https://dos2unix.sourceforge.io/"
+license=('BSD-2-Clause')
+depends=('glibc')
+makedepends=()
+provides=('unix2dos')
+source=("https://dos2unix.sourceforge.io/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make prefix=/usr
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make prefix=/usr DESTDIR="${pkgdir}" install
+}
