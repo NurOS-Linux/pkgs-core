@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_tomlkit
+pkgver=0.15.1
+pkgrel=1
+pkgdesc="Style preserving TOML library"
+arch=('any')
+url="https://github.com/python-poetry/tomlkit"
+license=('MIT')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_poetry_core')
+provides=('tomlkit')
+source=("https://files.pythonhosted.org/packages/94/96/e07752635b98536177fa1f37671c8f3cdde2e724c6bcf6034b2cfb571565/tomlkit-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/tomlkit-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/tomlkit-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
