@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=dnsmasq
+pkgver=2.93
+pkgrel=1
+pkgdesc="Lightweight DNS forwarder and DHCP server"
+arch=('x86_64')
+url="https://thekelleys.org.uk/dnsmasq/doc.html"
+license=('GPL-2.0-only')
+depends=(
+  'glibc' 'dbus' 'nettle' 'gmp' 'libidn2' 'libnetfilter_conntrack'
+  'libnfnetlink'
+)
+makedepends=('pkgconf')
+source=("https://thekelleys.org.uk/dnsmasq/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  sed -i -e "s|/\* #define HAVE_DBUS \*/|#define HAVE_DBUS|" -e "s|/\* #define HAVE_DNSSEC \*/|#define HAVE_DNSSEC|" -e "s|/\* #define HAVE_LIBIDN2 \*/|#define HAVE_LIBIDN2|" -e "s|/\* #define HAVE_CONNTRACK \*/|#define HAVE_CONNTRACK|" src/config.h
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr BINDIR=/usr/bin DESTDIR="${pkgdir}" install
+  install -Dm644 dnsmasq.conf.example "${pkgdir}/etc/dnsmasq.conf"
+}
