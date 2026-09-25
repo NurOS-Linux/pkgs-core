@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=guile
+pkgver=3.0.11
+pkgrel=1
+pkgdesc="Portable, embeddable Scheme implementation written in C"
+arch=('x86_64')
+url="https://www.gnu.org/software/guile/"
+license=('LGPL-3.0-or-later')
+depends=('glibc' 'gmp' 'libltdl' 'libunistring' 'gc')
+makedepends=('pkgconf')
+source=("https://ftp.gnu.org/gnu/guile/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr --sysconfdir=/etc --disable-error-on-warning
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
