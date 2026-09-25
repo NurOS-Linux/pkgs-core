@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_scons
+pkgver=4.11.1
+pkgrel=1
+pkgdesc="Open Source next-generation build tool."
+arch=('any')
+url="https://www.scons.org/"
+license=('MIT')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools')
+provides=('scons')
+source=("https://files.pythonhosted.org/packages/42/b9/b7a5c88f348a0c34594d88100872c55fa1cae863ccb222c1c438341b5503/scons-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/scons-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/scons-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
