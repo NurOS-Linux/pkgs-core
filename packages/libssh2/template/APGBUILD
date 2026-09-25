@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libssh2
+pkgver=1.11.1
+pkgrel=1
+pkgdesc="Client-side C library implementing the SSH2 protocol"
+arch=('x86_64')
+url="https://libssh2.org/"
+license=('BSD-3-Clause')
+depends=('glibc' 'openssl' 'zlib')
+makedepends=('pkgconf')
+source=("https://libssh2.org/download/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static \
+    --with-crypto=openssl \
+    --disable-docker-tests \
+    --disable-examples-build
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
