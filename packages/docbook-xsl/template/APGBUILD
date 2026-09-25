@@ -1,0 +1,53 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=docbook-xsl
+pkgver=1.79.2
+pkgrel=1
+pkgdesc="XSL stylesheets for DocBook"
+arch=('x86_64')
+url="https://docbook.org/"
+license=('MIT')
+depends=('libxml2' 'libxslt' 'docbook-xml')
+makedepends=('libxml2')
+install=docbook-xsl.install
+source=("https://github.com/docbook/xslt10-stylesheets/releases/download/release/${pkgver}/${pkgname}-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  local xsldir="/usr/share/xml/docbook/xsl-stylesheets-${pkgver}"
+  local catalog="${pkgdir}/etc/xml/docbook-xsl"
+  local dir
+
+  install -dm755 "${pkgdir}${xsldir}"
+  for dir in assembly common eclipse epub epub3 extensions fo highlighting html htmlhelp images javahelp lib manpages params profiling roundtrip slides template tools website xhtml xhtml-1_1 xhtml5; do
+    cp -R "${dir}" "${pkgdir}${xsldir}/"
+  done
+  install -m644 VERSION VERSION.xsl catalog.xml "${pkgdir}${xsldir}/"
+  ln -s "xsl-stylesheets-${pkgver}" "${pkgdir}/usr/share/xml/docbook/xsl-stylesheets"
+
+  install -dm755 "${pkgdir}/etc/xml"
+  xmlcatalog --noout --create "${catalog}"
+  for dir in "${pkgver}" current; do
+    xmlcatalog --noout --add "rewriteSystem" \
+      "http://docbook.sourceforge.net/release/xsl/${dir}" \
+      "file://${xsldir}" "${catalog}"
+    xmlcatalog --noout --add "rewriteURI" \
+      "http://docbook.sourceforge.net/release/xsl/${dir}" \
+      "file://${xsldir}" "${catalog}"
+    xmlcatalog --noout --add "rewriteSystem" \
+      "http://cdn.docbook.org/release/xsl/${dir}" \
+      "file://${xsldir}" "${catalog}"
+    xmlcatalog --noout --add "rewriteURI" \
+      "http://cdn.docbook.org/release/xsl/${dir}" \
+      "file://${xsldir}" "${catalog}"
+  done
+}
