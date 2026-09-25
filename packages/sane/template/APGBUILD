@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=sane
+pkgver=1.4.0
+pkgrel=1
+pkgdesc="Scanner Access Now Easy - backends"
+arch=('x86_64')
+url="http://www.sane-project.org/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'libusb' 'libjpeg-turbo' 'libpng')
+makedepends=('pkgconf')
+provides=('sane-backends')
+source=("https://gitlab.com/sane-project/backends/uploads/0572e90c76ad171965b32f22b8ea3716/sane-backends-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/sane-backends-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/sane-backends-${pkgver}"
+  ./configure --prefix=/usr --sysconfdir=/etc --sbindir=/usr/bin --disable-systemd
+  make
+}
+
+package() {
+  cd "${srcdir}/sane-backends-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
