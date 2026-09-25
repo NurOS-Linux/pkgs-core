@@ -1,0 +1,17 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=rust-analyzer
+pkgver=2026.09.21
+pkgrel=1
+pkgdesc="A Rust compiler front-end for IDEs"
+arch=('x86_64')
+url="https://rust-analyzer.github.io/"
+license=('Apache-2.0 OR MIT')
+depends=('glibc' 'gcc')
+makedepends=()
+source=("https://github.com/rust-lang/rust-analyzer/releases/download/${pkgver//./-}/rust-analyzer-x86_64-unknown-linux-gnu.gz")
+
+package() {
+  gzip -dc "${srcdir}/rust-analyzer-x86_64-unknown-linux-gnu.gz" > "${srcdir}/rust-analyzer"
+  install -Dm755 "${srcdir}/rust-analyzer" "${pkgdir}/usr/bin/rust-analyzer"
+}
