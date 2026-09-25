@@ -1,0 +1,30 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=sqlite-utils
+pkgver=4.0
+pkgrel=1
+pkgdesc="CLI utility and Python library for manipulating SQLite databases"
+arch=('any')
+url="https://sqlite-utils.datasette.io/"
+license=('Apache-2.0')
+depends=('python' 'sqlite' 'pypi_setuptools')
+makedepends=('python')
+source=("https://files.pythonhosted.org/packages/source/s/sqlite-utils/sqlite-utils-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/sqlite-utils-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/sqlite-utils-${pkgver}"
+  python3 setup.py build
+}
+
+package() {
+  cd "${srcdir}/sqlite-utils-${pkgver}"
+  python3 setup.py install --root="${pkgdir}" --prefix=/usr --optimize=1
+}
