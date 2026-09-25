@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=unibilium
+pkgver=2.1.4
+pkgrel=1
+pkgdesc="Terminfo parsing library"
+arch=('x86_64')
+url="https://github.com/neovim/unibilium"
+license=('LGPL-3.0-or-later')
+depends=('glibc')
+makedepends=('cmake' 'ninja')
+source=("https://github.com/neovim/unibilium/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DBUILD_TESTS=OFF \
+    -DBUILD_TOOLS=ON \
+    -DBUILD_MAN_PAGES=OFF
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
