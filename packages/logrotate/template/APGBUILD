@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=logrotate
+pkgver=3.22.0
+pkgrel=1
+pkgdesc="Rotates, compresses and mails system logs"
+arch=('x86_64')
+url="https://github.com/logrotate/logrotate"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'popt' 'acl')
+makedepends=('pkgconf')
+source=("https://github.com/logrotate/logrotate/releases/download/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sbindir=/usr/bin \
+    --with-state-file-path=/var/lib/logrotate/logrotate.status \
+    --with-acl \
+    --without-selinux
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
