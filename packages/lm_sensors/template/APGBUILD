@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=lm_sensors
+pkgver=3.6.2
+pkgrel=1
+pkgdesc="Collection of tools for monitoring hardware sensors"
+arch=('x86_64')
+url="https://github.com/lm-sensors/lm-sensors"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'bash')
+makedepends=('bison' 'flex')
+source=("https://github.com/lm-sensors/lm-sensors/archive/refs/tags/V${pkgver//./-}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/lm-sensors-3-6-2"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/lm-sensors-3-6-2"
+
+  make PREFIX=/usr SBINDIR=/usr/bin MANDIR=/usr/share/man BUILD_STATIC_LIB=0 EXLDFLAGS=
+}
+
+package() {
+  cd "${srcdir}/lm-sensors-3-6-2"
+
+  make PREFIX=/usr SBINDIR=/usr/bin MANDIR=/usr/share/man BUILD_STATIC_LIB=0 EXLDFLAGS= DESTDIR="${pkgdir}" install
+}
