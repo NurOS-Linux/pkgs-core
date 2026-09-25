@@ -1,0 +1,36 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libbsd
+pkgver=0.12.2
+pkgrel=1
+pkgdesc="Commonly-used BSD functions not implemented by all libcs"
+arch=('x86_64')
+url="https://libbsd.freedesktop.org/"
+license=('BSD-2-Clause' 'BSD-3-Clause' 'ISC' 'MIT')
+depends=('glibc' 'libmd')
+makedepends=('pkgconf')
+source=("https://libbsd.freedesktop.org/releases/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
