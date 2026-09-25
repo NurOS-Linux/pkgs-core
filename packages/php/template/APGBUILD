@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=php
+pkgver=8.4.26
+pkgrel=1
+pkgdesc="A general-purpose scripting language that is especially suited to web development"
+arch=('x86_64')
+url="https://www.php.net/"
+license=('PHP-3.01')
+depends=('glibc' 'libxml2' 'pcre2' 'zlib' 'openssl' 'sqlite' 'curl')
+makedepends=('pkgconf')
+source=("https://www.php.net/distributions/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc/php \
+    --with-config-file-path=/etc/php \
+    --with-openssl \
+    --with-zlib \
+    --with-curl \
+    --enable-mbstring \
+    --enable-bcmath \
+    --enable-cli
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make INSTALL_ROOT="${pkgdir}" install
+}
