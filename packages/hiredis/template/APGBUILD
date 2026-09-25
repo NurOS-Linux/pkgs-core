@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=hiredis
+pkgver=1.4.1
+pkgrel=1
+pkgdesc="Minimalistic C client library for Redis"
+arch=('x86_64')
+url="https://github.com/redis/hiredis"
+license=('BSD-3-Clause')
+depends=('glibc' 'openssl')
+makedepends=('pkgconf')
+source=("https://github.com/redis/hiredis/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr USE_SSL=1
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr USE_SSL=1 DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}"/usr/lib/libhiredis*.a
+}
