@@ -1,0 +1,43 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=lightdm-gtk-greeter
+pkgver=2.0.9
+pkgrel=1
+pkgdesc="GTK greeter for LightDM"
+arch=('x86_64')
+url="https://github.com/Xubuntu/lightdm-gtk-greeter"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'glib' 'gtk3' 'lightdm' 'libx11' 'gdk-pixbuf')
+makedepends=('pkgconf' 'intltool' 'gettext')
+source=("https://github.com/Xubuntu/lightdm-gtk-greeter/releases/download/${pkgname}-${pkgver}/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --libexecdir=/usr/lib/lightdm \
+    --sbindir=/usr/bin \
+    --disable-static \
+    --disable-libindicator \
+    --disable-indicator-services-command
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
