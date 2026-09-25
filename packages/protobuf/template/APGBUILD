@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=protobuf
+pkgver=31.1
+pkgrel=1
+pkgdesc="Protocol Buffers - Google's data interchange format"
+arch=('x86_64')
+url="https://protobuf.dev/"
+license=('BSD-3-Clause')
+depends=('glibc' 'gcc' 'zlib' 'abseil-cpp')
+makedepends=('cmake' 'ninja')
+source=("https://github.com/protocolbuffers/protobuf/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=/usr/lib \
+    -Dprotobuf_BUILD_TESTS=OFF \
+    -Dprotobuf_ABSL_PROVIDER=package
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
