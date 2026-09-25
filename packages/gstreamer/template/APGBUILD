@@ -1,0 +1,49 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gstreamer
+pkgver=1.28.7
+pkgrel=1
+pkgdesc="GStreamer multimedia framework core"
+arch=('x86_64')
+url="https://gstreamer.freedesktop.org/"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'glib')
+makedepends=('meson' 'ninja' 'pkgconf' 'bison' 'flex')
+source=("https://gstreamer.freedesktop.org/src/gstreamer/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dintrospection=disabled \
+    -Dtests=disabled \
+    -Dexamples=disabled \
+    -Dbenchmarks=disabled \
+    -Ddoc=disabled \
+    -Dnls=disabled \
+    -Dlibunwind=disabled \
+    -Dlibdw=disabled \
+    -Dbash-completion=disabled \
+    -Dptp-helper=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
