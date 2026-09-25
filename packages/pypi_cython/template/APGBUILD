@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_cython
+pkgver=3.3.0
+pkgrel=1
+pkgdesc="The Cython compiler for writing C extensions in the Python language."
+arch=('x86_64')
+url="https://cython.org/"
+license=('Apache-2.0')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools' 'pypi_wheel' 'gcc')
+provides=('cython')
+source=("https://files.pythonhosted.org/packages/a9/d8/4981ef716ad0e3ff0d3ef383aefc6b03c4a88dee33b272bf8e0d833001ca/cython-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/cython-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/cython-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
