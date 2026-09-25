@@ -1,0 +1,36 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=itstool
+pkgver=2.0.7
+pkgrel=1
+pkgdesc="Translate XML with PO files using ITS rules"
+arch=('x86_64')
+url="https://itstool.org/"
+license=('GPL-3.0-or-later')
+depends=('python' 'libxml2')
+makedepends=()
+source=("http://files.itstool.org/itstool/${pkgname}-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    PYTHON=/usr/bin/python3
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
