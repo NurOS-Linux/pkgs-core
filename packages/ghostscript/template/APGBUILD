@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ghostscript
+pkgver=10.08.0
+pkgrel=1
+pkgdesc="An interpreter for the PostScript language and for PDF"
+arch=('x86_64')
+url="https://ghostscript.com/"
+license=('AGPL-3.0-or-later')
+depends=('glibc' 'zlib' 'libpng' 'libjpeg-turbo' 'libtiff' 'freetype' 'fontconfig' 'lcms2')
+makedepends=('pkgconf')
+provides=('gs')
+source=("https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10080/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --enable-dynamic \
+    --with-system-libtiff \
+    --without-x
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
