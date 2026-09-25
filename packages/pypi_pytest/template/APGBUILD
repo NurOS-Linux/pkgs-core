@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_pytest
+pkgver=9.1.1
+pkgrel=1
+pkgdesc="pytest: simple powerful testing with Python"
+arch=('any')
+url="https://docs.pytest.org/en/latest/"
+license=('MIT')
+depends=('python' 'pypi_iniconfig' 'pypi_packaging' 'pypi_pluggy' 'pypi_pygments')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools' 'pypi_setuptools_scm')
+provides=('pytest')
+source=("https://files.pythonhosted.org/packages/e4/47/b9efed96c114afcfa3c9d3fe98a76a1d14c74a9e266d397cf6eb64be5e01/pytest-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/pytest-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/pytest-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
