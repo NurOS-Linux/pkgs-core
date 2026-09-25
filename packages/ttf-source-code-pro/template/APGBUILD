@@ -3,15 +3,26 @@
 pkgname=ttf-source-code-pro
 pkgver=2.042
 pkgrel=1
-pkgdesc="Monospaced font family for coding environments by Adobe"
+pkgdesc="Monospaced font family for user interface and coding environments from Adobe"
 arch=('any')
 url="https://github.com/adobe-fonts/source-code-pro"
-license=('OFL')
-depends=()
-makedepends=('unzip')
-source=("https://github.com/adobe-fonts/source-code-pro/releases/download/2.042R-u/1.062R-i/1.026R-vf/TTF-source-code-pro-${pkgver}R-u_1.062R-i.zip")
+license=('OFL-1.1')
+depends=('fontconfig')
+makedepends=()
+provides=('source-code-pro')
+source=("https://github.com/adobe-fonts/source-code-pro/archive/refs/tags/${pkgver}R-u/1.062R-i/1.026R-vf.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/source-code-pro-${pkgver}R-u-1.062R-i-1.026R-vf"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
 
 package() {
-  install -dm755 "${pkgdir}/usr/share/fonts/TTF"
-  find "${srcdir}" -type f -name "*.ttf" -exec install -m644 {} "${pkgdir}/usr/share/fonts/TTF/" \;
+  cd "${srcdir}/source-code-pro-${pkgver}R-u-1.062R-i-1.026R-vf"
+
+  install -dm755 "${pkgdir}/usr/share/fonts/source-code-pro"
+  find TTF -name "*.ttf" -exec install -Dm644 {} "${pkgdir}/usr/share/fonts/source-code-pro/" \;
 }
