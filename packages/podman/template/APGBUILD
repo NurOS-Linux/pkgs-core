@@ -1,0 +1,30 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=podman
+pkgver=6.1.0
+pkgrel=1
+pkgdesc="A tool for managing OCI containers and pods"
+arch=('x86_64')
+url="https://podman.io/"
+license=('Apache-2.0')
+depends=('glibc' 'conmon' 'runc' 'iptables' 'fuse-overlayfs' 'crun')
+makedepends=('go' 'pkgconf' 'btrfs-progs' 'gpgme')
+source=("https://github.com/containers/podman/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make BUILDTAGS="seccomp apparmor" PREFIX=/usr
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make PREFIX=/usr DESTDIR="${pkgdir}" install
+}
