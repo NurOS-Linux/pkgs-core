@@ -1,0 +1,30 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=elixir
+pkgver=1.20.4
+pkgrel=1
+pkgdesc="A dynamic, functional language on top of the Erlang VM"
+arch=('any')
+url="https://elixir-lang.org/"
+license=('Apache-2.0')
+depends=('erlang')
+makedepends=()
+source=("https://github.com/elixir-lang/elixir/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make PREFIX=/usr DESTDIR="${pkgdir}" install
+}
