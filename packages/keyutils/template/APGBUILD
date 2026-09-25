@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=keyutils
+pkgver=1.6.3
+pkgrel=1
+pkgdesc="Linux key management utilities"
+arch=('x86_64')
+url="https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git"
+license=('GPL-2.0-or-later')
+depends=('glibc')
+makedepends=()
+source=("https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git/snapshot/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make NO_ARLIB=1 LIBDIR=/usr/lib USRLIBDIR=/usr/lib BINDIR=/usr/bin SBINDIR=/usr/bin
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make NO_ARLIB=1 LIBDIR=/usr/lib USRLIBDIR=/usr/lib BINDIR=/usr/bin SBINDIR=/usr/bin DESTDIR="${pkgdir}" install
+}
