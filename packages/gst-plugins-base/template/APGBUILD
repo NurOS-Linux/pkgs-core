@@ -1,0 +1,60 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gst-plugins-base
+pkgver=1.28.7
+pkgrel=1
+pkgdesc="GStreamer base plugins and libraries"
+arch=('x86_64')
+url="https://gstreamer.freedesktop.org/"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'glib' 'gstreamer' 'alsa-lib' 'libogg' 'libvorbis' 'opus' 'iso-codes' 'libdrm' 'zlib')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://gstreamer.freedesktop.org/src/gst-plugins-base/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dintrospection=disabled \
+    -Dtests=disabled \
+    -Dexamples=disabled \
+    -Ddoc=disabled \
+    -Dnls=disabled \
+    -Dorc=disabled \
+    -Dgl=disabled \
+    -Dx11=disabled \
+    -Dxshm=disabled \
+    -Dxvideo=disabled \
+    -Dxi=disabled \
+    -Dpango=disabled \
+    -Dcdparanoia=disabled \
+    -Dlibvisual=disabled \
+    -Dtheora=disabled \
+    -Dtremor=disabled \
+    -Dalsa=enabled \
+    -Dogg=enabled \
+    -Dvorbis=enabled \
+    -Dopus=enabled \
+    -Diso-codes=enabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
