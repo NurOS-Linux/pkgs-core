@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=lshw
+pkgver=02.20
+pkgrel=1
+pkgdesc="Hardware lister"
+arch=('x86_64')
+url="https://www.ezix.org/project/wiki/HardwareLiSter"
+license=('GPL-2.0-only')
+depends=('glibc' 'gcc')
+makedepends=()
+source=("https://github.com/lyonel/lshw/archive/refs/tags/B.${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-B.${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-B.${pkgver}"
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-B.${pkgver}"
+
+  make PREFIX=/usr SBINDIR=/usr/bin DESTDIR="${pkgdir}" install
+}
