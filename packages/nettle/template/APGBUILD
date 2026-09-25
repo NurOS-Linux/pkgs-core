@@ -1,0 +1,36 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=nettle
+pkgver=4.0
+pkgrel=1
+pkgdesc="Low-level cryptographic library"
+arch=('x86_64')
+url="https://www.lysator.liu.se/~nisse/nettle/"
+license=('GPL-2.0-or-later' 'LGPL-3.0-or-later')
+depends=('glibc' 'gmp')
+makedepends=('pkgconf' 'm4')
+source=("https://ftp.gnu.org/gnu/nettle/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
