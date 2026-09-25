@@ -1,0 +1,17 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=clojure
+pkgver=1.12.6
+pkgrel=1
+pkgdesc="A dynamic programming language that targets the Java Virtual Machine"
+arch=('any')
+url="https://clojure.org/"
+license=('EPL-1.0')
+depends=('sh' 'bash')
+makedepends=()
+source=("https://download.clojure.org/install/clojure-tools-${pkgver}.1500.tar.gz")
+
+package() {
+  cd "${srcdir}/clojure-tools"
+  PREFIX="${pkgdir}/usr" ./install.sh
+}
