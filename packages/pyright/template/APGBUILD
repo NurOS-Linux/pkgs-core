@@ -1,0 +1,20 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pyright
+pkgver=1.1.414
+pkgrel=1
+pkgdesc="Static type checker for Python"
+arch=('any')
+url="https://github.com/microsoft/pyright"
+license=('MIT')
+depends=('nodejs')
+makedepends=('npm')
+source=()
+
+build() {
+  npm install -g --prefix="${pkgdir}/usr" pyright@${pkgver}
+}
+
+package() {
+  rm -rf "${pkgdir}/usr/etc"
+}
