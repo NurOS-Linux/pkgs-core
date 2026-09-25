@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=msgpack-c
+pkgver=7.0.2
+pkgrel=1
+pkgdesc="MessagePack implementation for C"
+arch=('x86_64')
+url="https://msgpack.org/"
+license=('BSL-1.0')
+depends=('glibc')
+makedepends=('cmake' 'ninja')
+source=("https://github.com/msgpack/msgpack-c/archive/refs/tags/c-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-c-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-c-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DBUILD_SHARED_LIBS=ON \
+    -DMSGPACK_BUILD_TESTS=OFF \
+    -DMSGPACK_BUILD_EXAMPLES=OFF
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-c-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
