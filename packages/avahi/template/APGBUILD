@@ -1,0 +1,55 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=avahi
+pkgver=0.8
+pkgrel=1
+pkgdesc="Service discovery on a local network via mDNS/DNS-SD"
+arch=('x86_64')
+url="https://avahi.org/"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'glib' 'dbus' 'expat' 'libdaemon' 'gdbm' 'libevent' 'libcap')
+makedepends=('pkgconf' 'intltool' 'gettext')
+source=("https://github.com/avahi/avahi/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --disable-static \
+    --disable-qt3 \
+    --disable-qt4 \
+    --disable-qt5 \
+    --disable-gtk \
+    --disable-gtk3 \
+    --disable-python \
+    --disable-mono \
+    --disable-monodoc \
+    --disable-doxygen-doc \
+    --disable-manpages \
+    --enable-compat-libdns_sd \
+    --with-distro=none \
+    --with-avahi-user=avahi \
+    --with-avahi-group=avahi \
+    --with-autoipd-user=avahi \
+    --with-autoipd-group=avahi
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
