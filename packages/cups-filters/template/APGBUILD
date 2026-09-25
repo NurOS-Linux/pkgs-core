@@ -1,0 +1,31 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=cups-filters
+pkgver=2.0.1
+pkgrel=1
+pkgdesc="OpenPrinting CUPS filters and backends"
+arch=('x86_64')
+url="https://github.com/OpenPrinting/cups-filters"
+license=('Apache-2.0 WITH LLVM-exception')
+depends=('glibc' 'cups' 'glib' 'poppler' 'qpdf')
+makedepends=('pkgconf')
+source=("https://github.com/OpenPrinting/cups-filters/releases/download/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure --prefix=/usr --sysconfdir=/etc --sbindir=/usr/bin
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
