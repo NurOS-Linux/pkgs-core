@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_jinja2
+pkgver=3.1.6
+pkgrel=1
+pkgdesc="A very fast and expressive template engine."
+arch=('any')
+url="https://github.com/pallets/jinja/"
+license=('BSD-3-Clause')
+depends=('python' 'pypi_markupsafe')
+makedepends=('python' 'pypi_pip' 'pypi_flit_core')
+provides=('jinja2')
+source=("https://files.pythonhosted.org/packages/df/bf/f7da0350254c0ed7c72f3e33cef02e048281fec7ecec5f032d4aac52226b/jinja2-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/jinja2-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/jinja2-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
