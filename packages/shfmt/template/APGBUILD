@@ -1,0 +1,31 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=shfmt
+pkgver=3.14.1
+pkgrel=1
+pkgdesc="A shell parser, formatter, and interpreter with bash support"
+arch=('x86_64')
+url="https://github.com/mvdan/sh"
+license=('BSD-3-Clause')
+depends=('glibc')
+makedepends=('go')
+source=("https://github.com/mvdan/sh/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/sh-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/sh-${pkgver}"
+  export CGO_ENABLED=0
+  go build -trimpath -ldflags="-s -w" -o shfmt ./cmd/shfmt
+}
+
+package() {
+  cd "${srcdir}/sh-${pkgver}"
+  install -Dm755 shfmt "${pkgdir}/usr/bin/shfmt"
+}
