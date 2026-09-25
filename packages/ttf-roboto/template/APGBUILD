@@ -1,0 +1,28 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ttf-roboto
+pkgver=3.016
+pkgrel=1
+pkgdesc="Google's signature family of fonts"
+arch=('any')
+url="https://fonts.google.com/specimen/Roboto"
+license=('Apache-2.0')
+depends=('fontconfig')
+makedepends=()
+provides=('roboto')
+source=("https://github.com/googlefonts/roboto-classic/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/roboto-classic-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/roboto-classic-${pkgver}"
+
+  install -dm755 "${pkgdir}/usr/share/fonts/TTF"
+  find . -name "*.ttf" -exec install -Dm644 {} "${pkgdir}/usr/share/fonts/TTF/" \;
+}
