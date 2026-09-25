@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_poetry_core
+pkgver=2.5.0
+pkgrel=1
+pkgdesc="Poetry PEP 517 Build Backend"
+arch=('any')
+url="https://github.com/python-poetry/poetry-core"
+license=('MIT')
+depends=('python')
+makedepends=('python' 'pypi_pip')
+provides=('poetry-core')
+source=("https://files.pythonhosted.org/packages/42/b5/50f1fda26c4fe5b1d6ce5cdf0391bdfa1ca12fdcb8ad68344d5cf678fc90/poetry_core-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/poetry_core-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/poetry_core-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
