@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=nfs-utils
+pkgver=2.9.2
+pkgrel=1
+pkgdesc="Support programs for Network File Systems"
+arch=('x86_64')
+url="https://linux-nfs.org/"
+license=('GPL-2.0-only')
+depends=('glibc' 'libevent' 'libtirpc' 'keyutils')
+makedepends=('pkgconf')
+source=("https://www.kernel.org/pub/linux/utils/nfs-utils/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --sbindir=/usr/bin \
+    --without-systemd \
+    --disable-gss \
+    --disable-nfsv41
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+}
