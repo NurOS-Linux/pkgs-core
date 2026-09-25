@@ -1,0 +1,28 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ttf-inconsolata
+pkgver=3.000
+pkgrel=1
+pkgdesc="Clear and resonant monospace font designed for programmer consoles"
+arch=('any')
+url="https://levien.com/type/myfonts/inconsolata.html"
+license=('OFL-1.1')
+depends=('fontconfig')
+makedepends=()
+provides=('inconsolata')
+source=("https://github.com/googlefonts/Inconsolata/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/Inconsolata-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/Inconsolata-${pkgver}"
+
+  install -dm755 "${pkgdir}/usr/share/fonts/inconsolata"
+  find . -name "*.ttf" -exec install -Dm644 {} "${pkgdir}/usr/share/fonts/inconsolata/" \;
+}
