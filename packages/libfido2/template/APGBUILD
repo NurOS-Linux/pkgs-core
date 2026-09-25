@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libfido2
+pkgver=1.17.0
+pkgrel=1
+pkgdesc="Library for communicating with FIDO2 authenticators"
+arch=('x86_64')
+url="https://developers.yubico.com/libfido2/"
+license=('BSD-2-Clause')
+depends=('glibc' 'libcbor' 'openssl' 'eudev' 'zlib')
+makedepends=('cmake' 'ninja' 'pkgconf')
+source=("https://developers.yubico.com/libfido2/Releases/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DBUILD_EXAMPLES=OFF \
+    -DBUILD_MANPAGES=OFF \
+    -DBUILD_TESTS=OFF \
+    -DBUILD_STATIC_LIBS=OFF \
+    -DUDEV_RULES_DIR=/usr/lib/udev/rules.d
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
