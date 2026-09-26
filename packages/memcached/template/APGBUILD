@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=memcached
+pkgver=1.6.45
+pkgrel=1
+pkgdesc="Distributed memory object caching system"
+arch=('x86_64')
+url="https://memcached.org/"
+license=('BSD-3-Clause')
+depends=('glibc' 'libevent' 'openssl')
+makedepends=('pkgconf')
+source=("https://www.memcached.org/files/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --enable-tls
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
