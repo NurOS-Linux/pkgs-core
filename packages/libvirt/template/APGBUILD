@@ -1,0 +1,89 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libvirt
+pkgver=12.7.0
+pkgrel=1
+pkgdesc="Virtualization API and daemon"
+arch=('x86_64')
+url="https://libvirt.org/"
+license=('LGPL-2.1-or-later')
+depends=(
+  'glibc' 'glib' 'gnutls' 'libxml2' 'libxslt' 'libpciaccess' 'libnl' 'curl'
+  'readline' 'libtirpc' 'dbus' 'polkit' 'libcap-ng' 'libssh2' 'json-c'
+  'util-linux' 'libpcap' 'device-mapper'
+)
+makedepends=('meson' 'ninja' 'pkgconf' 'python' 'perl' 'gettext')
+source=("https://download.libvirt.org/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Ddocs=disabled \
+    -Dtests=disabled \
+    -Dsystem=true \
+    -Ddriver_qemu=enabled \
+    -Ddriver_libxl=disabled \
+    -Ddriver_lxc=disabled \
+    -Ddriver_vbox=disabled \
+    -Ddriver_ch=disabled \
+    -Ddriver_bhyve=disabled \
+    -Ddriver_openvz=disabled \
+    -Ddriver_vmware=disabled \
+    -Ddriver_esx=disabled \
+    -Ddriver_hyperv=disabled \
+    -Ddriver_test=enabled \
+    -Ddriver_remote=enabled \
+    -Ddriver_network=enabled \
+    -Ddriver_interface=enabled \
+    -Dstorage_disk=disabled \
+    -Dstorage_lvm=disabled \
+    -Dstorage_iscsi=disabled \
+    -Dstorage_mpath=disabled \
+    -Dstorage_rbd=disabled \
+    -Dstorage_gluster=disabled \
+    -Dstorage_zfs=disabled \
+    -Dnumactl=disabled \
+    -Dselinux=disabled \
+    -Dapparmor=disabled \
+    -Daudit=disabled \
+    -Dfuse=disabled \
+    -Dsasl=disabled \
+    -Dpolkit=enabled \
+    -Dinit_script=openrc \
+    -Drunstatedir=/run \
+    -Dnss=disabled \
+    -Dsysctl_config=disabled \
+    -Dcurl=enabled \
+    -Dwireshark_dissector=disabled \
+    -Dlibssh=disabled \
+    -Dlibssh2=enabled \
+    -Dnetcf=disabled \
+    -Dpciaccess=enabled \
+    -Dudev=enabled \
+    -Djson_c=enabled \
+    -Dsanlock=disabled \
+    -Dlibpcap=enabled \
+    -Dlibnl=enabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
