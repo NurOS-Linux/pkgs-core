@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=xdpyinfo
+pkgver=1.4.0
+pkgrel=1
+pkgdesc="Display information utility for X"
+arch=('x86_64')
+url="https://xorg.freedesktop.org/"
+license=('MIT')
+depends=(
+  'glibc' 'libx11' 'libxext' 'libxtst' 'libxi' 'libxinerama' 'libxcomposite'
+  'libxrender' 'libxxf86vm' 'libxcb'
+)
+makedepends=('pkgconf' 'xorgproto' 'util-macros')
+source=("https://www.x.org/releases/individual/app/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
