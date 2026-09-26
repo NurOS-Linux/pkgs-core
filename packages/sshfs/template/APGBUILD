@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=sshfs
+pkgver=3.7.6
+pkgrel=1
+pkgdesc="FUSE client based on the SSH File Transfer Protocol"
+arch=('x86_64')
+url="https://github.com/libfuse/sshfs"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'fuse3' 'glib' 'openssh')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://github.com/libfuse/sshfs/releases/download/${pkgname}-${pkgver}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
