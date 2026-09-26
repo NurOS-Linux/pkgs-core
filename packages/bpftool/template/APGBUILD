@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=bpftool
+pkgver=7.7.0
+pkgrel=1
+pkgdesc="Tool for inspection and manipulation of eBPF programs"
+arch=('x86_64')
+url="https://github.com/libbpf/bpftool"
+license=('GPL-2.0-only')
+depends=('glibc' 'elfutils' 'zlib')
+makedepends=('clang' 'llvm' 'python')
+source=("https://github.com/libbpf/bpftool/releases/download/v${pkgver}/bpftool-libbpf-v${pkgver}-sources.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-libbpf-v${pkgver}-sources"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-libbpf-v${pkgver}-sources"
+
+  make -C src
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-libbpf-v${pkgver}-sources"
+
+  make -C src DESTDIR="${pkgdir}" prefix=/usr bash_compdir=/usr/share/bash-completion/completions install
+}
