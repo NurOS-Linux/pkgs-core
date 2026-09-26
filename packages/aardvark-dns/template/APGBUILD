@@ -1,0 +1,35 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=aardvark-dns
+pkgver=2.1.0
+pkgrel=1
+pkgdesc="Authoritative DNS server for container networks"
+arch=('x86_64')
+url="https://github.com/containers/aardvark-dns"
+license=('Apache-2.0')
+depends=('glibc' 'gcc')
+makedepends=('cargo')
+source=("https://github.com/containers/aardvark-dns/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  cargo fetch --locked
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cargo build --frozen --release
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 target/release/aardvark-dns "${pkgdir}/usr/lib/podman/aardvark-dns"
+}
