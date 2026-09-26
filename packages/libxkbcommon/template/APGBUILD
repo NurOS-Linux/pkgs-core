@@ -9,6 +9,7 @@ url="https://xkbcommon.org/"
 license=('MIT')
 depends=('glibc' 'xkeyboard-config')
 makedepends=('meson' 'ninja' 'pkgconf' 'bison')
+provides=('libxkbcommon-x11')
 source=("https://xkbcommon.org/download/${pkgname}-${pkgver}.tar.xz")
 
 prepare() {
