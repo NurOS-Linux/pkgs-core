@@ -1,0 +1,29 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=maven
+pkgver=3.9.16
+pkgrel=1
+pkgdesc="Java project management and build tool"
+arch=('any')
+url="https://maven.apache.org/"
+license=('Apache-2.0')
+depends=('openjdk')
+makedepends=()
+source=("https://dlcdn.apache.org/maven/maven-3/${pkgver}/binaries/apache-maven-${pkgver}-bin.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/apache-maven-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/apache-maven-${pkgver}"
+
+  install -dm755 "${pkgdir}/usr/share/maven" "${pkgdir}/usr/bin"
+  cp -a bin boot conf lib "${pkgdir}/usr/share/maven/"
+  ln -s ../share/maven/bin/mvn "${pkgdir}/usr/bin/mvn"
+  ln -s ../share/maven/bin/mvnDebug "${pkgdir}/usr/bin/mvnDebug"
+}
