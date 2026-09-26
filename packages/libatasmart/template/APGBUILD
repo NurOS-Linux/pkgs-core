@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libatasmart
+pkgver=0.19
+pkgrel=1
+pkgdesc="ATA S.M.A.R.T. reading and parsing library"
+arch=('x86_64')
+url="https://0pointer.de/blog/projects/being-smart.html"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'eudev')
+makedepends=('pkgconf')
+source=("https://0pointer.de/public/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-static
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
