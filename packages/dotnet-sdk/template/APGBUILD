@@ -1,0 +1,28 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=dotnet-sdk
+pkgver=10.0.401
+pkgrel=1
+pkgdesc=".NET SDK and runtime"
+arch=('x86_64')
+url="https://dotnet.microsoft.com/"
+license=('MIT')
+depends=('glibc' 'gcc' 'icu' 'openssl' 'krb5' 'zlib')
+makedepends=()
+source=("https://builds.dotnet.microsoft.com/dotnet/Sdk/${pkgver}/${pkgname}-${pkgver}-linux-x64.tar.gz")
+
+prepare() {
+  local dir="${srcdir}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}"
+
+  install -dm755 "${pkgdir}/usr/share/dotnet" "${pkgdir}/usr/bin"
+  cp -a dotnet dnx host packs sdk sdk-manifests shared templates LICENSE.txt ThirdPartyNotices.txt "${pkgdir}/usr/share/dotnet/"
+  ln -s ../share/dotnet/dotnet "${pkgdir}/usr/bin/dotnet"
+}
