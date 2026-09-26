@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=noto-fonts-cjk
+pkgver=2.004
+pkgrel=1
+pkgdesc="Google Noto CJK fonts (Sans)"
+arch=('any')
+url="https://github.com/notofonts/noto-cjk"
+license=('OFL-1.1')
+depends=()
+makedepends=()
+source=("https://github.com/notofonts/noto-cjk/releases/download/Sans${pkgver}/03_NotoSansCJK-OTC.zip")
+
+prepare() {
+  local dir="${srcdir}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}"
+
+  install -dm755 "${pkgdir}/usr/share/fonts/noto-cjk"
+  install -m644 ./*.ttc "${pkgdir}/usr/share/fonts/noto-cjk/"
+}
