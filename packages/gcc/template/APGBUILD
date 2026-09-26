@@ -8,6 +8,7 @@ arch=('x86_64')
 url="https://gcc.gnu.org/"
 license=('GPL-3.0-or-later' 'LGPL-3.0-or-later')
 depends=('glibc' 'binutils' 'gmp' 'mpfr' 'mpc' 'isl' 'zlib' 'zstd')
+provides=('gcc-libs')
 source=("https://ftp.gnu.org/gnu/gcc/gcc-${pkgver}/gcc-${pkgver}.tar.xz")
 
 prepare() {
