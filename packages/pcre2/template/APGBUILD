@@ -8,6 +8,7 @@ arch=('x86_64')
 url="https://www.pcre.org/"
 license=('BSD-3-Clause')
 depends=('glibc')
+provides=('libpcre2')
 source=("https://github.com/PCRE2Project/pcre2/releases/download/pcre2-${pkgver}/pcre2-${pkgver}.tar.bz2")
 
 prepare() {
