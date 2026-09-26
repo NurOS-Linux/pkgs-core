@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=haproxy
+pkgver=3.4.5
+pkgrel=1
+pkgdesc="Reliable, high performance TCP/HTTP load balancer"
+arch=('x86_64')
+url="https://www.haproxy.org/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'openssl' 'pcre2' 'zlib' 'lua')
+makedepends=()
+source=("https://www.haproxy.org/download/${pkgver%.*}/src/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make TARGET=linux-glibc USE_OPENSSL=1 USE_PCRE2=1 USE_PCRE2_JIT=1 USE_ZLIB=1 USE_LUA=1 USE_THREAD=1 USE_GETADDRINFO=1 USE_PROMEX=1 PREFIX=/usr
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make TARGET=linux-glibc USE_OPENSSL=1 USE_PCRE2=1 USE_PCRE2_JIT=1 USE_ZLIB=1 USE_LUA=1 USE_THREAD=1 USE_GETADDRINFO=1 USE_PROMEX=1 PREFIX=/usr SBINDIR=/usr/bin DESTDIR="${pkgdir}" install-bin install-man
+}
