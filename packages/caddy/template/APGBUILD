@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=caddy
+pkgver=2.11.4
+pkgrel=1
+pkgdesc="Fast web server with automatic HTTPS"
+arch=('x86_64')
+url="https://caddyserver.com/"
+license=('Apache-2.0')
+depends=('glibc')
+makedepends=('go')
+source=("https://github.com/caddyserver/caddy/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  export CGO_ENABLED=0
+  go build -trimpath -ldflags="-s -w -X github.com/caddyserver/caddy/v2.CustomVersion=v${pkgver}" -o caddy ./cmd/caddy
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 caddy "${pkgdir}/usr/bin/caddy"
+}
