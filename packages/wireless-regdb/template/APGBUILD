@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=wireless-regdb
+pkgver=2026.09.03
+pkgrel=1
+pkgdesc="Wireless regulatory database"
+arch=('any')
+url="https://wireless.docs.kernel.org/en/latest/en/developers/documentation/regulatory.html"
+license=('ISC')
+depends=()
+makedepends=()
+source=("https://mirrors.edge.kernel.org/pub/software/network/wireless-regdb/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm644 regulatory.db "${pkgdir}/usr/lib/firmware/regulatory.db"
+  install -Dm644 regulatory.db.p7s "${pkgdir}/usr/lib/firmware/regulatory.db.p7s"
+}
