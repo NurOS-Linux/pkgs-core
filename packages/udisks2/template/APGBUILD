@@ -1,0 +1,48 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=udisks2
+pkgver=2.11.2
+pkgrel=1
+pkgdesc="Disk management service"
+arch=('x86_64')
+url="https://storaged.org/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'glib' 'libblockdev' 'libatasmart' 'polkit' 'libgudev' 'util-linux')
+makedepends=('pkgconf' 'gettext' 'intltool')
+source=("https://github.com/storaged-project/udisks/releases/download/udisks-${pkgver}/udisks-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/udisks-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/udisks-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --sbindir=/usr/bin \
+    --disable-static \
+    --disable-introspection \
+    --disable-gtk-doc \
+    --disable-man \
+    --without-systemdsystemunitdir \
+    --disable-btrfs \
+    --disable-lvm2 \
+    --disable-iscsi \
+    --disable-lsm
+
+  make
+}
+
+package() {
+  cd "${srcdir}/udisks-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
