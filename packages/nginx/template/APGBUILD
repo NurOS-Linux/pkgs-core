@@ -1,0 +1,35 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=nginx
+pkgver=1.31.6
+pkgrel=1
+pkgdesc="HTTP and reverse proxy server"
+arch=('x86_64')
+url="https://nginx.org/"
+license=('BSD-2-Clause')
+depends=('glibc' 'pcre2' 'openssl' 'zlib')
+makedepends=()
+source=("https://nginx.org/download/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure --prefix=/etc/nginx --conf-path=/etc/nginx/nginx.conf --sbin-path=/usr/bin/nginx --pid-path=/run/nginx.pid --lock-path=/run/lock/nginx.lock --http-log-path=/var/log/nginx/access.log --error-log-path=/var/log/nginx/error.log --http-client-body-temp-path=/var/lib/nginx/client-body --http-proxy-temp-path=/var/lib/nginx/proxy --http-fastcgi-temp-path=/var/lib/nginx/fastcgi --http-scgi-temp-path=/var/lib/nginx/scgi --http-uwsgi-temp-path=/var/lib/nginx/uwsgi --user=nginx --group=nginx --with-threads --with-file-aio --with-pcre-jit --with-http_ssl_module --with-http_v2_module --with-http_realip_module --with-http_gzip_static_module --with-http_stub_status_module --with-http_auth_request_module --with-http_sub_module --with-stream --with-stream_ssl_module
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -rf "${pkgdir}/run" "${pkgdir}/var/log"
+  install -dm755 "${pkgdir}/var/lib/nginx" "${pkgdir}/var/log/nginx"
+}
