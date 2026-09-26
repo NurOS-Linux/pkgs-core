@@ -1,0 +1,26 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=fail2ban
+pkgver=1.1.1
+pkgrel=1
+pkgdesc="Ban hosts that cause multiple authentication errors"
+arch=('any')
+url="https://www.fail2ban.org/"
+license=('GPL-2.0-or-later')
+depends=('python' 'pypi_setuptools')
+makedepends=()
+source=("https://github.com/fail2ban/fail2ban/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  python3 setup.py install --root="${pkgdir}" --prefix=/usr --optimize=1
+}
