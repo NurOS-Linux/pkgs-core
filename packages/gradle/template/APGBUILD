@@ -1,0 +1,28 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gradle
+pkgver=9.8.0
+pkgrel=1
+pkgdesc="Build automation tool for the JVM"
+arch=('any')
+url="https://gradle.org/"
+license=('Apache-2.0')
+depends=('openjdk')
+makedepends=()
+source=("https://services.gradle.org/distributions/${pkgname}-${pkgver}-bin.zip")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -dm755 "${pkgdir}/usr/share/gradle" "${pkgdir}/usr/bin"
+  cp -a bin lib init.d "${pkgdir}/usr/share/gradle/"
+  ln -s ../share/gradle/bin/gradle "${pkgdir}/usr/bin/gradle"
+}
