@@ -1,0 +1,52 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=dovecot
+pkgver=2.4.5
+pkgrel=1
+pkgdesc="IMAP and POP3 server"
+arch=('x86_64')
+url="https://www.dovecot.org/"
+license=('MIT')
+depends=('glibc' 'openssl' 'linux-pam' 'zlib' 'bzip2' 'xz' 'zstd' 'lz4' 'libcap')
+makedepends=('pkgconf')
+source=("https://dovecot.org/releases/2.4/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --sbindir=/usr/bin \
+    --libexecdir=/usr/lib \
+    --with-rundir=/run/dovecot \
+    --with-pam \
+    --with-ssl=openssl \
+    --with-bzlib \
+    --with-lz4 \
+    --with-zstd \
+    --without-sql \
+    --without-ldap \
+    --without-lua \
+    --without-icu \
+    --without-stemmer \
+    --without-textcat
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
