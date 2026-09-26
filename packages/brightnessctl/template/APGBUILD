@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=brightnessctl
+pkgver=0.5.1
+pkgrel=1
+pkgdesc="Read and control device brightness"
+arch=('x86_64')
+url="https://github.com/Hummer12007/brightnessctl"
+license=('MIT')
+depends=('glibc' 'eudev')
+makedepends=('pkgconf')
+source=("https://github.com/Hummer12007/brightnessctl/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr UDEVDIR=/usr/lib/udev/rules.d DESTDIR="${pkgdir}" install
+}
