@@ -9,6 +9,7 @@ url="https://fmt.dev/"
 license=('MIT')
 depends=('glibc' 'gcc')
 makedepends=('cmake' 'ninja')
+provides=('libfmt')
 source=("https://github.com/fmtlib/fmt/archive/refs/tags/${pkgver}.tar.gz")
 
 prepare() {
