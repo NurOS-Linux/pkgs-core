@@ -1,0 +1,46 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=network-manager-applet
+pkgver=1.36.0
+pkgrel=1
+pkgdesc="Applet for managing network connections"
+arch=('x86_64')
+url="https://gitlab.gnome.org/GNOME/network-manager-applet"
+license=('GPL-2.0-or-later')
+depends=(
+  'glibc' 'glib' 'gtk3' 'networkmanager' 'libnma' 'libsecret' 'libnotify'
+  'libgudev'
+)
+makedepends=('meson' 'ninja' 'pkgconf' 'gettext')
+source=("https://download.gnome.org/sources/network-manager-applet/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dwwan=false \
+    -Dselinux=false \
+    -Dteam=false \
+    -Dappindicator=no
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
