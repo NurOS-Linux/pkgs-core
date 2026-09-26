@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=terminus-font
+pkgver=4.49
+pkgrel=1
+pkgdesc="Monospace bitmap font for console and X11"
+arch=('any')
+url="https://terminus-font.sourceforge.net/"
+license=('OFL-1.1')
+depends=()
+makedepends=('python')
+source=("https://downloads.sourceforge.net/project/terminus-font/${pkgname}-${pkgver}/${pkgname}-${pkgver}.1.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/terminus-font-${pkgver}.1"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/terminus-font-${pkgver}.1"
+
+  ./configure --prefix=/usr
+  make psf
+}
+
+package() {
+  cd "${srcdir}/terminus-font-${pkgver}.1"
+
+  make DESTDIR="${pkgdir}" install-psf
+}
