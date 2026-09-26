@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=kexec-tools
+pkgver=2.0.32
+pkgrel=1
+pkgdesc="Load another kernel from the currently running Linux"
+arch=('x86_64')
+url="https://kernel.org/pub/linux/utils/kernel/kexec/"
+license=('GPL-2.0-only')
+depends=('glibc' 'zlib' 'xz')
+makedepends=('pkgconf')
+source=("https://mirrors.edge.kernel.org/pub/linux/utils/kernel/kexec/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sbindir=/usr/bin
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
