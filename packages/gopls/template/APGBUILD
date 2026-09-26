@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gopls
+pkgver=0.23.0
+pkgrel=1
+pkgdesc="Go language server"
+arch=('x86_64')
+url="https://github.com/golang/tools/tree/master/gopls"
+license=('BSD-3-Clause')
+depends=('glibc')
+makedepends=('go')
+source=("https://github.com/golang/tools/archive/refs/tags/gopls/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/tools-gopls-v${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/tools-gopls-v${pkgver}/gopls"
+
+  export CGO_ENABLED=0
+  go build -trimpath -ldflags="-s -w" -o gopls
+}
+
+package() {
+  cd "${srcdir}/tools-gopls-v${pkgver}/gopls"
+
+  install -Dm755 gopls "${pkgdir}/usr/bin/gopls"
+}
