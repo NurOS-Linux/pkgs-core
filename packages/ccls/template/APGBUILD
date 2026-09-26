@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ccls
+pkgver=0.20250815.1
+pkgrel=1
+pkgdesc="C/C++/Objective-C language server"
+arch=('x86_64')
+url="https://github.com/MaskRay/ccls"
+license=('Apache-2.0')
+depends=('glibc' 'gcc' 'llvm' 'clang' 'zlib')
+makedepends=('cmake' 'ninja' 'rapidjson')
+source=("https://github.com/MaskRay/ccls/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DUSE_SYSTEM_RAPIDJSON=ON
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
