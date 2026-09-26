@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=sane-airscan
+pkgver=0.99.38
+pkgrel=1
+pkgdesc="SANE backend for AirPrint and eSCL scanners"
+arch=('x86_64')
+url="https://github.com/alexpevzner/sane-airscan"
+license=('GPL-2.0-or-later')
+depends=(
+  'glibc' 'sane' 'libsoup3' 'avahi' 'libjpeg-turbo' 'libpng' 'libtiff'
+  'libxml2' 'gnutls'
+)
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://github.com/alexpevzner/sane-airscan/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
