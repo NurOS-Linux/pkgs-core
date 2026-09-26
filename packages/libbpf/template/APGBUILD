@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libbpf
+pkgver=1.7.0
+pkgrel=1
+pkgdesc="Library for loading eBPF programs and reading maps"
+arch=('x86_64')
+url="https://github.com/libbpf/libbpf"
+license=('LGPL-2.1-only')
+depends=('glibc' 'elfutils' 'zlib')
+makedepends=('pkgconf')
+source=("https://github.com/libbpf/libbpf/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make -C src
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make -C src DESTDIR="${pkgdir}" PREFIX=/usr LIBSUBDIR=lib install
+  rm -f "${pkgdir}"/usr/lib/libbpf.a
+}
