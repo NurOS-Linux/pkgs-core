@@ -1,0 +1,28 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=julia
+pkgver=1.13.0
+pkgrel=1
+pkgdesc="High-level, high-performance dynamic language for technical computing"
+arch=('x86_64')
+url="https://julialang.org/"
+license=('MIT')
+depends=('glibc')
+makedepends=()
+source=("https://julialang-s3.julialang.org/bin/linux/x64/${pkgver%.*}/${pkgname}-${pkgver}-linux-x86_64.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -dm755 "${pkgdir}/usr/lib/julia" "${pkgdir}/usr/bin"
+  cp -a bin lib libexec share include etc "${pkgdir}/usr/lib/julia/"
+  ln -s ../lib/julia/bin/julia "${pkgdir}/usr/bin/julia"
+}
