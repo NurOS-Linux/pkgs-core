@@ -1,0 +1,61 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=apache
+pkgver=2.4.68
+pkgrel=1
+pkgdesc="Apache HTTP server"
+arch=('x86_64')
+url="https://httpd.apache.org/"
+license=('Apache-2.0')
+depends=(
+  'glibc' 'apr' 'apr-util' 'pcre2' 'openssl' 'expat' 'zlib' 'nghttp2'
+  'brotli' 'libxml2' 'lua'
+)
+makedepends=('pkgconf')
+source=("https://archive.apache.org/dist/httpd/httpd-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/httpd-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/httpd-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sbindir=/usr/bin \
+    --sysconfdir=/etc/httpd/conf \
+    --libexecdir=/usr/lib/httpd/modules \
+    --datadir=/usr/share/httpd \
+    --localstatedir=/var \
+    --with-mpm=event \
+    --enable-mpms-shared=all \
+    --enable-modules=few \
+    --enable-mods-shared=most \
+    --enable-ssl \
+    --enable-http2 \
+    --enable-proxy \
+    --enable-proxy-http2 \
+    --enable-deflate \
+    --enable-brotli \
+    --with-apr=/usr \
+    --with-apr-util=/usr \
+    --with-pcre=/usr/bin/pcre2-config \
+    --with-ssl=/usr \
+    --with-nghttp2=/usr \
+    --with-brotli=/usr \
+    --with-libxml2=/usr/include/libxml2
+
+  make
+}
+
+package() {
+  cd "${srcdir}/httpd-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
