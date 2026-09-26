@@ -1,0 +1,51 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=squid
+pkgver=7.7
+pkgrel=1
+pkgdesc="Caching proxy for the Web"
+arch=('x86_64')
+url="http://www.squid-cache.org/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'gcc' 'openssl' 'libtool' 'linux-pam' 'libcap' 'krb5')
+makedepends=('pkgconf' 'perl')
+source=("https://github.com/squid-cache/squid/releases/download/SQUID_${pkgver//./_}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc/squid \
+    --sbindir=/usr/bin \
+    --libexecdir=/usr/lib/squid \
+    --localstatedir=/var \
+    --datadir=/usr/share/squid \
+    --with-logdir=/var/log/squid \
+    --with-pidfile=/run/squid.pid \
+    --enable-ssl-crtd \
+    --with-openssl \
+    --enable-auth \
+    --enable-removal-policies=lru,heap \
+    --enable-storeio=aufs,ufs \
+    --disable-strict-error-checking \
+    --disable-arch-native \
+    --with-default-user=squid
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
