@@ -1,0 +1,44 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libnma
+pkgver=1.10.6
+pkgrel=1
+pkgdesc="NetworkManager GUI library"
+arch=('x86_64')
+url="https://gitlab.gnome.org/GNOME/libnma"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'glib' 'gtk3' 'networkmanager' 'gcr-4' 'libsecret')
+makedepends=('meson' 'ninja' 'pkgconf' 'gettext')
+source=("https://download.gnome.org/sources/libnma/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dintrospection=false \
+    -Dvapi=false \
+    -Dgtk_doc=false \
+    -Dmobile_broadband_provider_info=false \
+    -Dlibnma_gtk4=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
