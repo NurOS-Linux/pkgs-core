@@ -1,0 +1,34 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=openjdk
+pkgver=25.0.4.7
+pkgrel=1
+pkgdesc="OpenJDK 25 (Eclipse Temurin binary build)"
+arch=('x86_64')
+url="https://adoptium.net/"
+license=('GPL-2.0-only')
+depends=(
+  'glibc' 'zlib' 'freetype' 'fontconfig' 'alsa-lib' 'libx11' 'libxext'
+  'libxi' 'libxrender' 'libxtst'
+)
+makedepends=()
+provides=('java-runtime' 'java-environment')
+source=("https://github.com/adoptium/temurin25-binaries/releases/download/jdk-${pkgver%.*}+${pkgver##*.}/OpenJDK25U-jdk_x64_linux_hotspot_${pkgver%.*}_${pkgver##*.}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/jdk-${pkgver%.*}+${pkgver##*.}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/jdk-${pkgver%.*}+${pkgver##*.}"
+
+  install -dm755 "${pkgdir}/usr/lib/jvm/java-25-openjdk" "${pkgdir}/usr/bin"
+  cp -a ./. "${pkgdir}/usr/lib/jvm/java-25-openjdk/"
+  for bin in "${pkgdir}"/usr/lib/jvm/java-25-openjdk/bin/*; do
+    ln -s "../lib/jvm/java-25-openjdk/bin/${bin##*/}" "${pkgdir}/usr/bin/${bin##*/}"
+  done
+}
