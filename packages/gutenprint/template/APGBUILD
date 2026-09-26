@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gutenprint
+pkgver=5.3.5
+pkgrel=1
+pkgdesc="Top quality printer drivers for POSIX systems"
+arch=('x86_64')
+url="https://gimp-print.sourceforge.io/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'cups' 'gcc')
+makedepends=('pkgconf')
+source=("https://downloads.sourceforge.net/project/gimp-print/gutenprint-5.3/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --disable-static \
+    --disable-libgutenprintui2 \
+    --without-gimp2 \
+    --disable-test \
+    --disable-samples
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
