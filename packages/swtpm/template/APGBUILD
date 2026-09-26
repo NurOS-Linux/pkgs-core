@@ -1,0 +1,46 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=swtpm
+pkgver=0.10.2
+pkgrel=1
+pkgdesc="Software TPM emulator"
+arch=('x86_64')
+url="https://github.com/stefanberger/swtpm"
+license=('BSD-3-Clause')
+depends=(
+  'glibc' 'libtpms' 'glib' 'gnutls' 'json-glib' 'openssl' 'libtasn1' 'fuse3'
+  'libseccomp'
+)
+makedepends=('autoconf' 'automake' 'libtool' 'pkgconf')
+source=("https://github.com/stefanberger/swtpm/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  autoreconf -fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --with-openssl \
+    --without-selinux
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
