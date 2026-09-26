@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=open-iscsi
+pkgver=2.1.13
+pkgrel=1
+pkgdesc="iSCSI userspace tools"
+arch=('x86_64')
+url="https://github.com/open-iscsi/open-iscsi"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'kmod' 'openssl' 'util-linux' 'open-isns')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://github.com/open-iscsi/open-iscsi/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dno_systemd=true
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
