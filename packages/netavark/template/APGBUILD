@@ -1,0 +1,35 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=netavark
+pkgver=2.1.0
+pkgrel=1
+pkgdesc="Container network stack"
+arch=('x86_64')
+url="https://github.com/containers/netavark"
+license=('Apache-2.0')
+depends=('glibc' 'gcc')
+makedepends=('cargo' 'protobuf')
+source=("https://github.com/containers/netavark/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  cargo fetch --locked
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cargo build --frozen --release
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 target/release/netavark "${pkgdir}/usr/lib/podman/netavark"
+}
