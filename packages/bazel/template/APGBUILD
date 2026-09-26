@@ -1,0 +1,26 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=bazel
+pkgver=9.2.0
+pkgrel=1
+pkgdesc="Fast, correct build system"
+arch=('x86_64')
+url="https://bazel.build/"
+license=('Apache-2.0')
+depends=('glibc' 'gcc' 'zlib')
+makedepends=()
+source=("https://github.com/bazelbuild/bazel/releases/download/${pkgver}/${pkgname}-${pkgver}-linux-x86_64")
+
+prepare() {
+  local dir="${srcdir}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}"
+
+  install -Dm755 "${srcdir}/bazel-${pkgver}-linux-x86_64" "${pkgdir}/usr/bin/bazel"
+}
