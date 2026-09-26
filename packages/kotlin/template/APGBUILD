@@ -1,0 +1,31 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=kotlin
+pkgver=2.4.20
+pkgrel=1
+pkgdesc="Kotlin compiler and standard tools"
+arch=('any')
+url="https://kotlinlang.org/"
+license=('Apache-2.0')
+depends=('openjdk')
+makedepends=()
+source=("https://github.com/JetBrains/kotlin/releases/download/v${pkgver}/kotlin-compiler-${pkgver}.zip")
+
+prepare() {
+  local dir="${srcdir}/kotlinc"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/kotlinc"
+
+  install -dm755 "${pkgdir}/usr/share/kotlin" "${pkgdir}/usr/bin"
+  cp -a bin lib build.txt "${pkgdir}/usr/share/kotlin/"
+  rm -f "${pkgdir}"/usr/share/kotlin/bin/*.bat
+  for bin in kotlin kotlinc kotlinc-js kotlinc-jvm kotlin-dce-js; do
+    ln -s "../share/kotlin/bin/${bin}" "${pkgdir}/usr/bin/${bin}"
+  done
+}
