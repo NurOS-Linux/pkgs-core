@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=conntrack-tools
+pkgver=1.4.9
+pkgrel=1
+pkgdesc="Userspace tools to interact with the connection tracking system"
+arch=('x86_64')
+url="https://conntrack-tools.netfilter.org/"
+license=('GPL-2.0-or-later')
+depends=(
+  'glibc' 'libnfnetlink' 'libmnl' 'libnetfilter_conntrack'
+  'libnetfilter_cttimeout' 'libnetfilter_cthelper' 'libnetfilter_queue'
+)
+makedepends=('pkgconf' 'bison' 'flex')
+source=("https://www.netfilter.org/pub/conntrack-tools/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --sbindir=/usr/bin \
+    --disable-systemd
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
