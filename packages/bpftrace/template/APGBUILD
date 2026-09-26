@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=bpftrace
+pkgver=0.27.0
+pkgrel=1
+pkgdesc="High-level tracing language for eBPF"
+arch=('x86_64')
+url="https://github.com/bpftrace/bpftrace"
+license=('Apache-2.0')
+depends=('glibc' 'gcc' 'llvm' 'clang' 'libbpf' 'elfutils' 'zlib')
+makedepends=('cmake' 'ninja' 'bison' 'flex')
+source=("https://github.com/bpftrace/bpftrace/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cmake -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DBUILD_TESTING=OFF
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
