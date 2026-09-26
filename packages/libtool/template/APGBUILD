@@ -9,6 +9,7 @@ url="https://www.gnu.org/software/libtool/"
 license=('GPL-2.0-or-later')
 depends=('glibc' 'sh' 'tar' 'sed' 'grep')
 makedepends=()
+provides=('libltdl')
 source=("https://ftp.gnu.org/gnu/libtool/${pkgname}-${pkgver}.tar.xz")
 
 prepare() {
