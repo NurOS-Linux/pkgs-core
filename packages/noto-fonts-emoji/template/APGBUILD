@@ -1,0 +1,26 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=noto-fonts-emoji
+pkgver=2.051
+pkgrel=1
+pkgdesc="Google Noto color emoji font"
+arch=('any')
+url="https://github.com/googlefonts/noto-emoji"
+license=('OFL-1.1')
+depends=()
+makedepends=()
+source=("https://github.com/googlefonts/noto-emoji/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/noto-emoji-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/noto-emoji-${pkgver}"
+
+  install -Dm644 fonts/NotoColorEmoji.ttf "${pkgdir}/usr/share/fonts/noto/NotoColorEmoji.ttf"
+}
