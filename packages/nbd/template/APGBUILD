@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=nbd
+pkgver=3.27.1
+pkgrel=1
+pkgdesc="Tools for network block devices"
+arch=('x86_64')
+url="https://github.com/NetworkBlockDevice/nbd"
+license=('GPL-2.0-only')
+depends=('glibc' 'glib' 'gnutls' 'libnl' 'zlib')
+makedepends=('pkgconf' 'bison' 'flex')
+source=("https://github.com/NetworkBlockDevice/nbd/releases/download/${pkgname}-${pkgver}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sbindir=/usr/bin \
+    --sysconfdir=/etc
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
