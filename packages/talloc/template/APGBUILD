@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=talloc
+pkgver=2.5.0
+pkgrel=1
+pkgdesc="Hierarchical pool based memory allocator"
+arch=('x86_64')
+url="https://talloc.samba.org/"
+license=('LGPL-3.0-or-later')
+depends=('glibc')
+makedepends=('python' 'pkgconf')
+source=("https://download.samba.org/pub/talloc/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure --prefix=/usr --disable-rpath --disable-python --bundled-libraries=NONE
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+}
