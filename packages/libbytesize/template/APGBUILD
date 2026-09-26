@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libbytesize
+pkgver=2.12
+pkgrel=1
+pkgdesc="Library for operations with sizes in bytes"
+arch=('x86_64')
+url="https://github.com/storaged-project/libbytesize"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'gmp' 'mpfr' 'pcre2')
+makedepends=('pkgconf' 'gettext')
+source=("https://github.com/storaged-project/libbytesize/releases/download/${pkgver}/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --without-python3 \
+    --without-tools \
+    --without-gtk-doc
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
