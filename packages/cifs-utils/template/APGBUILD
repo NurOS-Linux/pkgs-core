@@ -1,0 +1,38 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=cifs-utils
+pkgver=7.8
+pkgrel=1
+pkgdesc="CIFS filesystem user-space tools"
+arch=('x86_64')
+url="https://wiki.samba.org/index.php/LinuxCIFS_utils"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'talloc' 'keyutils' 'libcap' 'krb5' 'linux-pam')
+makedepends=('pkgconf' 'python')
+source=("https://download.samba.org/pub/linux-cifs/cifs-utils/${pkgname}-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sbindir=/usr/bin \
+    --disable-systemd
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
