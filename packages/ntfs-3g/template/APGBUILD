@@ -1,0 +1,45 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ntfs-3g
+pkgver=2026.9.18
+pkgrel=1
+pkgdesc="NTFS filesystem driver and utilities"
+arch=('x86_64')
+url="https://github.com/tuxera/ntfs-3g"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'util-linux' 'libgcrypt' 'gnutls')
+makedepends=('pkgconf' 'autoconf' 'automake' 'libtool' 'gettext')
+source=("https://github.com/tuxera/ntfs-3g/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  autoreconf -fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sbindir=/usr/bin \
+    --with-fuse=internal \
+    --disable-ldconfig \
+    --enable-extras \
+    --enable-posix-acls \
+    --enable-xattr-mappings
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
