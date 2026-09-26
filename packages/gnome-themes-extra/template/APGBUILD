@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gnome-themes-extra
+pkgver=3.28
+pkgrel=1
+pkgdesc="Extra GTK themes for GNOME"
+arch=('x86_64')
+url="https://gitlab.gnome.org/GNOME/gnome-themes-extra"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'gtk3' 'gdk-pixbuf')
+makedepends=('pkgconf' 'intltool')
+source=("https://download.gnome.org/sources/gnome-themes-extra/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-gtk2-engine
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
