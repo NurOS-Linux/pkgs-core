@@ -1,0 +1,65 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gvfs
+pkgver=1.62.0
+pkgrel=1
+pkgdesc="Virtual filesystem implementation for GIO"
+arch=('x86_64')
+url="https://gitlab.gnome.org/GNOME/gvfs"
+license=('LGPL-2.0-or-later')
+depends=(
+  'glibc' 'glib' 'dbus' 'libgudev' 'udisks2' 'libsoup3' 'libxml2' 'fuse3'
+  'polkit' 'openssh' 'gcr-4' 'libsecret'
+)
+makedepends=('meson' 'ninja' 'pkgconf' 'gettext')
+source=("https://download.gnome.org/sources/gvfs/${pkgver%.*}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dsystemduserunitdir=no \
+    -Dtmpfilesdir=no \
+    -Dlogind=false \
+    -Dudisks2=true \
+    -Dgphoto2=false \
+    -Dmtp=false \
+    -Dafc=false \
+    -Dbluray=false \
+    -Dcdda=false \
+    -Dgoa=false \
+    -Dgoogle=false \
+    -Dnfs=false \
+    -Dsmb=false \
+    -Donedrive=false \
+    -Dkeyring=false \
+    -Dhttp=true \
+    -Dfuse=true \
+    -Dgudev=true \
+    -Dman=false \
+    -Dwsdd=false \
+    -Dafp=false \
+    -Ddnssd=false \
+    -Dsftp=true
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
