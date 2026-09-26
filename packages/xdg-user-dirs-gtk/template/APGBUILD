@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=xdg-user-dirs-gtk
+pkgver=0.16
+pkgrel=1
+pkgdesc="Creates user dirs and asks to relocate them"
+arch=('x86_64')
+url="https://gitlab.gnome.org/GNOME/xdg-user-dirs-gtk"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'glib' 'gtk3' 'xdg-user-dirs')
+makedepends=('meson' 'ninja' 'pkgconf' 'gettext')
+source=("https://download.gnome.org/sources/xdg-user-dirs-gtk/${pkgver}/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
