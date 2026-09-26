@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=postfix
+pkgver=3.11.7
+pkgrel=1
+pkgdesc="Fast, easy to administer and secure mail server"
+arch=('x86_64')
+url="http://www.postfix.org/"
+license=('IPL-1.0')
+depends=('glibc' 'openssl' 'pcre2' 'lmdb' 'db' 'icu')
+makedepends=('pkgconf')
+source=("https://github.com/vdukhovni/postfix/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make makefiles pie=yes shared=yes dynamicmaps=no CCARGS="-DUSE_TLS -DHAS_PCRE=2 $(pcre2-config --cflags) -DHAS_LMDB -DNO_NIS" AUXLIBS="-lssl -lcrypto" AUXLIBS_PCRE="$(pcre2-config --libs8)" AUXLIBS_LMDB="-llmdb"
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  sh postfix-install -non-interactive install_root="${pkgdir}" config_directory=/etc/postfix daemon_directory=/usr/lib/postfix/bin command_directory=/usr/bin sendmail_path=/usr/bin/sendmail newaliases_path=/usr/bin/newaliases mailq_path=/usr/bin/mailq queue_directory=/var/spool/postfix data_directory=/var/lib/postfix meta_directory=/etc/postfix shlib_directory=/usr/lib/postfix manpage_directory=/usr/share/man html_directory=no readme_directory=no mail_owner=postfix setgid_group=postdrop
+}
