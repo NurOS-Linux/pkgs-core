@@ -1,0 +1,29 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pandoc
+pkgver=3.11
+pkgrel=1
+pkgdesc="Universal markup converter"
+arch=('x86_64')
+url="https://pandoc.org/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'gmp' 'zlib' 'libffi')
+makedepends=()
+source=("https://github.com/jgm/pandoc/releases/download/${pkgver}/${pkgname}-${pkgver}-linux-amd64.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 bin/pandoc "${pkgdir}/usr/bin/pandoc"
+  install -Dm755 bin/pandoc-server "${pkgdir}/usr/bin/pandoc-server"
+  install -Dm755 bin/pandoc-lua "${pkgdir}/usr/bin/pandoc-lua"
+  install -Dm644 share/man/man1/pandoc.1.gz "${pkgdir}/usr/share/man/man1/pandoc.1.gz"
+}
