@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=kakoune
+pkgver=2026.05.21
+pkgrel=1
+pkgdesc="Modal code editor inspired by vi"
+arch=('x86_64')
+url="https://kakoune.org/"
+license=('Unlicense')
+depends=('glibc' 'gcc' 'ncurses')
+makedepends=('pkgconf')
+source=("https://github.com/mawww/kakoune/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/kakoune-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/kakoune-${pkgver}"
+
+  make PREFIX=/usr
+}
+
+package() {
+  cd "${srcdir}/kakoune-${pkgver}"
+
+  make PREFIX=/usr DESTDIR="${pkgdir}" install
+}
