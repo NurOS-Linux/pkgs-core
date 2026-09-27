@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=earlyoom
+pkgver=1.9.0
+pkgrel=1
+pkgdesc="Early OOM daemon for Linux"
+arch=('x86_64')
+url="https://github.com/rfjakob/earlyoom"
+license=('MIT')
+depends=('glibc')
+makedepends=()
+source=("https://github.com/rfjakob/earlyoom/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make VERSION=${pkgver}
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr BINDIR=/usr/bin DESTDIR="${pkgdir}" install-bin
+}
