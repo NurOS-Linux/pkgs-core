@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_httpie
+pkgver=3.2.4
+pkgrel=1
+pkgdesc="HTTPie: modern, user-friendly command-line HTTP client for the API era."
+arch=('any')
+url="https://httpie.io/"
+license=('BSD-3-Clause')
+depends=('python' 'pypi_pip' 'pypi_charset_normalizer' 'pypi_defusedxml' 'pypi_requests' 'pypi_pygments' 'pypi_requests_toolbelt' 'pypi_multidict' 'pypi_setuptools' 'pypi_rich')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools' 'pypi_wheel')
+provides=('httpie')
+source=("https://files.pythonhosted.org/packages/3e/bb/aefb0abbdbadeb9e8e7f04fb0f1942bc084f4215bf8dc729236153d09e1e/httpie-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/httpie-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/httpie-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
