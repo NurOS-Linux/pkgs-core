@@ -1,0 +1,36 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gforth
+pkgver=0.7.3
+pkgrel=1
+pkgdesc="Fast and portable implementation of the ANS Forth language"
+arch=('x86_64')
+url="https://gforth.org/"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'libffi' 'libtool')
+makedepends=('pkgconf')
+source=("https://ftp.gnu.org/gnu/gforth/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
