@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_idna
+pkgver=3.20
+pkgrel=1
+pkgdesc="Internationalized Domain Names in Applications (IDNA)"
+arch=('any')
+url="https://github.com/kjd/idna"
+license=('BSD-3-Clause')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_flit_core')
+provides=('idna')
+source=("https://files.pythonhosted.org/packages/f5/08/8eea9d4b8302028f3abb2c0813953f7aec26d33b7a8960ed760e65ff29fa/idna-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/idna-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/idna-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
