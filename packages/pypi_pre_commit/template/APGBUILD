@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_pre_commit
+pkgver=4.6.2
+pkgrel=1
+pkgdesc="A framework for managing and maintaining multi-language pre-commit hooks."
+arch=('any')
+url="https://github.com/pre-commit/pre-commit"
+license=('MIT')
+depends=('python' 'pypi_cfgv' 'pypi_identify' 'pypi_nodeenv' 'pypi_yaml' 'pypi_virtualenv')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools' 'pypi_wheel')
+provides=('pre-commit')
+source=("https://files.pythonhosted.org/packages/74/89/1f3e8e1fc3e97de0fa963495832f581f025f29471602a309e48808244292/pre_commit-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/pre_commit-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/pre_commit-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
