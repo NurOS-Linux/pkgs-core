@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=mupdf
+pkgver=1.28.5
+pkgrel=1
+pkgdesc="Lightweight PDF, XPS and E-book viewer"
+arch=('x86_64')
+url="https://mupdf.com/"
+license=('AGPL-3.0-or-later')
+depends=('glibc' 'gcc' 'freetype' 'harfbuzz' 'zlib' 'libjpeg-turbo' 'libx11' 'libxext')
+makedepends=('pkgconf')
+source=("https://mupdf.com/downloads/archive/${pkgname}-${pkgver}-source.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/mupdf-${pkgver}-source"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/mupdf-${pkgver}-source"
+
+  make build=release prefix=/usr USE_SYSTEM_LIBS=no HAVE_X11=yes HAVE_GLUT=no HAVE_CURL=no
+}
+
+package() {
+  cd "${srcdir}/mupdf-${pkgver}-source"
+
+  make build=release prefix=/usr USE_SYSTEM_LIBS=no HAVE_X11=yes HAVE_GLUT=no HAVE_CURL=no DESTDIR="${pkgdir}" install
+}
