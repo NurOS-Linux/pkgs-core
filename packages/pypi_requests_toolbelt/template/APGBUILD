@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_requests_toolbelt
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="A utility belt for advanced users of python-requests"
+arch=('any')
+url="https://toolbelt.readthedocs.io/"
+license=('Apache-2.0')
+depends=('python' 'pypi_requests')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools' 'pypi_wheel')
+provides=('requests-toolbelt')
+source=("https://files.pythonhosted.org/packages/f3/61/d7545dafb7ac2230c70d38d31cbfe4cc64f7144dc41f6e4e4b78ecd9f5bb/requests-toolbelt-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/requests-toolbelt-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/requests-toolbelt-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
