@@ -1,0 +1,46 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pcsc-lite
+pkgver=2.5.2
+pkgrel=1
+pkgdesc="Middleware to access a smart card using SCard API"
+arch=('x86_64')
+url="https://pcsclite.apdu.fr/"
+license=('BSD-3-Clause')
+depends=('glibc' 'eudev' 'polkit')
+makedepends=('meson' 'ninja' 'pkgconf' 'flex')
+source=("https://pcsclite.apdu.fr/files/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dlibsystemd=false \
+    -Dlibudev=true \
+    -Dlibusb=false \
+    -Dpolkit=true \
+    -Dusb=true \
+    -Dserial=false \
+    -Dsystemdunit=system
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
