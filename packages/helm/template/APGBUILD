@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=helm
+pkgver=4.3.0
+pkgrel=1
+pkgdesc="Package manager for Kubernetes"
+arch=('x86_64')
+url="https://helm.sh/"
+license=('Apache-2.0')
+depends=('glibc')
+makedepends=('go')
+source=("https://github.com/helm/helm/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  export CGO_ENABLED=0
+  go build -trimpath -ldflags="-s -w -X helm.sh/helm/v4/internal/version.version=v${pkgver}" -o helm ./cmd/helm
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 helm "${pkgdir}/usr/bin/helm"
+}
