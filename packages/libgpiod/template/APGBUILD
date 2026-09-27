@@ -1,0 +1,47 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=libgpiod
+pkgver=2.3.1
+pkgrel=1
+pkgdesc="Library and tools for the GPIO character device"
+arch=('x86_64')
+url="https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git"
+license=('LGPL-2.1-or-later')
+depends=('glibc')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://mirrors.edge.kernel.org/pub/software/libs/libgpiod/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dtools=enabled \
+    -Dtests=disabled \
+    -Dbindings-cxx=disabled \
+    -Dbindings-glib=disabled \
+    -Dgpioset-interactive=disabled \
+    -Ddbus=disabled \
+    -Dintrospection=disabled \
+    -Dsystemd=disabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
