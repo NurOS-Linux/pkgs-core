@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gparted
+pkgver=1.8.1
+pkgrel=1
+pkgdesc="GTK partition editor"
+arch=('x86_64')
+url="https://gparted.org/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'gcc' 'gtkmm3' 'glibmm' 'parted' 'polkit')
+makedepends=('pkgconf' 'intltool' 'gettext' 'autoconf' 'automake' 'libtool' 'yelp-tools')
+source=("https://github.com/GNOME/gparted/archive/refs/tags/GPARTED_${pkgver//./_}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-GPARTED_${pkgver//./_}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  autoreconf -fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-GPARTED_${pkgver//./_}"
+
+  ./configure \
+    --prefix=/usr \
+    --disable-doc
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-GPARTED_${pkgver//./_}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
