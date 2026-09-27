@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_glances
+pkgver=4.5.7
+pkgrel=1
+pkgdesc="An all-in-one system monitoring tool"
+arch=('any')
+url="https://github.com/nicolargo/glances"
+license=('LGPL-3.0-only')
+depends=('python' 'pypi_defusedxml' 'pypi_packaging' 'pypi_psutil' 'pypi_shtab' 'pypi_jinja2')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools')
+provides=('glances')
+source=("https://files.pythonhosted.org/packages/f5/93/7f95ced7d40a3d96873a022a6678c0adeb9912f8d9487c55e4182d1e9be7/glances-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/glances-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/glances-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
