@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_nodeenv
+pkgver=1.11.0
+pkgrel=1
+pkgdesc="Node.js virtual environment builder"
+arch=('any')
+url="https://github.com/ekalinin/nodeenv"
+license=('BSD-3-Clause')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools' 'pypi_setuptools_scm')
+provides=('nodeenv')
+source=("https://files.pythonhosted.org/packages/9a/8e/105de02c1322cfada6d9710d9146ef8026419d433c9d08359a2d35805811/nodeenv-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/nodeenv-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/nodeenv-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
