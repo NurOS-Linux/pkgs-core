@@ -1,0 +1,45 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=mc
+pkgver=4.8.33
+pkgrel=1
+pkgdesc="Text-mode visual file manager"
+arch=('x86_64')
+url="https://midnight-commander.org/"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'glib' 'ncurses' 'libssh2' 'pcre2')
+makedepends=('pkgconf' 'gettext' 'autoconf' 'automake' 'libtool')
+source=("https://github.com/MidnightCommander/mc/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  autoreconf -fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --with-screen=ncurses \
+    --enable-vfs-sftp \
+    --without-x \
+    --without-gpm-mouse \
+    --disable-static
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
