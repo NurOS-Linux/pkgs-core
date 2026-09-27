@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=sops
+pkgver=3.13.3
+pkgrel=1
+pkgdesc="Editor of encrypted files supporting YAML, JSON, ENV, INI and BINARY"
+arch=('x86_64')
+url="https://getsops.io/"
+license=('MPL-2.0')
+depends=('glibc')
+makedepends=('go')
+source=("https://github.com/getsops/sops/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  export CGO_ENABLED=0
+  go build -trimpath -ldflags="-s -w" -o sops ./cmd/sops
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 sops "${pkgdir}/usr/bin/sops"
+}
