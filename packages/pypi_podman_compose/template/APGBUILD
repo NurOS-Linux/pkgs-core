@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_podman_compose
+pkgver=1.6.0
+pkgrel=1
+pkgdesc="A script to run docker-compose.yml using podman"
+arch=('any')
+url="https://pypi.org/project/podman-compose/"
+license=('GPL-2.0-only')
+depends=('python' 'pypi_python_dotenv' 'pypi_yaml')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools')
+provides=('podman-compose')
+source=("https://files.pythonhosted.org/packages/1f/80/a6ada19562b12ed466dac5c3e02aef5ed7c8d0881864d80e0d94d0dc71f5/podman_compose-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/podman_compose-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/podman_compose-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
