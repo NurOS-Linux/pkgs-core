@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=opentofu
+pkgver=1.12.6
+pkgrel=1
+pkgdesc="Infrastructure as code tool, open source fork of Terraform"
+arch=('x86_64')
+url="https://opentofu.org/"
+license=('MPL-2.0')
+depends=('glibc')
+makedepends=('go')
+source=("https://github.com/opentofu/opentofu/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  export CGO_ENABLED=0
+  go build -trimpath -ldflags="-s -w -X github.com/opentofu/opentofu/version.dev=no" -o tofu ./cmd/tofu
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 tofu "${pkgdir}/usr/bin/tofu"
+}
