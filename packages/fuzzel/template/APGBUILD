@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=fuzzel
+pkgver=1.15.0
+pkgrel=1
+pkgdesc="Application launcher for Wayland"
+arch=('x86_64')
+url="https://codeberg.org/dnkl/fuzzel"
+license=('MIT')
+depends=('glibc' 'wayland' 'cairo' 'libxkbcommon' 'fcft' 'pixman' 'fontconfig')
+makedepends=('meson' 'ninja' 'pkgconf' 'wayland-protocols')
+source=("https://codeberg.org/dnkl/fuzzel/archive/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/fuzzel"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/fuzzel"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Denable-cairo=enabled \
+    -Dpng-backend=none \
+    -Dsvg-backend=none
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/fuzzel"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
