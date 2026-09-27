@@ -1,0 +1,44 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=aircrack-ng
+pkgver=1.7
+pkgrel=1
+pkgdesc="Wireless network security assessment tools"
+arch=('x86_64')
+url="https://www.aircrack-ng.org/"
+license=('GPL-2.0-or-later')
+depends=(
+  'glibc' 'gcc' 'libnl' 'openssl' 'sqlite' 'pcre2' 'libpcap' 'zlib' 'iw'
+  'pciutils'
+)
+makedepends=('pkgconf' 'autoconf' 'automake' 'libtool')
+source=("https://download.aircrack-ng.org/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  autoreconf -fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sbindir=/usr/bin \
+    --with-experimental
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
