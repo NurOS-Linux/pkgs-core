@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_shtab
+pkgver=1.12.1
+pkgrel=1
+pkgdesc="Automagic shell tab completion for Python CLI applications"
+arch=('any')
+url="https://pypi.org/project/shtab/"
+license=('MPL-2.0')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools' 'pypi_setuptools_scm')
+provides=('shtab')
+source=("https://files.pythonhosted.org/packages/ef/71/ddb3c0a7a86db44d2fb3f9cbac162f7ddbcbf563b4a174963ba2b3d4d819/shtab-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/shtab-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/shtab-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
