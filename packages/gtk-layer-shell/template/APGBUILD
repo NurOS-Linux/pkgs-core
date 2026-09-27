@@ -1,0 +1,44 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gtk-layer-shell
+pkgver=0.10.1
+pkgrel=1
+pkgdesc="Library for creating layer-shell surfaces with GTK"
+arch=('x86_64')
+url="https://github.com/wmww/gtk-layer-shell"
+license=('LGPL-3.0-or-later')
+depends=('glibc' 'gtk3' 'wayland')
+makedepends=('meson' 'ninja' 'pkgconf' 'wayland-protocols')
+source=("https://github.com/wmww/gtk-layer-shell/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Dexamples=false \
+    -Ddocs=false \
+    -Dtests=false \
+    -Dintrospection=false \
+    -Dvapi=false
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
