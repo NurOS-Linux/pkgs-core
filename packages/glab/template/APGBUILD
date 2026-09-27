@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=glab
+pkgver=1.119.0
+pkgrel=1
+pkgdesc="GitLab command line tool"
+arch=('x86_64')
+url="https://gitlab.com/gitlab-org/cli"
+license=('MIT')
+depends=('glibc' 'git')
+makedepends=('go')
+source=("https://gitlab.com/gitlab-org/cli/-/archive/v${pkgver}/cli-v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/cli-v${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/cli-v${pkgver}"
+
+  export CGO_ENABLED=0
+  go build -trimpath -ldflags="-s -w -X main.version=${pkgver}" -o glab ./cmd/glab
+}
+
+package() {
+  cd "${srcdir}/cli-v${pkgver}"
+
+  install -Dm755 glab "${pkgdir}/usr/bin/glab"
+}
