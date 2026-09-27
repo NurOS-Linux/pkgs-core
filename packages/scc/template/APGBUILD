@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=scc
+pkgver=4.1.0
+pkgrel=1
+pkgdesc="Fast and accurate code counter with complexity calculations"
+arch=('x86_64')
+url="https://github.com/boyter/scc"
+license=('MIT')
+depends=('glibc')
+makedepends=('go')
+source=("https://github.com/boyter/scc/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  export CGO_ENABLED=0
+  go build -trimpath -ldflags="-s -w" -o scc
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 scc "${pkgdir}/usr/bin/scc"
+}
