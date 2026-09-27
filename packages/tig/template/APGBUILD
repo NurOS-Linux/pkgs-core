@@ -1,0 +1,37 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=tig
+pkgver=2.6.1
+pkgrel=1
+pkgdesc="Text-mode interface for git"
+arch=('x86_64')
+url="https://jonas.github.io/tig/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'ncurses' 'readline' 'git')
+makedepends=('pkgconf')
+source=("https://github.com/jonas/tig/releases/download/${pkgname}-${pkgver}/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
