@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_platformdirs
+pkgver=4.12.0
+pkgrel=1
+pkgdesc="A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`."
+arch=('any')
+url="https://github.com/tox-dev/platformdirs"
+license=('MIT')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_hatch_vcs' 'pypi_hatchling')
+provides=('platformdirs')
+source=("https://files.pythonhosted.org/packages/23/4d/e78afe1b449720c481884ca0a2f960f85f9ffdaa34b2d127b5427422c564/platformdirs-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/platformdirs-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/platformdirs-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
