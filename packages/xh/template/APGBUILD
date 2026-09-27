@@ -1,0 +1,35 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=xh
+pkgver=0.26.2
+pkgrel=1
+pkgdesc="Friendly and fast tool for sending HTTP requests"
+arch=('x86_64')
+url="https://github.com/ducaale/xh"
+license=('MIT')
+depends=('glibc' 'gcc' 'openssl')
+makedepends=('cargo' 'pkgconf')
+source=("https://github.com/ducaale/xh/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  cargo fetch --locked
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  cargo build --frozen --release
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 "target/release/xh" "${pkgdir}/usr/bin/xh"
+}
