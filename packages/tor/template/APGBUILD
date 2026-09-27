@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=tor
+pkgver=0.4.9.13
+pkgrel=1
+pkgdesc="Anonymizing overlay network"
+arch=('x86_64')
+url="https://www.torproject.org/"
+license=('BSD-3-Clause')
+depends=('glibc' 'libevent' 'openssl' 'zlib' 'xz' 'zstd' 'libcap')
+makedepends=('pkgconf')
+source=("https://dist.torproject.org/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --disable-unittests \
+    --enable-lzma \
+    --enable-zstd
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
