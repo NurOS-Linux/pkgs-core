@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_mdurl
+pkgver=0.1.2
+pkgrel=1
+pkgdesc="Markdown URL utilities"
+arch=('any')
+url="https://github.com/executablebooks/mdurl"
+license=('MIT')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_flit_core')
+provides=('mdurl')
+source=("https://files.pythonhosted.org/packages/d6/54/cfe61301667036ec958cb99bd3efefba235e65cdeb9c84d24a8293ba1d90/mdurl-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/mdurl-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/mdurl-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
