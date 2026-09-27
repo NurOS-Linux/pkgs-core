@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=nnn
+pkgver=5.3
+pkgrel=1
+pkgdesc="Small, fast terminal file manager"
+arch=('x86_64')
+url="https://github.com/jarun/nnn"
+license=('BSD-2-Clause')
+depends=('glibc' 'ncurses' 'readline')
+makedepends=('pkgconf')
+source=("https://github.com/jarun/nnn/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make O_NERD=1
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr DESTDIR="${pkgdir}" install
+  make PREFIX=/usr DESTDIR="${pkgdir}" install-desktop
+}
