@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=gptfdisk
+pkgver=1.0.10
+pkgrel=1
+pkgdesc="Text-mode GPT partition table manipulators"
+arch=('x86_64')
+url="https://www.rodsbooks.com/gdisk/"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'gcc' 'popt' 'util-linux' 'ncurses' 'icu')
+makedepends=()
+source=("https://downloads.sourceforge.net/project/gptfdisk/gptfdisk/${pkgver}/${pkgname}-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 gdisk "${pkgdir}/usr/bin/gdisk"
+  install -Dm755 sgdisk "${pkgdir}/usr/bin/sgdisk"
+  install -Dm755 cgdisk "${pkgdir}/usr/bin/cgdisk"
+  install -Dm755 fixparts "${pkgdir}/usr/bin/fixparts"
+  install -Dm644 gdisk.8 "${pkgdir}/usr/share/man/man8/gdisk.8"
+  install -Dm644 sgdisk.8 "${pkgdir}/usr/share/man/man8/sgdisk.8"
+  install -Dm644 cgdisk.8 "${pkgdir}/usr/share/man/man8/cgdisk.8"
+  install -Dm644 fixparts.8 "${pkgdir}/usr/share/man/man8/fixparts.8"
+}
