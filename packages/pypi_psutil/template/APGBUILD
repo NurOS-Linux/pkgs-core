@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_psutil
+pkgver=7.2.2
+pkgrel=1
+pkgdesc="Cross-platform lib for process and system monitoring."
+arch=('x86_64')
+url="https://github.com/giampaolo/psutil"
+license=('BSD-3-Clause')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools' 'gcc')
+provides=('psutil')
+source=("https://files.pythonhosted.org/packages/aa/c6/d1ddf4abb55e93cebc4f2ed8b5d6dbad109ecb8d63748dd2b20ab5e57ebe/psutil-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/psutil-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/psutil-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
