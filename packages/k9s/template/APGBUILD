@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=k9s
+pkgver=0.51.0
+pkgrel=1
+pkgdesc="Terminal UI for Kubernetes clusters"
+arch=('x86_64')
+url="https://k9scli.io/"
+license=('Apache-2.0')
+depends=('glibc')
+makedepends=('go')
+source=("https://github.com/derailed/k9s/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  export CGO_ENABLED=0
+  go build -trimpath -ldflags="-s -w -X github.com/derailed/k9s/cmd.version=v${pkgver}" -o k9s
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 k9s "${pkgdir}/usr/bin/k9s"
+}
