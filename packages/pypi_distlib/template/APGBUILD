@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_distlib
+pkgver=0.4.3
+pkgrel=1
+pkgdesc="Distribution utilities"
+arch=('any')
+url="https://github.com/pypa/distlib"
+license=('PSF-2.0')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools' 'pypi_wheel')
+provides=('distlib')
+source=("https://files.pythonhosted.org/packages/c9/02/bd72be9134d25ed783ecbbc38a539ffaefbf90c78418c7fb7229600dbac7/distlib-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/distlib-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/distlib-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
