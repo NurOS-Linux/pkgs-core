@@ -1,0 +1,45 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=foot
+pkgver=1.28.0
+pkgrel=1
+pkgdesc="Fast, lightweight and minimalistic Wayland terminal emulator"
+arch=('x86_64')
+url="https://codeberg.org/dnkl/foot"
+license=('MIT')
+depends=(
+  'glibc' 'wayland' 'fontconfig' 'freetype' 'harfbuzz' 'libxkbcommon'
+  'pixman' 'fcft' 'utf8proc' 'ncurses'
+)
+makedepends=('meson' 'ninja' 'pkgconf' 'wayland-protocols')
+source=("https://codeberg.org/dnkl/foot/archive/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/foot"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/foot"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Ddocs=disabled \
+    -Dtests=false \
+    -Dterminfo=enabled
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/foot"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
