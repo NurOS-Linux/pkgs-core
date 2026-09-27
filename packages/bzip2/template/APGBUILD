@@ -25,6 +25,7 @@ prepare() {
 build() {
   cd "${srcdir}/${pkgname}-${pkgver}"
 
+  make clean
   make -f Makefile-libbz2_so
   make clean
   make bzip2 bzip2recover
