@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_multidict
+pkgver=7.0.0
+pkgrel=1
+pkgdesc="multidict implementation"
+arch=('x86_64')
+url="https://github.com/aio-libs/multidict"
+license=('Apache-2.0')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools' 'gcc')
+provides=('multidict')
+source=("https://files.pythonhosted.org/packages/c4/64/642465a4827331a98ba4ae29f97658be25d1bdcb868872a2f78f7482b507/multidict-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/multidict-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/multidict-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
