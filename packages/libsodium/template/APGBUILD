@@ -8,7 +8,7 @@ arch=('x86_64')
 url="https://libsodium.org/"
 license=('ISC')
 depends=('glibc')
-source=("https://download.libsodium.org/libsodium/releases/libsodium-${pkgver}.tar.gz")
+source=("https://github.com/jedisct1/libsodium/releases/download/${pkgver}-RELEASE/libsodium-${pkgver}.tar.gz")
 
 prepare() {
   local dir="${srcdir}/${pkgname}-${pkgver}"
