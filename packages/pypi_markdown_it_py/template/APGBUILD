@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_markdown_it_py
+pkgver=4.2.0
+pkgrel=1
+pkgdesc="Python port of markdown-it. Markdown parsing, done right!"
+arch=('any')
+url="https://github.com/executablebooks/markdown-it-py"
+license=('MIT')
+depends=('python' 'pypi_mdurl')
+makedepends=('python' 'pypi_pip' 'pypi_flit_core')
+provides=('markdown-it-py')
+source=("https://files.pythonhosted.org/packages/06/ff/7841249c247aa650a76b9ee4bbaeae59370dc8bfd2f6c01f3630c35eb134/markdown_it_py-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/markdown_it_py-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/markdown_it_py-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
