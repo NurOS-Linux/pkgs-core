@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_hatch_vcs
+pkgver=0.5.0
+pkgrel=1
+pkgdesc="Hatch plugin for versioning with your preferred VCS"
+arch=('any')
+url="https://github.com/ofek/hatch-vcs"
+license=('MIT')
+depends=('python' 'pypi_hatchling' 'pypi_setuptools_scm')
+makedepends=('python' 'pypi_pip' 'pypi_hatchling')
+provides=('hatch-vcs')
+source=("https://files.pythonhosted.org/packages/6b/b0/4cc743d38adbee9d57d786fa496ed1daadb17e48589b6da8fa55717a0746/hatch_vcs-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/hatch_vcs-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/hatch_vcs-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
