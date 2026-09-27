@@ -1,0 +1,26 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pass
+pkgver=1.7.4
+pkgrel=1
+pkgdesc="Stores, retrieves, generates and synchronizes passwords securely"
+arch=('any')
+url="https://www.passwordstore.org/"
+license=('GPL-2.0-or-later')
+depends=('bash' 'gnupg' 'git' 'tree')
+makedepends=()
+source=("https://git.zx2c4.com/password-store/snapshot/password-store-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/password-store-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/password-store-${pkgver}"
+
+  make PREFIX=/usr WITH_ALLCOMP=yes DESTDIR="${pkgdir}" install
+}
