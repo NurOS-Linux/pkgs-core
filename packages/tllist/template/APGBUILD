@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=tllist
+pkgver=1.1.0
+pkgrel=1
+pkgdesc="C header-only linked list implementation"
+arch=('x86_64')
+url="https://codeberg.org/dnkl/tllist"
+license=('MIT')
+depends=()
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://codeberg.org/dnkl/tllist/archive/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/tllist"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/tllist"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/tllist"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
