@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_filelock
+pkgver=4.0.4
+pkgrel=1
+pkgdesc="A platform independent file lock."
+arch=('any')
+url="https://github.com/tox-dev/py-filelock"
+license=('MIT')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_hatch_vcs' 'pypi_hatchling')
+provides=('filelock')
+source=("https://files.pythonhosted.org/packages/c8/d7/37691dc5063438a448b646f6f2442b4beebf16cc0e18d8cdfa7aeec60b8c/filelock-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/filelock-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/filelock-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
