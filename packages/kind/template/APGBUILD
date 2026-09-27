@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=kind
+pkgver=0.33.0
+pkgrel=1
+pkgdesc="Run local Kubernetes clusters using container nodes"
+arch=('x86_64')
+url="https://kind.sigs.k8s.io/"
+license=('Apache-2.0')
+depends=('glibc')
+makedepends=('go')
+source=("https://github.com/kubernetes-sigs/kind/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  export CGO_ENABLED=0
+  go build -trimpath -ldflags="-s -w" -o kind
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 kind "${pkgdir}/usr/bin/kind"
+}
