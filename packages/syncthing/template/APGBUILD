@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=syncthing
+pkgver=2.1.5
+pkgrel=1
+pkgdesc="Open source continuous file synchronization"
+arch=('x86_64')
+url="https://syncthing.net/"
+license=('MPL-2.0')
+depends=('glibc')
+makedepends=('go')
+source=("https://github.com/syncthing/syncthing/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  export CGO_ENABLED=0
+  go build -trimpath -tags noupgrade -ldflags="-s -w -X github.com/syncthing/syncthing/lib/build.Version=v${pkgver} -X github.com/syncthing/syncthing/lib/build.Stamp=0 -X github.com/syncthing/syncthing/lib/build.User=nuros -X github.com/syncthing/syncthing/lib/build.Host=nuros" -o syncthing ./cmd/syncthing
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 syncthing "${pkgdir}/usr/bin/syncthing"
+}
