@@ -1,0 +1,41 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=irqbalance
+pkgver=1.9.5
+pkgrel=1
+pkgdesc="Distribute hardware interrupts across processors"
+arch=('x86_64')
+url="https://github.com/Irqbalance/irqbalance"
+license=('GPL-2.0-only')
+depends=('glibc' 'glib' 'libcap-ng' 'libnl' 'ncurses')
+makedepends=('autoconf' 'automake' 'libtool' 'pkgconf')
+source=("https://github.com/Irqbalance/irqbalance/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  autoreconf -fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sbindir=/usr/bin \
+    --without-systemd
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
