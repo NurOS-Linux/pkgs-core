@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_defusedxml
+pkgver=0.7.1
+pkgrel=1
+pkgdesc="XML bomb protection for Python stdlib modules"
+arch=('any')
+url="https://github.com/tiran/defusedxml"
+license=('PSF-2.0')
+depends=('python')
+makedepends=('python' 'pypi_pip')
+provides=('defusedxml')
+source=("https://files.pythonhosted.org/packages/0f/d5/c66da9b79e5bdb124974bfe172b4daf3c984ebd9c2a06e2b8a4dc7331c72/defusedxml-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/defusedxml-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/defusedxml-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
