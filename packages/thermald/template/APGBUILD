@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=thermald
+pkgver=2.5.13
+pkgrel=1
+pkgdesc="Linux thermal daemon for Intel processors"
+arch=('x86_64')
+url="https://github.com/intel/thermal_daemon"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'gcc' 'glib' 'libxml2' 'upower' 'libevdev')
+makedepends=('autoconf' 'automake' 'libtool' 'pkgconf' 'gtk-doc')
+source=("https://github.com/intel/thermal_daemon/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/thermal_daemon-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  autoreconf -fi
+}
+
+build() {
+  cd "${srcdir}/thermal_daemon-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --sbindir=/usr/bin \
+    --disable-werror
+
+  make
+}
+
+package() {
+  cd "${srcdir}/thermal_daemon-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
