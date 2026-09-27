@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_virtualenv
+pkgver=21.13.0
+pkgrel=1
+pkgdesc="Virtual Python Environment builder"
+arch=('any')
+url="https://github.com/pypa/virtualenv"
+license=('MIT')
+depends=('python' 'pypi_distlib' 'pypi_filelock' 'pypi_platformdirs' 'pypi_python_discovery')
+makedepends=('python' 'pypi_pip' 'pypi_hatch_vcs' 'pypi_hatchling')
+provides=('virtualenv')
+source=("https://files.pythonhosted.org/packages/31/0b/825cbfd46beb2cc96c46403141081190c1afd1a348d0232a4ebcb6dcd362/virtualenv-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/virtualenv-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/virtualenv-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
