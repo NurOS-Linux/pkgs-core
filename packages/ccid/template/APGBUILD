@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ccid
+pkgver=1.8.4
+pkgrel=1
+pkgdesc="Generic USB CCID smart card reader driver"
+arch=('x86_64')
+url="https://ccid.apdu.fr/"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'libusb' 'pcsc-lite' 'eudev' 'zlib')
+makedepends=('meson' 'ninja' 'pkgconf' 'flex')
+source=("https://ccid.apdu.fr/files/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
