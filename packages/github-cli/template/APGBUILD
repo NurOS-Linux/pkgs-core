@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=github-cli
+pkgver=2.101.0
+pkgrel=1
+pkgdesc="GitHub command line tool"
+arch=('x86_64')
+url="https://cli.github.com/"
+license=('MIT')
+depends=('glibc' 'git')
+makedepends=('go')
+source=("https://github.com/cli/cli/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/cli-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/cli-${pkgver}"
+
+  export CGO_ENABLED=0
+  go build -trimpath -ldflags="-s -w -X github.com/cli/cli/v2/internal/build.Version=${pkgver}" -o gh ./cmd/gh
+}
+
+package() {
+  cd "${srcdir}/cli-${pkgver}"
+
+  install -Dm755 gh "${pkgdir}/usr/bin/gh"
+}
