@@ -1,0 +1,26 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=prettier
+pkgver=3.9.9
+pkgrel=1
+pkgdesc="Opinionated code formatter"
+arch=('any')
+url="https://www.npmjs.com/package/prettier"
+license=('MIT')
+depends=('nodejs')
+makedepends=('npm')
+source=("https://registry.npmjs.org/prettier/-/${pkgname}-${pkgver}.tgz")
+
+prepare() {
+  local dir="${srcdir}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}"
+
+  npm install -g --prefix "${pkgdir}/usr" --no-audit --no-fund "${srcdir}/prettier-${pkgver}.tgz"
+}
