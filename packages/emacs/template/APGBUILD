@@ -1,0 +1,53 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=emacs
+pkgver=31.1
+pkgrel=1
+pkgdesc="Extensible, customizable, self-documenting text editor"
+arch=('x86_64')
+url="https://www.gnu.org/software/emacs/"
+license=('GPL-3.0-or-later')
+depends=(
+  'glibc' 'gtk3' 'gnutls' 'jansson' 'libxml2' 'sqlite' 'tree-sitter'
+  'ncurses' 'harfbuzz' 'cairo' 'libx11' 'libxpm' 'libjpeg-turbo' 'libpng'
+  'libtiff' 'libwebp' 'zlib' 'fontconfig' 'freetype'
+)
+makedepends=('pkgconf')
+source=("https://ftp.gnu.org/gnu/emacs/${pkgname}-${pkgver}.tar.xz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --with-x-toolkit=gtk3 \
+    --with-native-compilation=no \
+    --with-tree-sitter \
+    --with-sqlite3 \
+    --with-gnutls \
+    --without-gif \
+    --without-rsvg \
+    --without-pgtk \
+    --without-libsystemd \
+    --without-selinux \
+    --without-compress-install
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
