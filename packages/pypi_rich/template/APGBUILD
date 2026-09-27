@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_rich
+pkgver=15.0.0
+pkgrel=1
+pkgdesc="Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
+arch=('any')
+url="https://github.com/Textualize/rich"
+license=('MIT')
+depends=('python' 'pypi_markdown_it_py' 'pypi_pygments')
+makedepends=('python' 'pypi_pip' 'pypi_poetry_core')
+provides=('rich')
+source=("https://files.pythonhosted.org/packages/c0/8f/0722ca900cc807c13a6a0c696dacf35430f72e0ec571c4275d2371fca3e9/rich-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/rich-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/rich-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
