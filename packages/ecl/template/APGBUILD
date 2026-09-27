@@ -1,0 +1,40 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=ecl
+pkgver=26.5.5
+pkgrel=1
+pkgdesc="Embeddable Common Lisp"
+arch=('x86_64')
+url="https://ecl.common-lisp.dev/"
+license=('LGPL-2.1-or-later')
+depends=('glibc' 'gmp' 'libffi' 'gc')
+makedepends=('pkgconf')
+source=("https://ecl.common-lisp.dev/static/files/release/${pkgname}-${pkgver}.tgz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr \
+    --enable-boehm=system \
+    --with-libffi-prefix=/usr \
+    --with-gmp-prefix=/usr \
+    --enable-threads
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
