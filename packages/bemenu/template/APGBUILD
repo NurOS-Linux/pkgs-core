@@ -1,0 +1,32 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=bemenu
+pkgver=0.6.23
+pkgrel=1
+pkgdesc="Dynamic menu library and client program inspired by dmenu"
+arch=('x86_64')
+url="https://github.com/Cloudef/bemenu"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'wayland' 'cairo' 'pango' 'libxkbcommon' 'libx11' 'ncurses')
+makedepends=('pkgconf' 'wayland-protocols')
+source=("https://github.com/Cloudef/bemenu/archive/refs/tags/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make PREFIX=/usr DESTDIR="${pkgdir}" install
+}
