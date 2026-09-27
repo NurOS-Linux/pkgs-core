@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_cfgv
+pkgver=3.5.0
+pkgrel=1
+pkgdesc="Validate configuration and produce human readable error messages."
+arch=('any')
+url="https://github.com/asottile/cfgv"
+license=('MIT')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools' 'pypi_wheel')
+provides=('cfgv')
+source=("https://files.pythonhosted.org/packages/4e/b5/721b8799b04bf9afe054a3899c6cf4e880fcf8563cc71c15610242490a0c/cfgv-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/cfgv-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/cfgv-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
