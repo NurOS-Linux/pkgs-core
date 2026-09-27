@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_requests
+pkgver=2.34.2
+pkgrel=1
+pkgdesc="Python HTTP for Humans."
+arch=('any')
+url="https://github.com/psf/requests"
+license=('Apache-2.0')
+depends=('python' 'pypi_charset_normalizer' 'pypi_idna' 'pypi_urllib3' 'pypi_certifi')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools')
+provides=('requests')
+source=("https://files.pythonhosted.org/packages/ac/c3/e2a2b89f2d3e2179abd6d00ebd70bff6273f37fb3e0cc209f48b39d00cbf/requests-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/requests-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/requests-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
