@@ -1,0 +1,36 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=testdisk
+pkgver=7.2
+pkgrel=1
+pkgdesc="Data recovery and partition repair (TestDisk and PhotoRec)"
+arch=('x86_64')
+url="https://www.cgsecurity.org/wiki/TestDisk"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'ncurses' 'e2fsprogs' 'util-linux' 'zlib' 'openssl')
+makedepends=('pkgconf')
+source=("https://www.cgsecurity.org/${pkgname}-${pkgver}.tar.bz2")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
