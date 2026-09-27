@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_certifi
+pkgver=2026.7.22
+pkgrel=1
+pkgdesc="Python package for providing Mozilla's CA Bundle."
+arch=('any')
+url="https://github.com/certifi/python-certifi"
+license=('MPL-2.0')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools')
+provides=('certifi')
+source=("https://files.pythonhosted.org/packages/a3/c2/24167ea9858356b47a87a50d39908bfdb72ceeefe0041586e704e5376b3a/certifi-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/certifi-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/certifi-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
