@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_identify
+pkgver=2.6.20
+pkgrel=1
+pkgdesc="File identification library for Python"
+arch=('any')
+url="https://github.com/pre-commit/identify"
+license=('MIT')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools' 'pypi_wheel')
+provides=('identify')
+source=("https://files.pythonhosted.org/packages/53/35/d70c0006c7cee65999ea94a6273e60b2094f600a3d8b71b04318253fc643/identify-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/identify-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/identify-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
