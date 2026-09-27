@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_python_dotenv
+pkgver=1.2.3
+pkgrel=1
+pkgdesc="Read key-value pairs from a .env file and set them as environment variables"
+arch=('any')
+url="https://github.com/theskumar/python-dotenv"
+license=('BSD-3-Clause')
+depends=('python')
+makedepends=('python' 'pypi_pip' 'pypi_setuptools')
+provides=('python-dotenv')
+source=("https://files.pythonhosted.org/packages/6a/53/ed9d74092561d4b01a2ef1349d52cdbc135e526c245f366b089cfca6de49/python_dotenv-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/python_dotenv-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/python_dotenv-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
