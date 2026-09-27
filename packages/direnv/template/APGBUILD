@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=direnv
+pkgver=2.37.1
+pkgrel=1
+pkgdesc="Environment switcher for the shell"
+arch=('x86_64')
+url="https://direnv.net/"
+license=('MIT')
+depends=('glibc')
+makedepends=('go')
+source=("https://github.com/direnv/direnv/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  export CGO_ENABLED=0
+  go build -trimpath -ldflags="-s -w" -o direnv
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  install -Dm755 direnv "${pkgdir}/usr/bin/direnv"
+}
