@@ -1,0 +1,33 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=git-lfs
+pkgver=3.8.0
+pkgrel=1
+pkgdesc="Git extension for versioning large files"
+arch=('x86_64')
+url="https://git-lfs.com/"
+license=('MIT')
+depends=('git')
+makedepends=('go')
+source=("https://github.com/git-lfs/git-lfs/releases/download/v${pkgver}/git-lfs-v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/git-lfs-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/git-lfs-${pkgver}"
+
+  export CGO_ENABLED=0
+  go build -trimpath -ldflags="-s -w -X github.com/git-lfs/git-lfs/v3/config.Vendor=NurOS" -o git-lfs .
+}
+
+package() {
+  cd "${srcdir}/git-lfs-${pkgver}"
+
+  install -Dm755 git-lfs "${pkgdir}/usr/bin/git-lfs"
+}
