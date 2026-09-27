@@ -1,0 +1,27 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=pypi_python_discovery
+pkgver=1.6.1
+pkgrel=1
+pkgdesc="Python interpreter discovery"
+arch=('any')
+url="https://github.com/tox-dev/python-discovery"
+license=('MIT')
+depends=('python' 'pypi_filelock')
+makedepends=('python' 'pypi_pip' 'pypi_hatch_vcs' 'pypi_hatchling')
+provides=('python-discovery')
+source=("https://files.pythonhosted.org/packages/0c/57/250bd238b966cece44328235eb85290045d059265fdaf7527a3a958123db/python_discovery-${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/python_discovery-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+package() {
+  cd "${srcdir}/python_discovery-${pkgver}"
+
+  python3 -m pip install --no-deps --no-build-isolation --root="${pkgdir}" --prefix=/usr .
+}
