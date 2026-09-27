@@ -1,0 +1,39 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=nload
+pkgver=0.7.4
+pkgrel=1
+pkgdesc="Monitor network traffic and bandwidth usage"
+arch=('x86_64')
+url="https://github.com/rolandriegel/nload"
+license=('GPL-2.0-or-later')
+depends=('glibc' 'gcc' 'ncurses')
+makedepends=('autoconf' 'automake' 'pkgconf' 'libtool')
+source=("https://github.com/rolandriegel/nload/archive/refs/tags/v${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/${pkgname}-${pkgver}"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+
+  cd "${dir}"
+  autoreconf -fi
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure \
+    --prefix=/usr
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+  rm -f "${pkgdir}/usr/share/info/dir"
+}
