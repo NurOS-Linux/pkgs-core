@@ -1,0 +1,42 @@
+# Maintainer: AnmiTaliDev <anmitalidev@nuros.org>
+
+pkgname=fcft
+pkgver=3.3.3
+pkgrel=1
+pkgdesc="Simple font loading and glyph rasterization library"
+arch=('x86_64')
+url="https://codeberg.org/dnkl/fcft"
+license=('MIT')
+depends=('glibc' 'fontconfig' 'freetype' 'harfbuzz' 'pixman' 'utf8proc' 'tllist')
+makedepends=('meson' 'ninja' 'pkgconf')
+source=("https://codeberg.org/dnkl/fcft/archive/${pkgver}.tar.gz")
+
+prepare() {
+  local dir="${srcdir}/fcft"
+  if [ ! -d "${dir}" ]; then
+    echo "Error: ${dir} not found" >&2
+    return 1
+  fi
+}
+
+build() {
+  cd "${srcdir}/fcft"
+
+  rm -rf build
+  meson setup build \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --buildtype=release \
+    -Ddocs=disabled \
+    -Dtest-text-shaping=false \
+    -Dsvg-backend=none
+
+  ninja -C build
+}
+
+package() {
+  cd "${srcdir}/fcft"
+
+  DESTDIR="${pkgdir}" ninja -C build install
+}
