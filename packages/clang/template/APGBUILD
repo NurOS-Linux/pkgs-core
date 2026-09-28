@@ -7,7 +7,7 @@ pkgdesc="C language family frontend for LLVM"
 arch=('x86_64')
 url="https://clang.llvm.org/"
 license=('Apache-2.0 WITH LLVM-exception')
-depends=('llvm' 'glibc' 'gcc')
+depends=('llvm' 'glibc' 'gcc' 'libxml2')
 makedepends=('llvm' 'cmake' 'ninja' 'python')
 source=("https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}/llvm-project-${pkgver}.src.tar.xz")
 
