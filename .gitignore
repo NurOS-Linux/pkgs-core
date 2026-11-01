@@ -11,3 +11,7 @@
 *.tbz2
 *.txz
 *.zip
+
+# Python bytecode
+__pycache__/
+*.py[cod]
