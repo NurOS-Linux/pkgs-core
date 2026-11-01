@@ -1,0 +1,56 @@
+name: Weekly package database generation
+
+on:
+  schedule:
+    - cron: '17 2 * * 2'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: package-maintenance
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Test database generator
+        run: python -m unittest discover -s scripts -p 'test_bd_gen.py'
+
+      - name: Generate and validate database
+        run: |
+          python scripts/bd-gen.py
+          python scripts/bd-gen.py --check
+
+      - name: Commit updated database
+        shell: bash
+        run: |
+          git add -- packages.json
+          if git diff --cached --quiet; then
+            echo "No package database changes."
+            exit 0
+          fi
+          git -c user.name='github-actions[bot]' \
+              -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+              commit -m "chore: regenerate package database"
+          git pull --rebase
+          python scripts/bd-gen.py
+          python scripts/bd-gen.py --check
+          git add -- packages.json
+          if ! git diff --cached --quiet; then
+            git -c user.name='github-actions[bot]' \
+                -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+                commit -m "chore: refresh database after rebase"
+          fi
+          git push

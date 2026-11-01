@@ -61,6 +61,22 @@ not parsed or invoked. `--stdout` prints
 JSON and `--output FILE` selects an alternative destination. Generation is
 deterministic and fails on extraction errors or duplicate package names.
 
+## Weekly automation
+
+Two GitHub Actions workflows maintain the default branch:
+
+* `.github/workflows/bump.yml`: Monday at 02:17 UTC, runs
+  `python scripts/bump.py --bump` (the next available version, not `--latest`)
+  and commits changed APGBUILD recipes.
+* `.github/workflows/package-database.yml`: Tuesday at 02:17 UTC, tests the
+  generator, regenerates and validates `packages.json`, and commits changes.
+
+Both support manual runs through `workflow_dispatch`, share a concurrency
+group to avoid overlapping writes, and skip commits when nothing changes.
+Schedules become active once the workflows are on the default branch.
+GitHub Actions needs permission to push to that branch. These workflows update
+the GitHub repository; synchronization to the Forgejo primary is separate.
+
 ## License
 
 All package recipes in this repository are licensed under the MIT License unless stated otherwise.
